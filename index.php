@@ -42,7 +42,7 @@
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
-      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+      <a href="index.php" class="logo d-flex align-items-center me-auto me-xl-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <!-- <img src="assets/img/logo.webp" alt=""> -->
         <svg class="my-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -72,22 +72,22 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.html" class="active">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="departments.html">Departments</a></li>
-          <li><a href="services.html">Services</a></li>
-          <li><a href="doctors.html">Doctors</a></li>
+          <li><a href="index.php" class="active">Home</a></li>
+          <li><a href="about.php">About</a></li>
+          <li><a href="departments.php">Departments</a></li>
+          <li><a href="services.php">Services</a></li>
+          <li><a href="doctors.php">Doctors</a></li>
           <li class="dropdown"><a href="#"><span>More Pages</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
-              <li><a href="department-details.html">Department Details</a></li>
-              <li><a href="service-details.html">Service Details</a></li>
-              <li><a href="appointment.html">Appointment</a></li>
-              <li><a href="testimonials.html">Testimonials</a></li>
-              <li><a href="faq.html">Frequently Asked Questions</a></li>
-              <li><a href="gallery.html">Gallery</a></li>
-              <li><a href="terms.html">Terms</a></li>
-              <li><a href="privacy.html">Privacy</a></li>
-              <li><a href="404.html">404</a></li>
+              <li><a href="department-details.php">Department Details</a></li>
+              <li><a href="service-details.php">Service Details</a></li>
+              <li><a href="appointment.php">Appointment</a></li>
+              <li><a href="testimonials.php">Testimonials</a></li>
+              <li><a href="faq.php">Frequently Asked Questions</a></li>
+              <li><a href="gallery.php">Gallery</a></li>
+              <li><a href="terms.php">Terms</a></li>
+              <li><a href="privacy.php">Privacy</a></li>
+              <li><a href="404.php">404</a></li>
             </ul>
           </li>
           <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
@@ -107,12 +107,12 @@
               <li><a href="#">Dropdown 4</a></li>
             </ul>
           </li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="contact.php">Contact</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      <a class="btn-getstarted" href="appointment.html">Appointment</a>
+      <a class="btn-getstarted" href="appointment.php">Appointment</a>
 
     </div>
   </header>
@@ -137,8 +137,8 @@
                     <p data-aos="fade-up" data-aos-delay="250">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
 
                     <div class="cta-group" data-aos="fade-up" data-aos-delay="300">
-                      <a href="appointment.html" class="btn btn-primary">Book Appointment</a>
-                      <a href="services.html" class="btn btn-outline">Explore Services</a>
+                      <a href="appointment.php" class="btn btn-primary">Book Appointment</a>
+                      <a href="services.php" class="btn btn-outline">Explore Services</a>
                     </div>
 
                     <div class="info-badges" data-aos="fade-up" data-aos-delay="350">
@@ -255,7 +255,7 @@
               </div>
 
               <div class="cta-wrapper mt-4">
-                <a href="about.html" class="btn btn-primary">Learn More About Us</a>
+                <a href="about.php" class="btn btn-primary">Learn More About Us</a>
                 <a href="#" class="btn btn-outline">Meet Our Team</a>
               </div>
             </div>
@@ -312,7 +312,7 @@
                 </div>
                 <h3>Cardiology</h3>
                 <p>Comprehensive cardiovascular care with advanced diagnostic techniques and treatment options for heart conditions, ensuring optimal cardiac health for all patients.</p>
-                <a href="department-details.html" class="btn-learn-more">
+                <a href="department-details.php" class="btn-learn-more">
                   <span>Learn More</span>
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -331,7 +331,7 @@
                 </div>
                 <h3>Neurology</h3>
                 <p>Expert neurological care specializing in brain and nervous system disorders, providing cutting-edge treatments and compassionate support for neurological conditions.</p>
-                <a href="department-details.html" class="btn-learn-more">
+                <a href="department-details.php" class="btn-learn-more">
                   <span>Learn More</span>
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -350,7 +350,7 @@
                 </div>
                 <h3>Orthopedics</h3>
                 <p>Advanced musculoskeletal care focusing on bones, joints, and muscles with innovative surgical and non-surgical treatment approaches for mobility restoration.</p>
-                <a href="department-details.html" class="btn-learn-more">
+                <a href="department-details.php" class="btn-learn-more">
                   <span>Learn More</span>
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -369,7 +369,7 @@
                 </div>
                 <h3>Pediatrics</h3>
                 <p>Specialized healthcare for children from infancy through adolescence, offering comprehensive medical care in a child-friendly environment with experienced pediatric specialists.</p>
-                <a href="department-details.html" class="btn-learn-more">
+                <a href="department-details.php" class="btn-learn-more">
                   <span>Learn More</span>
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -388,7 +388,7 @@
                 </div>
                 <h3>Oncology</h3>
                 <p>Comprehensive cancer care with multidisciplinary approach, offering advanced treatment options, clinical trials, and compassionate support throughout the cancer journey.</p>
-                <a href="department-details.html" class="btn-learn-more">
+                <a href="department-details.php" class="btn-learn-more">
                   <span>Learn More</span>
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -407,7 +407,7 @@
                 </div>
                 <h3>Emergency Care</h3>
                 <p>Round-the-clock emergency medical services with rapid response capabilities, state-of-the-art equipment, and experienced emergency physicians for critical care.</p>
-                <a href="department-details.html" class="btn-learn-more">
+                <a href="department-details.php" class="btn-learn-more">
                   <span>Learn More</span>
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -447,7 +447,7 @@
                   <li><i class="fas fa-check-circle"></i>24/7 Emergency Care</li>
                   <li><i class="fas fa-check-circle"></i>Preventive Screenings</li>
                 </ul>
-                <a href="services.html" class="service-btn">
+                <a href="services.php" class="service-btn">
                   Learn More
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -468,7 +468,7 @@
                   <li><i class="fas fa-check-circle"></i>Stroke Treatment Center</li>
                   <li><i class="fas fa-check-circle"></i>Neurological Rehabilitation</li>
                 </ul>
-                <a href="services.html" class="service-btn">
+                <a href="services.php" class="service-btn">
                   Learn More
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -489,7 +489,7 @@
                   <li><i class="fas fa-check-circle"></i>Sports Medicine</li>
                   <li><i class="fas fa-check-circle"></i>Minimally Invasive Procedures</li>
                 </ul>
-                <a href="services.html" class="service-btn">
+                <a href="services.php" class="service-btn">
                   Learn More
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -510,7 +510,7 @@
                   <li><i class="fas fa-check-circle"></i>Level 1 Trauma Center</li>
                   <li><i class="fas fa-check-circle"></i>Critical Care Units</li>
                 </ul>
-                <a href="services.html" class="service-btn">
+                <a href="services.php" class="service-btn">
                   Learn More
                   <i class="fas fa-arrow-right"></i>
                 </a>
@@ -741,8 +741,8 @@
             <p data-aos="fade-up" data-aos-delay="250">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
 
             <div class="cta-buttons" data-aos="fade-up" data-aos-delay="300">
-              <a href="appointment.html" class="btn-primary">Book Appointment</a>
-              <a href="doctors.html" class="btn-secondary">Find a Doctor</a>
+              <a href="appointment.php" class="btn-primary">Book Appointment</a>
+              <a href="doctors.php" class="btn-secondary">Find a Doctor</a>
             </div>
           </div>
         </div>
@@ -1008,7 +1008,7 @@
     <div class="container footer-top">
       <div class="row gy-4">
         <div class="col-lg-4 col-md-6 footer-about">
-          <a href="index.html" class="logo d-flex align-items-center">
+          <a href="index.php" class="logo d-flex align-items-center">
             <span class="sitename">MediTrust</span>
           </a>
           <div class="footer-contact pt-3">
