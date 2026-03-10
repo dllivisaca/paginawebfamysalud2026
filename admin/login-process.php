@@ -1,19 +1,28 @@
 <?php
-session_start();
+require_once "session-bootstrap.php";
 require_once "../db.php";
 
 function getClientIpAddress(): string
 {
-    if (!empty($_SERVER["HTTP_CLIENT_IP"])) {
-        return trim($_SERVER["HTTP_CLIENT_IP"]);
-    }
-
-    if (!empty($_SERVER["HTTP_X_FORWARDED_FOR"])) {
-        $parts = explode(",", $_SERVER["HTTP_X_FORWARDED_FOR"]);
-        return trim($parts[0]);
-    }
-
     return $_SERVER["REMOTE_ADDR"] ?? "0.0.0.0";
+}
+
+function failLogin(): void
+{
+    header("Location: login.php?error=invalid");
+    exit;
+}
+
+function logFailedAttempt(mysqli $conn, string $email, string $ipAddress): void
+{
+    $logSql = "INSERT INTO admin_login_attempts (email, ip_address, is_success)
+               VALUES (?, ?, 0)";
+    $logStmt = $conn->prepare($logSql);
+
+    if ($logStmt) {
+        $logStmt->bind_param("ss", $email, $ipAddress);
+        $logStmt->execute();
+    }
 }
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -23,14 +32,18 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
 $email = trim($_POST["email"] ?? "");
 $password = $_POST["password"] ?? "";
+$csrfToken = $_POST["csrf_token"] ?? "";
+
+if (!isset($_SESSION["csrf_token"]) || !hash_equals($_SESSION["csrf_token"], $csrfToken)) {
+    failLogin();
+}
 
 $ipAddress = getClientIpAddress();
 $maxAttempts = 5;
 $lockMinutes = 15;
 
 if ($email === "" || $password === "") {
-    header("Location: login.php?error=invalid");
-    exit;
+    failLogin();
 }
 
 $attemptSql = "SELECT COUNT(*) AS total_failed
@@ -42,7 +55,9 @@ $attemptSql = "SELECT COUNT(*) AS total_failed
 $attemptStmt = $conn->prepare($attemptSql);
 
 if (!$attemptStmt) {
-    die("Error al preparar la consulta de intentos: " . $conn->error);
+    error_log("No se pudo preparar la consulta de intentos de login.");
+    header("Location: login.php?error=unavailable");
+    exit;
 }
 
 $attemptStmt->bind_param("iss", $lockMinutes, $email, $ipAddress);
@@ -63,7 +78,9 @@ $sql = "SELECT id, name, email, password_hash, is_active
 $stmt = $conn->prepare($sql);
 
 if (!$stmt) {
-    die("Error al preparar la consulta: " . $conn->error);
+    error_log("No se pudo preparar la consulta de autenticacion.");
+    header("Location: login.php?error=unavailable");
+    exit;
 }
 
 $stmt->bind_param("s", $email);
@@ -71,56 +88,28 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows !== 1) {
-    $logSql = "INSERT INTO admin_login_attempts (email, ip_address, is_success)
-               VALUES (?, ?, 0)";
-    $logStmt = $conn->prepare($logSql);
-
-    if ($logStmt) {
-        $logStmt->bind_param("ss", $email, $ipAddress);
-        $logStmt->execute();
-    }
-
-    header("Location: login.php?error=invalid");
-    exit;
+    logFailedAttempt($conn, $email, $ipAddress);
+    failLogin();
 }
 
 $user = $result->fetch_assoc();
 
 if ((int) $user["is_active"] !== 1) {
-    $logSql = "INSERT INTO admin_login_attempts (email, ip_address, is_success)
-               VALUES (?, ?, 0)";
-    $logStmt = $conn->prepare($logSql);
-
-    if ($logStmt) {
-        $logStmt->bind_param("ss", $email, $ipAddress);
-        $logStmt->execute();
-    }
-
-    header("Location: login.php?error=inactive");
-    exit;
+    logFailedAttempt($conn, $email, $ipAddress);
+    failLogin();
 }
 
 if (!password_verify($password, $user["password_hash"])) {
-    $logSql = "INSERT INTO admin_login_attempts (email, ip_address, is_success)
-               VALUES (?, ?, 0)";
-    $logStmt = $conn->prepare($logSql);
-
-    if ($logStmt) {
-        $logStmt->bind_param("ss", $email, $ipAddress);
-        $logStmt->execute();
-    }
-
-    header("Location: login.php?error=invalid");
-    exit;
+    logFailedAttempt($conn, $email, $ipAddress);
+    failLogin();
 }
-
-session_regenerate_id(true);
 
 session_regenerate_id(true);
 
 $_SESSION["admin_id"] = (int) $user["id"];
 $_SESSION["admin_name"] = $user["name"];
 $_SESSION["admin_email"] = $user["email"];
+$_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 
 $successLogSql = "INSERT INTO admin_login_attempts (email, ip_address, is_success)
                   VALUES (?, ?, 1)";

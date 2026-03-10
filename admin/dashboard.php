@@ -73,16 +73,19 @@ require_once "auth-check.php";
         <div class="topbar">
             <div>
                 <h1>Dashboard</h1>
-                <p class="muted">Bienvenida, <?php echo htmlspecialchars($_SESSION["admin_name"]); ?></p>
+                <p class="muted">Bienvenida, <?php echo htmlspecialchars($_SESSION["admin_name"], ENT_QUOTES, "UTF-8"); ?></p>
             </div>
 
-            <a href="logout.php" class="btn btn-logout">Cerrar sesión</a>
+            <form action="logout.php" method="post" style="margin: 0;">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
+                <button type="submit" class="btn btn-logout" style="border: 0; cursor: pointer;">Cerrar sesi&oacute;n</button>
+            </form>
         </div>
 
         <div class="card">
-            <h3>Menú del sitio</h3>
-            <p class="muted">Administra los ítems del menú principal y sus submenús.</p>
-            <a href="menu/index.php">Ir al módulo de menú</a>
+            <h3>Men&uacute; del sitio</h3>
+            <p class="muted">Administra los &iacute;tems del men&uacute; principal y sus submen&uacute;s.</p>
+            <a href="menu/index.php">Ir al m&oacute;dulo de men&uacute;</a>
         </div>
     </div>
 
