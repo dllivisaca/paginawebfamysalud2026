@@ -1,0 +1,9 @@
+{
+  "name": "famysalud/panel-admin",
+  "description": "Proyecto PHP para el panel administrativo de FamySALUD.",
+  "type": "project",
+  "require": {
+    "phpmailer/phpmailer": "^7.0",
+    "vlucas/phpdotenv": "^5.6"
+  }
+}

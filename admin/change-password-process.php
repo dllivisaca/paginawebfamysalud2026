@@ -1,6 +1,7 @@
 <?php
 require_once "auth-check.php";
 require_once "../db.php";
+require_once "security-mailer.php";
 
 function redirectWithStatus(string $status): void
 {
@@ -54,7 +55,7 @@ if (!isset($_SESSION["admin_id"]) || !is_numeric($_SESSION["admin_id"])) {
 }
 
 $adminId = (int) $_SESSION["admin_id"];
-$sql = "SELECT password_hash FROM admin_users WHERE id = ? AND is_active = 1 LIMIT 1";
+$sql = "SELECT name, email, password_hash FROM admin_users WHERE id = ? AND is_active = 1 LIMIT 1";
 $stmt = $conn->prepare($sql);
 
 if (!$stmt) {
@@ -157,5 +158,12 @@ try {
 
 session_regenerate_id(true);
 $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+
+if (!empty($admin["email"])) {
+    sendPasswordChangedSecurityEmail(
+        $admin["email"],
+        $admin["name"] ?? ""
+    );
+}
 
 redirectWithStatus("success");
