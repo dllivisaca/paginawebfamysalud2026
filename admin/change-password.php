@@ -432,7 +432,7 @@ $status = $_GET["status"] ?? "";
                 <?php endif; ?>
 
                 <?php if ($status === "reused"): ?>
-                    <div class="alert alert-error">La nueva contrase&ntilde;a debe ser distinta a la actual.</div>
+                    <div class="alert alert-error">La nueva contrase&ntilde;a no puede coincidir con la actual ni con una de tus &uacute;ltimas 5 contrase&ntilde;as.</div>
                 <?php endif; ?>
 
                 <?php if ($status === "error"): ?>

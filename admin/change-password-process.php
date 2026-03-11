@@ -79,24 +79,79 @@ if (password_verify($newPassword, $admin["password_hash"])) {
     redirectWithStatus("reused");
 }
 
+$historySql = "SELECT password_hash
+               FROM admin_password_history
+               WHERE admin_user_id = ?
+               ORDER BY id DESC
+               LIMIT 5";
+$historyStmt = $conn->prepare($historySql);
+
+if (!$historyStmt) {
+    redirectWithStatus("error");
+}
+
+$historyStmt->bind_param("i", $adminId);
+$historyStmt->execute();
+$historyResult = $historyStmt->get_result();
+
+while ($historyRow = $historyResult->fetch_assoc()) {
+    if (isset($historyRow["password_hash"]) && password_verify($newPassword, $historyRow["password_hash"])) {
+        $historyStmt->close();
+        redirectWithStatus("reused");
+    }
+}
+
+$historyStmt->close();
+
 $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
 
 if ($newPasswordHash === false) {
     redirectWithStatus("error");
 }
 
-$updateSql = "UPDATE admin_users SET password_hash = ?, updated_at = NOW() WHERE id = ? LIMIT 1";
-$updateStmt = $conn->prepare($updateSql);
+$conn->begin_transaction();
 
-if (!$updateStmt) {
-    redirectWithStatus("error");
-}
+try {
+    $insertHistorySql = "INSERT INTO admin_password_history (admin_user_id, password_hash)
+                         VALUES (?, ?)";
+    $insertHistoryStmt = $conn->prepare($insertHistorySql);
 
-$updateStmt->bind_param("si", $newPasswordHash, $adminId);
-$ok = $updateStmt->execute();
-$updateStmt->close();
+    if (!$insertHistoryStmt) {
+        throw new Exception("No se pudo preparar el historial de contraseñas.");
+    }
 
-if (!$ok) {
+    $currentPasswordHash = $admin["password_hash"];
+    $insertHistoryStmt->bind_param("is", $adminId, $currentPasswordHash);
+
+    if (!$insertHistoryStmt->execute()) {
+        $insertHistoryStmt->close();
+        throw new Exception("No se pudo guardar la contraseña anterior en el historial.");
+    }
+
+    $insertHistoryStmt->close();
+
+    $updateSql = "UPDATE admin_users
+                  SET password_hash = ?, updated_at = NOW()
+                  WHERE id = ?
+                  LIMIT 1";
+    $updateStmt = $conn->prepare($updateSql);
+
+    if (!$updateStmt) {
+        throw new Exception("No se pudo preparar la actualización de contraseña.");
+    }
+
+    $updateStmt->bind_param("si", $newPasswordHash, $adminId);
+
+    if (!$updateStmt->execute()) {
+        $updateStmt->close();
+        throw new Exception("No se pudo actualizar la nueva contraseña.");
+    }
+
+    $updateStmt->close();
+
+    $conn->commit();
+} catch (Throwable $e) {
+    $conn->rollback();
     redirectWithStatus("error");
 }
 
