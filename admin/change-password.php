@@ -369,7 +369,7 @@ $status = $_GET["status"] ?? "";
 
                     <a href="menu/index.php">
                         <span class="nav-icon">&#128203;</span>
-                        <span>Men&uacute; del sitio</span>
+                        <span>Men&uacute; de navegaci&oacute;n</span>
                     </a>
                 </nav>
             </div>

@@ -335,28 +335,28 @@ require_once "auth-check.php";
                 <p class="sidebar-section-title">Principal</p>
                 <nav class="nav">
                     <a href="dashboard.php" class="active">
-                        <span class="nav-icon">🏠</span>
+                        <span class="nav-icon">&#127968;</span>
                         <span>Panel de inicio</span>
                     </a>
 
                     <a href="menu/index.php">
-                        <span class="nav-icon">📋</span>
-                        <span>Menú del sitio</span>
+                        <span class="nav-icon">&#128203;</span>
+                        <span>Men&uacute; de navegaci&oacute;n</span>
                     </a>
                 </nav>
             </div>
 
             <div>
-                <p class="sidebar-section-title">Configuración</p>
+                <p class="sidebar-section-title">Configuraci&oacute;n</p>
                 <nav class="nav">
                     <a href="settings.php">
-                        <span class="nav-icon">⚙️</span>
-                        <span>Configuración</span>
+                        <span class="nav-icon">&#9881;</span>
+                        <span>Configuraci&oacute;n</span>
                     </a>
 
                     <a href="change-password.php">
-                        <span class="nav-icon">🔒</span>
-                        <span>Cambiar contraseña</span>
+                        <span class="nav-icon">&#128274;</span>
+                        <span>Cambiar contrase&ntilde;a</span>
                     </a>
                 </nav>
             </div>
@@ -372,7 +372,7 @@ require_once "auth-check.php";
                 </div>
 
                 <div class="topbar-actions">
-                    <a href="change-password.php" class="btn btn-outline">Cambiar contraseña</a>
+                    <a href="change-password.php" class="btn btn-outline">Cambiar contrase&ntilde;a</a>
 
                     <form action="logout.php" method="post" style="margin: 0;">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
@@ -391,11 +391,11 @@ require_once "auth-check.php";
 
             <section class="grid">
                 <div class="card">
-                    <h3>Men&uacute; del sitio</h3>
+                    <h3>Men&uacute; de navegaci&oacute;n</h3>
                     <p class="muted">
-                        Administra los &iacute;tems del men&uacute; principal y sus submen&uacute;s de forma ordenada.
+                        Administra los enlaces del header y el bot&oacute;n destacado del navbar.
                     </p>
-                    <a href="menu/index.php">Ir al m&oacute;dulo de men&uacute;</a>
+                    <a href="menu/index.php">Ir al m&oacute;dulo de navegaci&oacute;n</a>
                 </div>
 
                 <div class="card">
@@ -415,8 +415,8 @@ require_once "auth-check.php";
 
                 <div class="quick-list">
                     <a href="menu/index.php" class="quick-link">
-                        <strong>Men&uacute; del sitio</strong>
-                        <span>Edita los enlaces principales y submen&uacute;s</span>
+                        <strong>Men&uacute; de navegaci&oacute;n</strong>
+                        <span>Edita los enlaces principales y el bot&oacute;n destacado</span>
                     </a>
 
                     <a href="settings.php" class="quick-link">

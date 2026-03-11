@@ -1,7 +1,7 @@
 <?php
-require_once "session-bootstrap.php";
-require_once "../db.php";
-require_once "admin-session-store.php";
+require_once __DIR__ . "/session-bootstrap.php";
+require_once dirname(__DIR__) . "/db.php";
+require_once __DIR__ . "/admin-session-store.php";
 
 if (!isset($_SESSION["admin_id"])) {
     header("Location: login.php");
