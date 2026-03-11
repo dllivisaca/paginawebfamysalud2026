@@ -31,7 +31,6 @@ function loadSecurityMailerEnvironment(): bool
     static $isLoaded = false;
 
     if ($isLoaded) {
-        error_log("SecurityMailer: entorno ya cargado previamente.");
         return true;
     }
 
@@ -53,7 +52,6 @@ function loadSecurityMailerEnvironment(): bool
 
     $dotenv = Dotenv::createImmutable(dirname(__DIR__));
     $dotenv->safeLoad();
-    error_log("SecurityMailer: .env cargado correctamente.");
 
     $isLoaded = true;
 
@@ -62,10 +60,7 @@ function loadSecurityMailerEnvironment(): bool
 
 function sendPasswordChangedSecurityEmail(string $recipientEmail, string $recipientName = ""): bool
 {
-    error_log("SecurityMailer: inicio de sendPasswordChangedSecurityEmail.");
-
     if (!loadSecurityMailerEnvironment()) {
-        error_log("SecurityMailer: no se pudo cargar el entorno.");
         return false;
     }
 
@@ -77,14 +72,6 @@ function sendPasswordChangedSecurityEmail(string $recipientEmail, string $recipi
     $mailFromAddress = $_ENV["MAIL_FROM_ADDRESS"] ?? "";
     $mailFromName = $_ENV["MAIL_FROM_NAME"] ?? "";
     $smtpSecure = "";
-
-    error_log("SecurityMailer: MAIL_HOST=" . ($mailHost !== "" ? $mailHost : "(vacio)"));
-    error_log("SecurityMailer: MAIL_PORT=" . ($mailPort !== "" ? $mailPort : "(vacio)"));
-    error_log("SecurityMailer: MAIL_USERNAME_CARGADO=" . ($mailUsername !== "" ? "SI" : "NO"));
-    error_log("SecurityMailer: MAIL_PASSWORD_CARGADO=" . ($mailPassword !== "" ? "SI" : "NO"));
-    error_log("SecurityMailer: MAIL_ENCRYPTION=" . ($mailEncryption !== "" ? $mailEncryption : "(vacio)"));
-    error_log("SecurityMailer: MAIL_FROM_ADDRESS=" . ($mailFromAddress !== "" ? $mailFromAddress : "(vacio)"));
-    error_log("SecurityMailer: recipientEmail=" . $recipientEmail);
 
     if (
         $mailHost === "" ||
@@ -136,10 +123,6 @@ function sendPasswordChangedSecurityEmail(string $recipientEmail, string $recipi
     try {
         $mailer->CharSet = "UTF-8";
         $mailer->isSMTP();
-        $mailer->SMTPDebug = 2;
-        $mailer->Debugoutput = static function (string $message, int $level): void {
-            error_log("SecurityMailer SMTP debug [" . $level . "]: " . $message);
-        };
         $mailer->Host = $mailHost;
         $mailer->Port = (int) $mailPort;
         $mailer->SMTPAuth = true;
@@ -168,21 +151,8 @@ function sendPasswordChangedSecurityEmail(string $recipientEmail, string $recipi
         $mailer->isHTML(true);
         $mailer->Body = $htmlBody;
         $mailer->AltBody = $textBody;
-        error_log(
-            "SecurityMailer: configuracion aplicada host="
-            . $mailer->Host
-            . " port="
-            . $mailer->Port
-            . " encryption="
-            . $mailEncryption
-            . " from="
-            . $mailFromAddress
-        );
 
-        $sendResult = $mailer->send();
-        error_log("SecurityMailer: mailer->send() devolvio " . ($sendResult ? "true" : "false"));
-
-        return $sendResult;
+        return $mailer->send();
     } catch (PHPMailerException $exception) {
         error_log("Error enviando correo de seguridad por cambio de contrasena: " . $exception->getMessage());
         return false;
