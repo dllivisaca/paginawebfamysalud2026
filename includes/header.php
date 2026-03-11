@@ -1,4 +1,101 @@
 <?php
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    require_once __DIR__ . "/../db.php";
+}
+
+if (!function_exists("publicPageUrl")) {
+    function publicPageUrl(string $slug): string
+    {
+        $slug = trim($slug, "/");
+
+        if ($slug === "" || $slug === "inicio") {
+            return "index.php";
+        }
+
+        return "page.php?slug=" . rawurlencode($slug);
+    }
+}
+
+if (!function_exists("isAbsoluteMenuUrl")) {
+    function isAbsoluteMenuUrl(string $url): bool
+    {
+        return (bool) preg_match('#^https?://#i', $url);
+    }
+}
+
+if (!function_exists("resolveMenuItemHref")) {
+    function resolveMenuItemHref(string $url, bool $isButton = false): string
+    {
+        $url = trim($url);
+
+        if ($url === "" || $url === "index.php") {
+            return "index.php";
+        }
+
+        if (isAbsoluteMenuUrl($url)) {
+            return $url;
+        }
+
+        if (preg_match('/\.php$/i', $url)) {
+            return $url;
+        }
+
+        return publicPageUrl($url);
+    }
+}
+
+if (!function_exists("resolveMenuItemTarget")) {
+    function resolveMenuItemTarget(string $target): string
+    {
+        return $target === "_blank" ? "_blank" : "_self";
+    }
+}
+
+$publicMenuItems = [];
+$publicMenuButton = null;
+
+if (isset($conn) && $conn instanceof mysqli) {
+    $menuSql = "SELECT id, item_key, label, url, target
+                FROM menu_items
+                WHERE is_button = 0 AND is_active = 1
+                ORDER BY display_order ASC, id ASC";
+    $menuResult = $conn->query($menuSql);
+
+    if ($menuResult) {
+        while ($row = $menuResult->fetch_assoc()) {
+            $publicMenuItems[] = $row;
+        }
+    }
+
+    $buttonSql = "SELECT id, label, url, target
+                  FROM menu_items
+                  WHERE is_button = 1 AND is_active = 1
+                  ORDER BY display_order ASC, id ASC
+                  LIMIT 1";
+    $buttonResult = $conn->query($buttonSql);
+
+    if ($buttonResult) {
+        $publicMenuButton = $buttonResult->fetch_assoc() ?: null;
+    }
+}
+
+if (count($publicMenuItems) === 0) {
+    $publicMenuItems = [
+        [
+            "item_key" => "home",
+            "label" => "Inicio",
+            "url" => "index.php",
+            "target" => "_self",
+        ],
+        [
+            "item_key" => "about",
+            "label" => "Nosotros",
+            "url" => "nosotros",
+            "target" => "_self",
+        ],
+    ];
+}
+
 $pageTitleEscaped = htmlspecialchars($pageTitle, ENT_QUOTES, "UTF-8");
 $metaDescriptionEscaped = htmlspecialchars($metaDescription, ENT_QUOTES, "UTF-8");
 $metaKeywordsEscaped = htmlspecialchars($metaKeywords, ENT_QUOTES, "UTF-8");
@@ -74,16 +171,36 @@ $currentPublicSlug = (string) ($currentPublicSlug ?? "");
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php"<?php echo $currentPublicSlug === "inicio" ? ' class="active"' : ""; ?>>Inicio</a></li>
-          <li><a href="<?php echo htmlspecialchars(publicPageUrl("nosotros"), ENT_QUOTES, "UTF-8"); ?>"<?php echo $currentPublicSlug === "nosotros" ? ' class="active"' : ""; ?>>Nosotros</a></li>
-          <li><a href="departments.html">Especialidades</a></li>
-          <li><a href="services.html">Servicios</a></li>
-          <li><a href="doctors.html">Doctores</a></li>
-          <li><a href="contact.html">Contacto</a></li>
+          <?php foreach ($publicMenuItems as $menuItem): ?>
+            <?php
+            $menuItemLabel = htmlspecialchars((string) ($menuItem["label"] ?? ""), ENT_QUOTES, "UTF-8");
+            $menuItemUrl = resolveMenuItemHref((string) ($menuItem["url"] ?? ""));
+            $menuItemTarget = resolveMenuItemTarget((string) ($menuItem["target"] ?? "_self"));
+            $menuItemKey = (string) ($menuItem["item_key"] ?? "");
+            $menuIsHome = $menuItemUrl === "index.php" || $menuItemKey === "home";
+            $menuIsActive = $menuIsHome
+                ? in_array($currentPublicSlug, ["", "inicio", "home"], true)
+                : trim((string) ($menuItem["url"] ?? ""), "/") === $currentPublicSlug;
+            ?>
+            <li>
+              <a href="<?php echo htmlspecialchars($menuItemUrl, ENT_QUOTES, "UTF-8"); ?>" target="<?php echo htmlspecialchars($menuItemTarget, ENT_QUOTES, "UTF-8"); ?>"<?php echo $menuIsActive ? ' class="active"' : ""; ?>>
+                <?php echo $menuItemLabel; ?>
+              </a>
+            </li>
+          <?php endforeach; ?>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      <a class="btn-getstarted" href="appointment.html">Agendar cita</a>
+      <?php if ($publicMenuButton !== null): ?>
+        <?php
+        $buttonHref = resolveMenuItemHref((string) ($publicMenuButton["url"] ?? ""), true);
+        $buttonTarget = resolveMenuItemTarget((string) ($publicMenuButton["target"] ?? "_self"));
+        $buttonLabel = htmlspecialchars((string) ($publicMenuButton["label"] ?? "Agendar cita"), ENT_QUOTES, "UTF-8");
+        ?>
+        <a class="btn-getstarted" href="<?php echo htmlspecialchars($buttonHref, ENT_QUOTES, "UTF-8"); ?>" target="<?php echo htmlspecialchars($buttonTarget, ENT_QUOTES, "UTF-8"); ?>"><?php echo $buttonLabel; ?></a>
+      <?php else: ?>
+        <a class="btn-getstarted" href="appointment.html">Agendar cita</a>
+      <?php endif; ?>
     </div>
   </header>
