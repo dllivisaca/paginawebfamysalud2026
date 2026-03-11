@@ -1,17 +1,23 @@
   <footer id="footer" class="footer position-relative light-background">
     <div class="container footer-top">
       <div class="row gy-4">
-        <div class="col-lg-5 col-md-6 footer-about">
+        <div class="col-lg-4 col-md-6 footer-about">
           <a href="index.php" class="logo d-flex align-items-center">
             <span class="sitename">FamySalud</span>
           </a>
           <div class="footer-contact pt-3">
-            <p>Atenci&oacute;n m&eacute;dica con enfoque humano y profesional.</p>
-            <p>Informaci&oacute;n de contacto en actualizaci&oacute;n.</p>
+            <p>Atenci&oacute;n m&eacute;dica con enfoque humano, cercano y profesional.</p>
+            <p>Informaci&oacute;n institucional y canales de contacto en proceso de actualizaci&oacute;n.</p>
+          </div>
+          <div class="social-links d-flex mt-4">
+            <a href="#" aria-label="X"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
           </div>
         </div>
 
-        <div class="col-lg-3 col-md-3 footer-links">
+        <div class="col-lg-2 col-md-3 footer-links">
           <h4>Enlaces &uacute;tiles</h4>
           <ul>
             <li><a href="index.php">Inicio</a></li>
@@ -22,14 +28,36 @@
           </ul>
         </div>
 
-        <div class="col-lg-4 col-md-3 footer-links">
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Servicios</h4>
+          <ul>
+            <li><a href="services.html">Consulta m&eacute;dica</a></li>
+            <li><a href="departments.html">Especialidades</a></li>
+            <li><a href="services.html">Atenci&oacute;n preventiva</a></li>
+            <li><a href="services.html">Evaluaciones</a></li>
+            <li><a href="services.html">Seguimiento</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
           <h4>Informaci&oacute;n</h4>
           <ul>
             <li><a href="departments.html">Especialidades</a></li>
-            <li><a href="services.html">Servicios</a></li>
             <li><a href="doctors.html">Doctores</a></li>
             <li><a href="privacy.html">Pol&iacute;tica de privacidad</a></li>
             <li><a href="terms.html">T&eacute;rminos del servicio</a></li>
+            <li><a href="faq.html">Preguntas frecuentes</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Apoyo</h4>
+          <ul>
+            <li><a href="contact.html">Canales de contacto</a></li>
+            <li><a href="appointment.html">Solicitar cita</a></li>
+            <li><a href="services.html">Orientaci&oacute;n de servicios</a></li>
+            <li><a href="privacy.html">Uso de datos</a></li>
+            <li><a href="terms.html">Condiciones del sitio</a></li>
           </ul>
         </div>
       </div>
