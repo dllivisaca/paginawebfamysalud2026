@@ -324,7 +324,7 @@ $buttonConfigured = $primaryButton !== null;
             <section class="card">
                 <h2>Resumen</h2>
                 <div class="summary-grid">
-                    <div class="summary-box"><div class="summary-label">Opciones del men&uacute;</div><div class="summary-value"><?php echo count($menuOptions); ?> de 8</div></div>
+                    <div class="summary-box"><div class="summary-label">Opciones del men&uacute;</div><div class="summary-value"><?php echo count($menuOptions) + ($homeItem !== null ? 1 : 0); ?> de 8</div></div>
                     <div class="summary-box"><div class="summary-label">Bot&oacute;n principal</div><div class="summary-value"><?php echo $buttonConfigured ? "Configurado" : "Pendiente"; ?></div></div>
                 </div>
             </section>
