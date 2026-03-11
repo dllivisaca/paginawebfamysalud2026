@@ -66,7 +66,46 @@ function countByType(mysqli $conn, int $isButton): int
     return (int) ($row["total"] ?? 0);
 }
 
+function ensureHomeMenuItem(mysqli $conn): void
+{
+    $sql = "INSERT INTO menu_items (parent_id, item_key, label, url, display_order, is_active, is_button, target, created_at, updated_at)
+            VALUES (NULL, 'home', 'Inicio', 'index.php', 1, 1, 0, '_self', NOW(), NOW())
+            ON DUPLICATE KEY UPDATE
+                label = 'Inicio',
+                url = 'index.php',
+                display_order = 1,
+                is_active = 1,
+                is_button = 0,
+                target = '_self',
+                updated_at = NOW()";
+
+    $conn->query($sql);
+}
+
+function getMenuItemById(mysqli $conn, int $id): ?array
+{
+    $stmt = $conn->prepare("SELECT id, item_key, is_button FROM menu_items WHERE id = ? LIMIT 1");
+    if (!$stmt) {
+        return null;
+    }
+
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    return $row ?: null;
+}
+
+function isHomeMenuItem(?array $item): bool
+{
+    return is_array($item) && (($item["item_key"] ?? "") === "home");
+}
+
 $status = $_GET["status"] ?? "";
+
+ensureHomeMenuItem($conn);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $csrfToken = $_POST["csrf_token"] ?? "";
@@ -87,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $target = menuTarget($_POST["target"] ?? "_self");
         $isActive = isset($_POST["is_active"]) ? 1 : 0;
 
-        if ($name === "" || $path === "" || $position === false || $position < 1 || $position > 8) {
+        if ($name === "" || $path === "" || $position === false || $position < 2 || $position > 8) {
             redirectToMenu("invalid");
         }
 
@@ -143,7 +182,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $path = menuPath($_POST["path"] ?? "");
         $position = filter_input(INPUT_POST, "display_order", FILTER_VALIDATE_INT);
 
-        if ($itemId === false || $itemId === null || $name === "" || $path === "" || $position === false || $position < 1 || $position > 8) {
+        if ($itemId === false || $itemId === null) {
+            redirectToMenu("invalid");
+        }
+
+        $currentItem = getMenuItemById($conn, (int) $itemId);
+        if (!$currentItem || (int) ($currentItem["is_button"] ?? 0) !== 0) {
+            redirectToMenu("invalid");
+        }
+
+        if (isHomeMenuItem($currentItem)) {
+            redirectToMenu("protected");
+        }
+
+        if ($name === "" || $path === "" || $position === false || $position < 2 || $position > 8) {
             redirectToMenu("invalid");
         }
 
@@ -165,6 +217,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             redirectToMenu("invalid");
         }
 
+        $currentItem = getMenuItemById($conn, (int) $itemId);
+        if (!$currentItem) {
+            redirectToMenu("invalid");
+        }
+
+        if (isHomeMenuItem($currentItem)) {
+            redirectToMenu("protected");
+        }
+
         $stmt = $conn->prepare("UPDATE menu_items SET is_active = ?, updated_at = NOW() WHERE id = ? LIMIT 1");
         if (!$stmt) {
             redirectToMenu("error");
@@ -180,6 +241,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($itemId === false || $itemId === null) {
             redirectToMenu("invalid");
+        }
+
+        $currentItem = getMenuItemById($conn, (int) $itemId);
+        if (!$currentItem) {
+            redirectToMenu("invalid");
+        }
+
+        if (isHomeMenuItem($currentItem)) {
+            redirectToMenu("protected");
         }
 
         $stmt = $conn->prepare("DELETE FROM menu_items WHERE id = ? LIMIT 1");
@@ -198,7 +268,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 $items = [];
 $menuOptions = [];
 $primaryButton = null;
-$result = $conn->query("SELECT id, label, url, display_order, is_active, is_button, target FROM menu_items ORDER BY is_button ASC, display_order ASC, id ASC");
+$homeItem = null;
+$result = $conn->query("SELECT id, item_key, label, url, display_order, is_active, is_button, target FROM menu_items ORDER BY is_button ASC, display_order ASC, id ASC");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $items[] = $row;
@@ -211,7 +282,11 @@ foreach ($items as $item) {
             $primaryButton = $item;
         }
     } else {
-        $menuOptions[] = $item;
+        if (($item["item_key"] ?? "") === "home") {
+            $homeItem = $item;
+        } else {
+            $menuOptions[] = $item;
+        }
     }
 }
 
@@ -242,6 +317,7 @@ $buttonConfigured = $primaryButton !== null;
 
             <?php if ($status === "created" || $status === "updated" || $status === "toggled" || $status === "deleted"): ?><div class="alert alert-success">Los cambios se guardaron correctamente.</div><?php endif; ?>
             <?php if ($status === "invalid" || $status === "error"): ?><div class="alert alert-error">No se pudo guardar la informaci&oacute;n. Revisa los datos e intenta nuevamente.</div><?php endif; ?>
+            <?php if ($status === "protected"): ?><div class="alert alert-error">La opci&oacute;n Inicio es fija del sistema y no se puede editar, ocultar ni eliminar.</div><?php endif; ?>
             <?php if ($status === "limit_options"): ?><div class="alert alert-error">Ya tienes configuradas las 8 opciones permitidas para el men&uacute;.</div><?php endif; ?>
             <?php if ($status === "limit_button"): ?><div class="alert alert-error">Solo puedes tener un bot&oacute;n principal configurado.</div><?php endif; ?>
 
@@ -263,7 +339,7 @@ $buttonConfigured = $primaryButton !== null;
                         <div class="form-group"><label for="new_name">Nombre de la p&aacute;gina</label><input type="text" id="new_name" name="name" maxlength="255" required data-slug-source="menu-option"></div>
                         <div class="form-group"><label for="new_path">Direcci&oacute;n de la p&aacute;gina</label><div class="input-prefix"><span>/</span><input type="text" id="new_path" name="path" maxlength="255" required data-slug-target="menu-option"></div><div class="helper">Se genera autom&aacute;ticamente, pero puedes editarla manualmente si lo necesitas.</div></div>
                         <div class="form-group"><label for="new_target">Abrir enlace</label><select id="new_target" name="target"><option value="_self">En la misma pesta&ntilde;a</option><option value="_blank">En una pesta&ntilde;a nueva</option></select></div>
-                        <div class="form-group"><label for="new_order">Posici&oacute;n en el men&uacute;</label><select id="new_order" name="display_order"><?php for ($i = 1; $i <= 8; $i++): ?><option value="<?php echo $i; ?>"><?php echo $i; ?></option><?php endfor; ?></select></div>
+                        <div class="form-group"><label for="new_order">Posici&oacute;n en el men&uacute;</label><select id="new_order" name="display_order"><?php for ($i = 2; $i <= 8; $i++): ?><option value="<?php echo $i; ?>"><?php echo $i; ?></option><?php endfor; ?></select><div class="helper">La posici&oacute;n 1 est&aacute; reservada para Inicio.</div></div>
                         <div class="form-group"><label>Mostrar en el men&uacute;</label><div class="checkbox-row"><input type="checkbox" id="new_active" name="is_active" value="1" checked><label for="new_active" style="margin:0;font-weight:normal;">S&iacute;, mostrar</label></div></div>
                     </div>
                     <div class="actions-row"><button type="submit" class="btn btn-primary">Agregar opci&oacute;n</button></div>
@@ -290,6 +366,30 @@ $buttonConfigured = $primaryButton !== null;
             <section class="card">
                 <h2 class="section-title">Vista actual del men&uacute;</h2>
                 <h3 class="section-title">Opciones del men&uacute;</h3>
+
+                <?php if ($homeItem !== null): ?>
+                    <article class="menu-item" style="margin-bottom:14px;">
+                        <div class="item-header">
+                            <h4 class="item-title"><?php echo htmlspecialchars($homeItem["label"], ENT_QUOTES, "UTF-8"); ?></h4>
+                            <span class="status-pill status-visible">Fija</span>
+                        </div>
+                        <div class="meta-grid">
+                            <div class="meta-box">
+                                <div class="meta-label">Direcci&oacute;n</div>
+                                <div class="meta-value"><?php echo htmlspecialchars($homeItem["url"], ENT_QUOTES, "UTF-8"); ?></div>
+                            </div>
+                            <div class="meta-box">
+                                <div class="meta-label">Posici&oacute;n</div>
+                                <div class="meta-value">1</div>
+                            </div>
+                            <div class="meta-box">
+                                <div class="meta-label">Apertura</div>
+                                <div class="meta-value">En la misma pesta&ntilde;a</div>
+                            </div>
+                        </div>
+                        <div class="helper" style="margin-top:12px;">Esta opci&oacute;n es fija del sistema y siempre aparece primero.</div>
+                    </article>
+                <?php endif; ?>
                 <?php if (count($menuOptions) === 0): ?>
                     <div class="empty-state">A&uacute;n no hay opciones configuradas para el men&uacute; superior.</div>
                 <?php else: ?>
@@ -309,7 +409,7 @@ $buttonConfigured = $primaryButton !== null;
                                     <div class="form-grid-compact">
                                         <div class="form-group"><label for="name_<?php echo (int) $item["id"]; ?>">Nombre visible</label><input type="text" id="name_<?php echo (int) $item["id"]; ?>" name="name" maxlength="255" required value="<?php echo htmlspecialchars($item["label"], ENT_QUOTES, "UTF-8"); ?>" data-slug-source="option-<?php echo (int) $item["id"]; ?>"></div>
                                         <div class="form-group"><label for="path_<?php echo (int) $item["id"]; ?>">Direcci&oacute;n</label><div class="input-prefix"><span>/</span><input type="text" id="path_<?php echo (int) $item["id"]; ?>" name="path" maxlength="255" required value="<?php echo htmlspecialchars($item["url"], ENT_QUOTES, "UTF-8"); ?>" data-slug-target="option-<?php echo (int) $item["id"]; ?>"></div></div>
-                                        <div class="form-group"><label for="order_<?php echo (int) $item["id"]; ?>">Posici&oacute;n</label><select id="order_<?php echo (int) $item["id"]; ?>" name="display_order"><?php for ($i = 1; $i <= 8; $i++): ?><option value="<?php echo $i; ?>" <?php echo (int) $item["display_order"] === $i ? "selected" : ""; ?>><?php echo $i; ?></option><?php endfor; ?></select></div>
+                                        <div class="form-group"><label for="order_<?php echo (int) $item["id"]; ?>">Posici&oacute;n</label><select id="order_<?php echo (int) $item["id"]; ?>" name="display_order"><?php for ($i = 2; $i <= 8; $i++): ?><option value="<?php echo $i; ?>" <?php echo (int) $item["display_order"] === $i ? "selected" : ""; ?>><?php echo $i; ?></option><?php endfor; ?></select></div>
                                         <div class="form-group"><button type="submit" class="btn btn-primary">Editar</button></div>
                                     </div>
                                 </form>
