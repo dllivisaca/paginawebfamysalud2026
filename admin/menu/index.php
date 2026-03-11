@@ -47,6 +47,11 @@ function menuTarget(string $value): string
     return $value === "_blank" ? "_blank" : "_self";
 }
 
+function buttonPath(string $value): string
+{
+    return textValue(trim($value), 255);
+}
+
 function countByType(mysqli $conn, int $isButton): int
 {
     $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM menu_items WHERE is_button = ?");
@@ -99,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($action === "save_button") {
         $buttonId = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
         $text = textValue($_POST["button_text"] ?? "");
-        $path = menuPath($_POST["button_path"] ?? "");
+        $path = buttonPath($_POST["button_path"] ?? "");
         $target = menuTarget($_POST["target"] ?? "_self");
         $isActive = isset($_POST["is_active"]) ? 1 : 0;
 
@@ -170,6 +175,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         redirectToMenu($ok ? "toggled" : "error");
     }
 
+    if ($action === "delete") {
+        $itemId = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
+
+        if ($itemId === false || $itemId === null) {
+            redirectToMenu("invalid");
+        }
+
+        $stmt = $conn->prepare("DELETE FROM menu_items WHERE id = ? LIMIT 1");
+        if (!$stmt) {
+            redirectToMenu("error");
+        }
+        $stmt->bind_param("i", $itemId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        redirectToMenu($ok ? "deleted" : "error");
+    }
+
     redirectToMenu("error");
 }
 
@@ -192,6 +214,8 @@ foreach ($items as $item) {
         $menuOptions[] = $item;
     }
 }
+
+$buttonConfigured = $primaryButton !== null;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -216,7 +240,7 @@ foreach ($items as $item) {
                 <div class="topbar-actions"><a href="../dashboard.php" class="btn btn-outline">Volver al panel</a><form action="../logout.php" method="post" style="margin:0;"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>"><button type="submit" class="btn btn-logout">Cerrar sesi&oacute;n</button></form></div>
             </div>
 
-            <?php if ($status === "created" || $status === "updated" || $status === "toggled"): ?><div class="alert alert-success">Los cambios se guardaron correctamente.</div><?php endif; ?>
+            <?php if ($status === "created" || $status === "updated" || $status === "toggled" || $status === "deleted"): ?><div class="alert alert-success">Los cambios se guardaron correctamente.</div><?php endif; ?>
             <?php if ($status === "invalid" || $status === "error"): ?><div class="alert alert-error">No se pudo guardar la informaci&oacute;n. Revisa los datos e intenta nuevamente.</div><?php endif; ?>
             <?php if ($status === "limit_options"): ?><div class="alert alert-error">Ya tienes configuradas las 8 opciones permitidas para el men&uacute;.</div><?php endif; ?>
             <?php if ($status === "limit_button"): ?><div class="alert alert-error">Solo puedes tener un bot&oacute;n principal configurado.</div><?php endif; ?>
@@ -254,8 +278,8 @@ foreach ($items as $item) {
                     <input type="hidden" name="action" value="save_button">
                     <input type="hidden" name="id" value="<?php echo $primaryButton !== null ? (int) $primaryButton["id"] : ""; ?>">
                     <div class="form-grid">
-                        <div class="form-group"><label for="button_text">Texto del bot&oacute;n</label><input type="text" id="button_text" name="button_text" maxlength="255" required value="<?php echo htmlspecialchars($primaryButton["label"] ?? "", ENT_QUOTES, "UTF-8"); ?>" data-slug-source="primary-button"></div>
-                        <div class="form-group"><label for="button_path">Direcci&oacute;n del bot&oacute;n</label><div class="input-prefix"><span>/</span><input type="text" id="button_path" name="button_path" maxlength="255" required value="<?php echo htmlspecialchars($primaryButton["url"] ?? "", ENT_QUOTES, "UTF-8"); ?>" data-slug-target="primary-button"></div><div class="helper">Si est&aacute; vac&iacute;a, se completar&aacute; autom&aacute;ticamente a partir del texto.</div></div>
+                        <div class="form-group"><label for="button_text">Texto del bot&oacute;n</label><input type="text" id="button_text" name="button_text" maxlength="255" required value="<?php echo htmlspecialchars($primaryButton["label"] ?? "", ENT_QUOTES, "UTF-8"); ?>"></div>
+                        <div class="form-group"><label for="button_path">Direcci&oacute;n del bot&oacute;n</label><input type="text" id="button_path" name="button_path" maxlength="255" required value="<?php echo htmlspecialchars($primaryButton["url"] ?? "", ENT_QUOTES, "UTF-8"); ?>"><div class="helper">Aqu&iacute; puedes escribir un enlace completo real, por ejemplo: https://midominio.com/agendar o https://wa.me/593...</div></div>
                         <div class="form-group"><label for="button_target">Abrir enlace</label><select id="button_target" name="target"><option value="_self" <?php echo ($primaryButton["target"] ?? "_self") === "_self" ? "selected" : ""; ?>>En la misma pesta&ntilde;a</option><option value="_blank" <?php echo ($primaryButton["target"] ?? "_self") === "_blank" ? "selected" : ""; ?>>En una pesta&ntilde;a nueva</option></select></div>
                         <div class="form-group"><label>Mostrar bot&oacute;n principal</label><div class="checkbox-row"><input type="checkbox" id="button_active" name="is_active" value="1" <?php echo (($primaryButton["is_active"] ?? 1) == 1) ? "checked" : ""; ?>><label for="button_active" style="margin:0;font-weight:normal;">S&iacute;, mostrar</label></div></div>
                     </div>
@@ -289,7 +313,7 @@ foreach ($items as $item) {
                                         <div class="form-group"><button type="submit" class="btn btn-primary">Editar</button></div>
                                     </div>
                                 </form>
-                                <div class="actions-row"><form action="index.php" method="post"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="<?php echo (int) $item["id"]; ?>"><input type="hidden" name="next_state" value="<?php echo (int) $item["is_active"] === 1 ? 0 : 1; ?>"><button type="submit" class="btn btn-soft"><?php echo (int) $item["is_active"] === 1 ? "Ocultar" : "Mostrar"; ?></button></form></div>
+                                <div class="actions-row"><form action="index.php" method="post"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="<?php echo (int) $item["id"]; ?>"><input type="hidden" name="next_state" value="<?php echo (int) $item["is_active"] === 1 ? 0 : 1; ?>"><button type="submit" class="btn btn-soft"><?php echo (int) $item["is_active"] === 1 ? "Ocultar" : "Mostrar"; ?></button></form><form action="index.php" method="post" onsubmit="return confirm('¿Seguro que deseas eliminar esta opción del menú?');"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?php echo (int) $item["id"]; ?>"><button type="submit" class="btn btn-soft">Eliminar</button></form></div>
                             </article>
                         <?php endforeach; ?>
                     </div>
@@ -302,11 +326,11 @@ foreach ($items as $item) {
                     <article class="menu-item">
                         <div class="item-header"><h4 class="item-title"><?php echo htmlspecialchars($primaryButton["label"], ENT_QUOTES, "UTF-8"); ?></h4><span class="status-pill <?php echo (int) $primaryButton["is_active"] === 1 ? "status-visible" : "status-hidden"; ?>"><?php echo (int) $primaryButton["is_active"] === 1 ? "Visible" : "Oculto"; ?></span></div>
                         <div class="meta-grid">
-                            <div class="meta-box"><div class="meta-label">Direcci&oacute;n</div><div class="meta-value">/<?php echo htmlspecialchars($primaryButton["url"], ENT_QUOTES, "UTF-8"); ?></div></div>
+                            <div class="meta-box"><div class="meta-label">Direcci&oacute;n</div><div class="meta-value"><?php echo htmlspecialchars($primaryButton["url"], ENT_QUOTES, "UTF-8"); ?></div></div>
                             <div class="meta-box"><div class="meta-label">Posici&oacute;n</div><div class="meta-value">Bot&oacute;n principal</div></div>
                             <div class="meta-box"><div class="meta-label">Apertura</div><div class="meta-value"><?php echo ($primaryButton["target"] ?? "_self") === "_blank" ? "En una pesta&ntilde;a nueva" : "En la misma pesta&ntilde;a"; ?></div></div>
                         </div>
-                        <div class="actions-row"><form action="index.php" method="post"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="<?php echo (int) $primaryButton["id"]; ?>"><input type="hidden" name="next_state" value="<?php echo (int) $primaryButton["is_active"] === 1 ? 0 : 1; ?>"><button type="submit" class="btn btn-soft"><?php echo (int) $primaryButton["is_active"] === 1 ? "Ocultar" : "Mostrar"; ?></button></form></div>
+                        <div class="actions-row"><form action="index.php" method="post"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="<?php echo (int) $primaryButton["id"]; ?>"><input type="hidden" name="next_state" value="<?php echo (int) $primaryButton["is_active"] === 1 ? 0 : 1; ?>"><button type="submit" class="btn btn-soft"><?php echo (int) $primaryButton["is_active"] === 1 ? "Ocultar" : "Mostrar"; ?></button></form><form action="index.php" method="post" onsubmit="return confirm('¿Seguro que deseas eliminar este botón principal?');"><input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?php echo (int) $primaryButton["id"]; ?>"><button type="submit" class="btn btn-soft">Eliminar</button></form></div>
                     </article>
                 <?php endif; ?>
             </section>
