@@ -29,6 +29,7 @@ $status = $_GET["status"] ?? "";
         .layout {
             min-height: 100vh;
             display: flex;
+            align-items: flex-start;
         }
 
         .sidebar {
@@ -39,6 +40,11 @@ $status = $_GET["status"] ?? "";
             display: flex;
             flex-direction: column;
             gap: 22px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .brand {
@@ -108,6 +114,7 @@ $status = $_GET["status"] ?? "";
         .main {
             flex: 1;
             padding: 32px;
+            min-width: 0;
         }
 
         .topbar {
@@ -297,6 +304,10 @@ $status = $_GET["status"] ?? "";
                 border-right: 0;
                 border-bottom: 1px solid #e5e7eb;
                 padding: 18px;
+                position: static;
+                top: auto;
+                height: auto;
+                overflow-y: visible;
             }
 
             .main {

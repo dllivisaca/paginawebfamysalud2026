@@ -23,6 +23,7 @@ require_once "auth-check.php";
         .layout {
             min-height: 100vh;
             display: flex;
+            align-items: flex-start;
         }
 
         .sidebar {
@@ -33,6 +34,11 @@ require_once "auth-check.php";
             display: flex;
             flex-direction: column;
             gap: 22px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .brand {
@@ -102,6 +108,7 @@ require_once "auth-check.php";
         .main {
             flex: 1;
             padding: 32px;
+            min-width: 0;
         }
 
         .topbar {
@@ -268,6 +275,10 @@ require_once "auth-check.php";
                 border-right: 0;
                 border-bottom: 1px solid #e5e7eb;
                 padding: 18px;
+                position: static;
+                top: auto;
+                height: auto;
+                overflow-y: visible;
             }
 
             .main {
