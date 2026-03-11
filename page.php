@@ -131,7 +131,15 @@ if ($ogDescription === "") {
 $ogImage = trim((string) ($page["og_image"] ?? ""));
 $canonicalUrl = trim((string) ($page["canonical_url"] ?? ""));
 if ($canonicalUrl === "") {
-    $canonicalUrl = publicPageUrl((string) $page["slug"]);
+    $scheme = (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ? "https" : "http";
+    $host = trim((string) ($_SERVER["HTTP_HOST"] ?? ""));
+
+    if ($host !== "") {
+        $canonicalUrl = $scheme . "://" . $host . "/" . ltrim(publicPageUrl((string) $page["slug"]), "/");
+    } else {
+        // Si no hay host disponible en este entorno, se conserva un fallback relativo estable.
+        $canonicalUrl = publicPageUrl((string) $page["slug"]);
+    }
 }
 
 $currentPublicSlug = (string) ($page["slug"] ?? "");

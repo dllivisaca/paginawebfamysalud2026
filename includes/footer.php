@@ -1,72 +1,42 @@
   <footer id="footer" class="footer position-relative light-background">
     <div class="container footer-top">
       <div class="row gy-4">
-        <div class="col-lg-4 col-md-6 footer-about">
+        <div class="col-lg-5 col-md-6 footer-about">
           <a href="index.php" class="logo d-flex align-items-center">
-            <span class="sitename">MediTrust</span>
+            <span class="sitename">FamySalud</span>
           </a>
           <div class="footer-contact pt-3">
-            <p>A108 Adam Street</p>
-            <p>New York, NY 535022</p>
-            <p class="mt-3"><strong>Teléfono:</strong> <span>+1 5589 55488 55</span></p>
-            <p><strong>Correo:</strong> <span>info@example.com</span></p>
-          </div>
-          <div class="social-links d-flex mt-4">
-            <a href=""><i class="bi bi-twitter-x"></i></a>
-            <a href=""><i class="bi bi-facebook"></i></a>
-            <a href=""><i class="bi bi-instagram"></i></a>
-            <a href=""><i class="bi bi-linkedin"></i></a>
+            <p>Atenci&oacute;n m&eacute;dica con enfoque humano y profesional.</p>
+            <p>Informaci&oacute;n de contacto en actualizaci&oacute;n.</p>
           </div>
         </div>
 
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Enlaces útiles</h4>
+        <div class="col-lg-3 col-md-3 footer-links">
+          <h4>Enlaces &uacute;tiles</h4>
           <ul>
             <li><a href="index.php">Inicio</a></li>
             <li><a href="<?php echo htmlspecialchars(publicPageUrl("nosotros"), ENT_QUOTES, "UTF-8"); ?>">Nosotros</a></li>
             <li><a href="services.html">Servicios</a></li>
-            <li><a href="terms.html">Términos del servicio</a></li>
-            <li><a href="privacy.html">Política de privacidad</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Nuestros servicios</h4>
-          <ul>
-            <li><a href="#">Diseño web</a></li>
-            <li><a href="#">Desarrollo web</a></li>
-            <li><a href="#">Gestión de productos</a></li>
-            <li><a href="#">Marketing</a></li>
-            <li><a href="#">Diseño gráfico</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Recursos</h4>
-          <ul>
-            <li><a href="#">Preguntas frecuentes</a></li>
-            <li><a href="#">Testimonios</a></li>
-            <li><a href="#">Galería</a></li>
-            <li><a href="#">Especialidades</a></li>
-            <li><a href="#">Doctores</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Ayuda</h4>
-          <ul>
             <li><a href="contact.html">Contacto</a></li>
             <li><a href="appointment.html">Agendar cita</a></li>
-            <li><a href="#">Soporte</a></li>
-            <li><a href="#">Ubicación</a></li>
-            <li><a href="#">Horarios</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-3 footer-links">
+          <h4>Informaci&oacute;n</h4>
+          <ul>
+            <li><a href="departments.html">Especialidades</a></li>
+            <li><a href="services.html">Servicios</a></li>
+            <li><a href="doctors.html">Doctores</a></li>
+            <li><a href="privacy.html">Pol&iacute;tica de privacidad</a></li>
+            <li><a href="terms.html">T&eacute;rminos del servicio</a></li>
           </ul>
         </div>
       </div>
     </div>
 
     <div class="container copyright text-center mt-4">
-      <p>&copy; <span>Copyright</span> <strong class="px-1 sitename">MyWebsite</strong> <span>Todos los derechos reservados</span></p>
+      <p>&copy; <span>Copyright</span> <strong class="px-1 sitename">FamySalud</strong> <span>Todos los derechos reservados</span></p>
     </div>
   </footer>
 

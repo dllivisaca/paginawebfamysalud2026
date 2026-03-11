@@ -69,7 +69,7 @@ $currentPublicSlug = (string) ($currentPublicSlug ?? "");
             <path d="M14 7L10 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
           </g>
         </svg>
-        <h1 class="sitename">MediTrust</h1>
+        <h1 class="sitename">FamySalud</h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
