@@ -12,7 +12,7 @@ $status = $_GET["status"] ?? "";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cambiar contraseña</title>
+    <title>Cambiar contrase&ntilde;a</title>
     <style>
         * {
             box-sizing: border-box;
@@ -196,6 +196,10 @@ $status = $_GET["status"] ?? "";
             margin-bottom: 18px;
         }
 
+        .password-field {
+            position: relative;
+        }
+
         label {
             display: block;
             margin-bottom: 8px;
@@ -203,10 +207,11 @@ $status = $_GET["status"] ?? "";
             color: #374151;
         }
 
-        input[type="password"] {
+        input[type="password"],
+        input[type="text"] {
             width: 100%;
             height: 44px;
-            padding: 12px 14px;
+            padding: 12px 94px 12px 14px;
             border: 1px solid #d1d5db;
             border-radius: 10px;
             font-size: 14px;
@@ -214,9 +219,30 @@ $status = $_GET["status"] ?? "";
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        input[type="password"]:focus {
+        input[type="password"]:focus,
+        input[type="text"]:focus {
             border-color: #198754;
             box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.12);
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            width: auto;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 8px;
+            background: #e9f7ef;
+            color: #198754;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .toggle-password:hover {
+            background: #d7ebdf;
         }
 
         .hint {
@@ -337,28 +363,28 @@ $status = $_GET["status"] ?? "";
                 <p class="sidebar-section-title">Principal</p>
                 <nav class="nav">
                     <a href="dashboard.php">
-                        <span class="nav-icon">🏠</span>
+                        <span class="nav-icon">&#127968;</span>
                         <span>Panel de inicio</span>
                     </a>
 
                     <a href="menu/index.php">
-                        <span class="nav-icon">📋</span>
-                        <span>Menú del sitio</span>
+                        <span class="nav-icon">&#128203;</span>
+                        <span>Men&uacute; del sitio</span>
                     </a>
                 </nav>
             </div>
 
             <div>
-                <p class="sidebar-section-title">Configuración</p>
+                <p class="sidebar-section-title">Configuraci&oacute;n</p>
                 <nav class="nav">
                     <a href="settings.php">
-                        <span class="nav-icon">⚙️</span>
-                        <span>Configuración</span>
+                        <span class="nav-icon">&#9881;</span>
+                        <span>Configuraci&oacute;n</span>
                     </a>
 
                     <a href="change-password.php" class="active">
-                        <span class="nav-icon">🔒</span>
-                        <span>Cambiar contraseña</span>
+                        <span class="nav-icon">&#128274;</span>
+                        <span>Cambiar contrase&ntilde;a</span>
                     </a>
                 </nav>
             </div>
@@ -367,7 +393,7 @@ $status = $_GET["status"] ?? "";
         <main class="main">
             <div class="topbar">
                 <div>
-                    <h1 class="page-title">Cambiar contraseña</h1>
+                    <h1 class="page-title">Cambiar contrase&ntilde;a</h1>
                     <p class="page-subtitle muted">
                         Actualiza tu clave de acceso de forma segura.
                     </p>
@@ -386,56 +412,89 @@ $status = $_GET["status"] ?? "";
             <section class="card">
                 <h2>Seguridad de la cuenta</h2>
                 <p class="muted">
-                    Ingresa tu contraseña actual y luego escribe tu nueva contraseña dos veces para confirmarla.
+                    Ingresa tu contrase&ntilde;a actual y luego escribe tu nueva contrase&ntilde;a dos veces para confirmarla.
                 </p>
 
                 <?php if ($status === "success"): ?>
-                    <div class="alert alert-success">La contraseña se actualizó correctamente.</div>
+                    <div class="alert alert-success">La contrase&ntilde;a se actualiz&oacute; correctamente.</div>
                 <?php endif; ?>
 
                 <?php if ($status === "invalid_current"): ?>
-                    <div class="alert alert-error">La contraseña actual no es correcta.</div>
+                    <div class="alert alert-error">La contrase&ntilde;a actual no es correcta.</div>
                 <?php endif; ?>
 
                 <?php if ($status === "mismatch"): ?>
-                    <div class="alert alert-error">La nueva contraseña y su confirmación no coinciden.</div>
+                    <div class="alert alert-error">La nueva contrase&ntilde;a y su confirmaci&oacute;n no coinciden.</div>
                 <?php endif; ?>
 
                 <?php if ($status === "weak"): ?>
-                    <div class="alert alert-error">La nueva contraseña no cumple con los requisitos mínimos.</div>
+                    <div class="alert alert-error">La nueva contrase&ntilde;a debe tener entre 12 y 128 caracteres e incluir may&uacute;sculas, min&uacute;sculas, n&uacute;meros y s&iacute;mbolos.</div>
+                <?php endif; ?>
+
+                <?php if ($status === "reused"): ?>
+                    <div class="alert alert-error">La nueva contrase&ntilde;a debe ser distinta a la actual.</div>
                 <?php endif; ?>
 
                 <?php if ($status === "error"): ?>
-                    <div class="alert alert-error">No se pudo actualizar la contraseña. Intenta nuevamente.</div>
+                    <div class="alert alert-error">No se pudo actualizar la contrase&ntilde;a. Intenta nuevamente.</div>
                 <?php endif; ?>
 
                 <form action="change-password-process.php" method="post" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
 
                     <div class="form-group">
-                        <label for="current_password">Contraseña actual</label>
-                        <input type="password" id="current_password" name="current_password" required autocomplete="current-password">
+                        <label for="current_password">Contrase&ntilde;a actual</label>
+                        <div class="password-field">
+                            <input type="password" id="current_password" name="current_password" required autocomplete="current-password">
+                            <button type="button" class="toggle-password" data-target="current_password">Ver</button>
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="new_password">Nueva contraseña</label>
-                        <input type="password" id="new_password" name="new_password" required autocomplete="new-password">
-                        <div class="hint">Usa al menos 8 caracteres. Idealmente combina letras mayúsculas, minúsculas, números y símbolos.</div>
+                        <label for="new_password">Nueva contrase&ntilde;a</label>
+                        <div class="password-field">
+                            <input type="password" id="new_password" name="new_password" required autocomplete="new-password" minlength="12" maxlength="128">
+                            <button type="button" class="toggle-password" data-target="new_password">Ver</button>
+                        </div>
+                        <div class="hint">Usa entre 12 y 128 caracteres, incluyendo may&uacute;sculas, min&uacute;sculas, n&uacute;meros y s&iacute;mbolos.</div>
                     </div>
 
                     <div class="form-group">
-                        <label for="confirm_password">Confirmar nueva contraseña</label>
-                        <input type="password" id="confirm_password" name="confirm_password" required autocomplete="new-password">
+                        <label for="confirm_password">Confirmar nueva contrase&ntilde;a</label>
+                        <div class="password-field">
+                            <input type="password" id="confirm_password" name="confirm_password" required autocomplete="new-password" minlength="12" maxlength="128">
+                            <button type="button" class="toggle-password" data-target="confirm_password">Ver</button>
+                        </div>
                     </div>
 
                     <div class="actions">
-                        <button type="submit" class="btn btn-primary">Guardar nueva contraseña</button>
+                        <button type="submit" class="btn btn-primary">Guardar nueva contrase&ntilde;a</button>
                         <a href="dashboard.php" class="btn btn-outline">Cancelar</a>
                     </div>
                 </form>
             </section>
         </main>
     </div>
+
+    <script>
+        (function () {
+            var toggleButtons = document.querySelectorAll(".toggle-password");
+
+            toggleButtons.forEach(function (button) {
+                button.addEventListener("click", function () {
+                    var input = document.getElementById(button.getAttribute("data-target"));
+
+                    if (!input) {
+                        return;
+                    }
+
+                    var isHidden = input.type === "password";
+                    input.type = isHidden ? "text" : "password";
+                    button.textContent = isHidden ? "Ocultar" : "Ver";
+                });
+            });
+        }());
+    </script>
 
 </body>
 </html>
