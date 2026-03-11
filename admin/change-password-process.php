@@ -1,6 +1,7 @@
 <?php
 require_once "auth-check.php";
 require_once "../db.php";
+require_once "admin-session-store.php";
 require_once "security-mailer.php";
 
 function redirectWithStatus(string $status): void
@@ -158,6 +159,22 @@ try {
 
 session_regenerate_id(true);
 $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+
+$currentSessionId = session_id();
+
+if ($currentSessionId === "" || !upsertAdminUserSession($conn, $adminId, $currentSessionId)) {
+    error_log("No se pudo registrar la sesion actual tras el cambio de contrasena.");
+    destroyCurrentAdminPhpSession();
+    header("Location: login.php?error=unavailable");
+    exit;
+}
+
+if (!deactivateOtherAdminUserSessions($conn, $adminId, $currentSessionId)) {
+    error_log("No se pudieron invalidar las otras sesiones activas del administrador.");
+    destroyCurrentAdminPhpSession();
+    header("Location: login.php?error=unavailable");
+    exit;
+}
 
 if (!empty($admin["email"])) {
     sendPasswordChangedSecurityEmail(

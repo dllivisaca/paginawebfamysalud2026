@@ -1,11 +1,7 @@
 <?php
 require_once "session-bootstrap.php";
 require_once "../db.php";
-
-function getClientIpAddress(): string
-{
-    return $_SERVER["REMOTE_ADDR"] ?? "0.0.0.0";
-}
+require_once "admin-session-store.php";
 
 function failLogin(): void
 {
@@ -38,7 +34,7 @@ if (!isset($_SESSION["csrf_token"]) || !hash_equals($_SESSION["csrf_token"], $cs
     failLogin();
 }
 
-$ipAddress = getClientIpAddress();
+$ipAddress = getAdminSessionIpAddress();
 $maxAttempts = 5;
 $lockMinutes = 15;
 
@@ -110,6 +106,15 @@ $_SESSION["admin_id"] = (int) $user["id"];
 $_SESSION["admin_name"] = $user["name"];
 $_SESSION["admin_email"] = $user["email"];
 $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+
+$currentSessionId = session_id();
+
+if ($currentSessionId === "" || !upsertAdminUserSession($conn, (int) $user["id"], $currentSessionId)) {
+    error_log("No se pudo registrar la sesion activa del administrador.");
+    destroyCurrentAdminPhpSession();
+    header("Location: login.php?error=unavailable");
+    exit;
+}
 
 $successLogSql = "INSERT INTO admin_login_attempts (email, ip_address, is_success)
                   VALUES (?, ?, 1)";
