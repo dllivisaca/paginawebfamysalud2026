@@ -386,6 +386,16 @@ $status = $_GET["status"] ?? "";
             </div>
 
             <div>
+                <p class="sidebar-section-title">Contenido</p>
+                <nav class="nav">
+                    <a href="pages/index.php">
+                        <span class="nav-icon">&#128196;</span>
+                        <span>P&aacute;ginas del sitio</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div>
                 <p class="sidebar-section-title">Configuraci&oacute;n</p>
                 <nav class="nav">
                     <a href="settings.php">

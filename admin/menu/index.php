@@ -307,6 +307,7 @@ $buttonConfigured = $primaryButton !== null;
         <aside class="sidebar">
             <div class="brand"><h2>Panel Admin</h2><p>Gestiona el contenido principal del sitio desde un solo lugar.</p></div>
             <div><p class="sidebar-section-title">Principal</p><nav class="nav"><a href="../dashboard.php"><span class="nav-icon">&#127968;</span><span>Panel de inicio</span></a><a href="index.php" class="active"><span class="nav-icon">&#128203;</span><span>Men&uacute; de navegaci&oacute;n</span></a></nav></div>
+            <div><p class="sidebar-section-title">Contenido</p><nav class="nav"><a href="../pages/index.php"><span class="nav-icon">&#128196;</span><span>P&aacute;ginas del sitio</span></a></nav></div>
             <div><p class="sidebar-section-title">Configuraci&oacute;n</p><nav class="nav"><a href="../settings.php"><span class="nav-icon">&#9881;</span><span>Configuraci&oacute;n</span></a><a href="../change-password.php"><span class="nav-icon">&#128274;</span><span>Cambiar contrase&ntilde;a</span></a></nav></div>
         </aside>
         <main class="main">
