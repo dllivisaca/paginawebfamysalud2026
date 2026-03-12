@@ -153,7 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "seo_description" => trim((string) ($_POST["seo_description"] ?? "")),
             "seo_keywords" => trim((string) ($_POST["seo_keywords"] ?? "")),
             "h1_title" => trim((string) ($_POST["h1_title"] ?? "")),
-            "meta_robots" => trim((string) ($_POST["meta_robots"] ?? "")),
+            "meta_robots" => "index,follow",
             "og_title" => trim((string) ($_POST["og_title"] ?? "")),
             "og_description" => trim((string) ($_POST["og_description"] ?? "")),
             "canonical_url" => trim((string) ($_POST["canonical_url"] ?? "")),
@@ -166,10 +166,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($isHomePage && $existingPage) {
             $pageData["slug"] = (string) ($existingPage["slug"] ?? "");
             $pageData["is_active"] = 1;
-        }
-
-        if ($pageData["meta_robots"] === "") {
-            $pageData["meta_robots"] = "index,follow";
         }
 
         if ($pageData["title"] === "") {
@@ -837,12 +833,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                         <option value="0"<?php echo (int) $pageData["is_active"] === 0 ? " selected" : ""; ?>>Inactiva</option>
                                     </select>
                                 <?php endif; ?>
-                            </div>
-
-                            <div class="field-group">
-                                <label class="field-label" for="meta_robots">Instrucciones para robots</label>
-                                <input class="form-input" type="text" id="meta_robots" name="meta_robots" value="<?php echo htmlspecialchars($pageData["meta_robots"], ENT_QUOTES, "UTF-8"); ?>">
-                                <p class="field-help">Si lo dejas vac&iacute;o, se guardar&aacute; como <span class="muted">index,follow</span>.</p>
                             </div>
 
                             <div class="field-group field-group-full">
