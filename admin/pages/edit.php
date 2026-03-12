@@ -940,15 +940,45 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </div>
     <script>
         (function () {
+            var isCreateMode = <?php echo $isCreateMode ? "true" : "false"; ?>;
+            var titleInput = document.getElementById("title");
+            var pageKeyInput = document.getElementById("page_key");
             var slugInput = document.getElementById("slug");
+            var h1TitleInput = document.getElementById("h1_title");
+            var seoTitleInput = document.getElementById("seo_title");
             var canonicalInput = document.getElementById("canonical_url");
 
-            if (!slugInput || !canonicalInput) {
+            if (!isCreateMode || !titleInput || !pageKeyInput || !slugInput || !h1TitleInput || !seoTitleInput || !canonicalInput) {
                 return;
             }
 
             var baseUrl = <?php echo json_encode($siteBaseUrlForJs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>;
-            var canonicalTouched = false;
+            var manualFlags = {
+                pageKey: false,
+                slug: false,
+                h1Title: false,
+                seoTitle: false,
+                canonical: false
+            };
+
+            function normalizeText(value) {
+                value = value.toLowerCase().trim();
+                value = value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                value = value.replace(/[^a-z0-9\s-_]/g, " ");
+                value = value.replace(/[\s-]+/g, "-");
+                value = value.replace(/-+/g, "-");
+                value = value.replace(/^-+|-+$/g, "");
+
+                return value;
+            }
+
+            function buildSlug(value) {
+                return normalizeText(value);
+            }
+
+            function buildPageKey(value) {
+                return buildSlug(value).replace(/-/g, "_");
+            }
 
             function buildCanonicalUrl(slug) {
                 slug = slug.trim();
@@ -960,17 +990,62 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 return baseUrl + "/page.php?slug=" + encodeURIComponent(slug);
             }
 
-            canonicalInput.addEventListener("input", function () {
-                canonicalTouched = canonicalInput.value.trim() !== "";
+            function syncDerivedFields() {
+                var sourceTitle = titleInput.value.trim();
+                var nextSlug = buildSlug(sourceTitle);
+                var nextPageKey = buildPageKey(sourceTitle);
+                var nextCanonicalUrl = buildCanonicalUrl(nextSlug);
+
+                if (!manualFlags.slug) {
+                    slugInput.value = nextSlug;
+                }
+
+                if (!manualFlags.pageKey) {
+                    pageKeyInput.value = nextPageKey;
+                }
+
+                if (!manualFlags.h1Title) {
+                    h1TitleInput.value = sourceTitle;
+                }
+
+                if (!manualFlags.seoTitle) {
+                    seoTitleInput.value = sourceTitle;
+                }
+
+                if (!manualFlags.canonical) {
+                    canonicalInput.value = nextCanonicalUrl;
+                }
+            }
+
+            pageKeyInput.addEventListener("input", function () {
+                manualFlags.pageKey = pageKeyInput.value.trim() !== "";
             });
 
             slugInput.addEventListener("input", function () {
-                if (canonicalTouched) {
-                    return;
-                }
+                manualFlags.slug = slugInput.value.trim() !== "";
 
-                canonicalInput.value = buildCanonicalUrl(slugInput.value);
+                if (!manualFlags.canonical) {
+                    canonicalInput.value = buildCanonicalUrl(slugInput.value);
+                }
             });
+
+            h1TitleInput.addEventListener("input", function () {
+                manualFlags.h1Title = h1TitleInput.value.trim() !== "";
+            });
+
+            seoTitleInput.addEventListener("input", function () {
+                manualFlags.seoTitle = seoTitleInput.value.trim() !== "";
+            });
+
+            canonicalInput.addEventListener("input", function () {
+                manualFlags.canonical = canonicalInput.value.trim() !== "";
+            });
+
+            titleInput.addEventListener("input", function () {
+                syncDerivedFields();
+            });
+
+            syncDerivedFields();
         }());
     </script>
 </body>
