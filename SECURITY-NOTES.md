@@ -105,3 +105,49 @@
 
 ### Como retomar en una nueva sesion
 - Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-11".
+
+## Sesion 2026-03-12
+
+### Cambios realizados hoy
+- Se convirtio `admin/pages/index.php` en un listado basado solo en registros reales de `site_pages`, eliminando la mezcla con paginas esperadas hardcodeadas.
+- Se agrego CRUD base para `admin/pages/` con creacion, edicion, activacion, desactivacion y eliminacion, manteniendo protegida la pagina `Inicio`.
+- Se creo `admin/pages/edit.php` para crear y editar paginas reales de `site_pages` con validaciones de unicidad, CSRF y mensajes en espanol.
+- Se bloqueo la edicion de `page_key` despues de crear una pagina y se mejoro el autocompletado del formulario para slugs, clave interna, H1, SEO y canonicidad.
+- `meta_robots` dejo de ser visible en admin y ahora se fuerza internamente a `index,follow`.
+- `template_key` en `admin/pages/edit.php` paso de texto libre a `select` validado contra `page_templates` activas.
+- Se mejoro la generacion automatica de `canonical_url` usando deteccion conservadora de base URL del entorno actual.
+- Se ajusto `page.php` para resolver plantillas publicas con compatibilidad entre `template_key` nuevos y nombres fisicos heredados en `templates/pages/`.
+- Se reorganizo `admin/menu/` para separar listado y formularios: `admin/menu/index.php` quedo como vista resumida, `admin/menu/edit.php` para crear/editar opciones, y `admin/menu/button-edit.php` para el boton principal.
+- Se incorporo soporte admin para tipos de opcion del menu `PÃ¡gina interna` y `Enlace personalizado`, con persistencia compatible en `menu_items` usando `link_type`, `site_page_id` y `url`.
+- Se mantuvo `Inicio` como opcion protegida del menu, pero ahora con edicion controlada de destino/tipo/target sin permitir ocultarla, eliminarla o moverla.
+- Se mejoro la UX del listado de paginas y menu ocultando IDs tecnicos cuando no aportan valor visual y usando numeracion o posicion como referencia principal.
+- Se corrigio HTML invalido por formularios anidados en el bloque del boton principal del admin menu antes de separar su edicion.
+
+### Archivos creados
+- `admin/pages/edit.php`
+- `admin/menu/edit.php`
+- `admin/menu/button-edit.php`
+- `admin/menu/menu-helpers.php`
+
+### Archivos modificados
+- `admin/pages/index.php`
+- `admin/pages/edit.php`
+- `page.php`
+- `admin/menu/index.php`
+- `admin/menu/edit.php`
+- `admin/menu/menu-helpers.php`
+- `includes/header.php`
+
+### Verificacion realizada
+- Se ejecuto `php -l` sobre los archivos PHP creados o modificados en las iteraciones principales del dia.
+- Los archivos validados quedaron sin errores de sintaxis en las comprobaciones ejecutadas.
+
+### Pendientes recomendados
+- Ejecutar manualmente y verificar en todos los entornos el `ALTER TABLE` de `menu_items` para `link_type` y `site_page_id` si aun no se aplico.
+- Probar de punta a punta en navegador los flujos de crear/editar/toggle/eliminar en `admin/pages/` y `admin/menu/`.
+- Revisar dependencias futuras antes de permitir eliminar paginas si despues se enlazan desde otros modulos como contenido o bloques.
+- Reemplazar caracteres con codificacion rota heredados en algunos textos antiguos del admin para evitar artefactos visuales.
+- Consolidar estilos compartidos del admin si el numero de pantallas sigue creciendo.
+
+### Como retomar en una nueva sesion
+- Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-12".
