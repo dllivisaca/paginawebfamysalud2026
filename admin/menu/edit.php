@@ -341,12 +341,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <?php endif; ?>
                         </div>
 
-                        <?php if (!$isCreateMode): ?>
-                            <div class="form-group field-full">
-                                <label>ID del registro</label>
-                                <div class="readonly-box"><?php echo (int) $itemId; ?></div>
-                            </div>
-                        <?php endif; ?>
                     </div>
 
                     <div class="actions-row">

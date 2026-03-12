@@ -216,7 +216,6 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                     <table class="pages-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Nombre visible</th>
                                 <th>Tipo de opci&oacute;n</th>
                                 <th>Direcci&oacute;n</th>
@@ -228,7 +227,6 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                         <tbody>
                             <?php if ($homeItem !== null): ?>
                                 <tr>
-                                    <td><?php echo (int) $homeItem["id"]; ?></td>
                                     <td>
                                         <?php echo htmlspecialchars((string) $homeItem["label"], ENT_QUOTES, "UTF-8"); ?>
                                         <div class="protected-badge">Opci&oacute;n protegida</div>
@@ -249,7 +247,6 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                                 <?php foreach ($menuOptions as $item): ?>
                                     <?php $isActive = (int) ($item["is_active"] ?? 0) === 1; ?>
                                     <tr>
-                                        <td><?php echo (int) $item["id"]; ?></td>
                                         <td><?php echo htmlspecialchars((string) ($item["label"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
                                         <td><?php echo ($item["link_type"] ?? "custom") === "internal" ? "P&aacute;gina interna" : "Enlace personalizado"; ?></td>
                                         <td><?php echo htmlspecialchars((string) ($item["url"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
@@ -277,7 +274,7 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                                 <?php endforeach; ?>
                             <?php elseif ($homeItem === null): ?>
                                 <tr>
-                                    <td colspan="7" class="muted">A&uacute;n no hay opciones configuradas para el men&uacute; superior.</td>
+                                    <td colspan="6" class="muted">A&uacute;n no hay opciones configuradas para el men&uacute; superior.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
