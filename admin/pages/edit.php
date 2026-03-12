@@ -10,6 +10,8 @@ $isCreateMode = $pageId <= 0 || ((string) ($_GET["action"] ?? "")) === "create";
 $status = (string) ($_GET["status"] ?? "");
 $errors = [];
 $successMessage = "";
+$activeTemplates = [];
+$hasActiveTemplates = false;
 
 $pageData = [
     "title" => "",
@@ -32,6 +34,31 @@ if ($status === "created") {
 } elseif ($status === "updated") {
     $successMessage = "La pagina se actualizo correctamente.";
 }
+
+$templatesResult = $conn->query(
+    "SELECT template_key, template_name
+     FROM page_templates
+     WHERE is_active = 1
+     ORDER BY template_name ASC, id ASC"
+);
+
+if ($templatesResult) {
+    while ($templateRow = $templatesResult->fetch_assoc()) {
+        $templateKey = trim((string) ($templateRow["template_key"] ?? ""));
+        $templateName = trim((string) ($templateRow["template_name"] ?? ""));
+
+        if ($templateKey === "") {
+            continue;
+        }
+
+        $activeTemplates[$templateKey] = [
+            "template_key" => $templateKey,
+            "template_name" => $templateName !== "" ? $templateName : $templateKey,
+        ];
+    }
+}
+
+$hasActiveTemplates = $activeTemplates !== [];
 
 $existingPage = null;
 
@@ -159,6 +186,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($pageData["template_key"] === "") {
             $errors[] = "La plantilla es obligatoria.";
+        }
+
+        if (!$hasActiveTemplates) {
+            $errors[] = "No hay plantillas activas disponibles.";
+        } elseif (!isset($activeTemplates[$pageData["template_key"]])) {
+            $errors[] = "La plantilla seleccionada no es válida.";
         }
 
         if ($pageData["is_active"] !== 0 && $pageData["is_active"] !== 1) {
@@ -753,7 +786,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                             <div class="field-group">
                                 <label class="field-label" for="template_key">Plantilla</label>
-                                <input class="form-input" type="text" id="template_key" name="template_key" value="<?php echo htmlspecialchars($pageData["template_key"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                <select class="form-select" id="template_key" name="template_key"<?php echo !$hasActiveTemplates ? " disabled" : ""; ?> required>
+                                    <option value="">Selecciona una plantilla</option>
+                                    <?php foreach ($activeTemplates as $templateOption): ?>
+                                        <option value="<?php echo htmlspecialchars($templateOption["template_key"], ENT_QUOTES, "UTF-8"); ?>"<?php echo $pageData["template_key"] === $templateOption["template_key"] ? " selected" : ""; ?>>
+                                            <?php echo htmlspecialchars($templateOption["template_name"], ENT_QUOTES, "UTF-8"); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <?php if (!$hasActiveTemplates): ?>
+                                    <input type="hidden" name="template_key" value="">
+                                    <p class="field-help">No hay plantillas activas disponibles.</p>
+                                <?php else: ?>
+                                    <p class="field-help">Selecciona el diseño base que usará esta página.</p>
+                                <?php endif; ?>
                             </div>
 
                             <div class="field-group">
