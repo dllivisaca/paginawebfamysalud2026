@@ -64,6 +64,42 @@ function renderPageNotFound(): void
     exit;
 }
 
+function resolvePageTemplatePath(string $templateKey): string
+{
+    $templateKey = trim($templateKey);
+
+    if ($templateKey === "") {
+        return "";
+    }
+
+    $templatesDirectory = __DIR__ . "/templates/pages";
+    $candidateFiles = [];
+
+    if (preg_match('/^[a-zA-Z0-9_-]+$/', $templateKey) === 1) {
+        $candidateFiles[] = $templateKey . ".php";
+    }
+
+    $fallbackTemplateMap = [
+        "about" => ["about_v1.php"],
+    ];
+
+    foreach ($fallbackTemplateMap[$templateKey] ?? [] as $fallbackFile) {
+        if (!in_array($fallbackFile, $candidateFiles, true)) {
+            $candidateFiles[] = $fallbackFile;
+        }
+    }
+
+    foreach ($candidateFiles as $candidateFile) {
+        $candidatePath = $templatesDirectory . "/" . $candidateFile;
+
+        if (is_file($candidatePath)) {
+            return $candidatePath;
+        }
+    }
+
+    return "";
+}
+
 $slug = resolveRequestedSlug();
 
 if ($slug === "") {
@@ -91,11 +127,7 @@ if (!$page) {
     renderPageNotFound();
 }
 
-$templateMap = [
-    "about_v1" => __DIR__ . "/templates/pages/about_v1.php",
-];
-
-$templatePath = $templateMap[$page["template_key"]] ?? "";
+$templatePath = resolvePageTemplatePath((string) ($page["template_key"] ?? ""));
 
 if ($templatePath === "" || !is_file($templatePath)) {
     renderPageNotFound();
