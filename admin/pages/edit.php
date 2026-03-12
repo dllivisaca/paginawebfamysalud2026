@@ -851,8 +851,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <div class="field-group">
                                 <label class="field-label" for="page_key">Clave interna del sistema</label>
                                 <?php if ($isCreateMode): ?>
-                                    <input class="form-input" type="text" id="page_key" name="page_key" value="<?php echo htmlspecialchars($pageData["page_key"], ENT_QUOTES, "UTF-8"); ?>" required>
-                                    <p class="field-help">Identificador interno &uacute;nico de la p&aacute;gina. Despu&eacute;s de crearla ya no se podr&aacute; editar.</p>
+                                    <input class="form-input" type="text" id="page_key" name="page_key" value="<?php echo htmlspecialchars($pageData["page_key"], ENT_QUOTES, "UTF-8"); ?>" readonly required>
+                                    <p class="field-help">Se genera autom&aacute;ticamente a partir del nombre de la p&aacute;gina y no se puede editar manualmente.</p>
                                 <?php else: ?>
                                     <div class="readonly-box"><?php echo htmlspecialchars($pageData["page_key"], ENT_QUOTES, "UTF-8"); ?></div>
                                     <input type="hidden" name="page_key" value="<?php echo htmlspecialchars($pageData["page_key"], ENT_QUOTES, "UTF-8"); ?>">
@@ -946,18 +946,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             var slugInput = document.getElementById("slug");
             var h1TitleInput = document.getElementById("h1_title");
             var seoTitleInput = document.getElementById("seo_title");
+            var seoDescriptionInput = document.getElementById("seo_description");
+            var ogTitleInput = document.getElementById("og_title");
+            var ogDescriptionInput = document.getElementById("og_description");
             var canonicalInput = document.getElementById("canonical_url");
 
-            if (!isCreateMode || !titleInput || !pageKeyInput || !slugInput || !h1TitleInput || !seoTitleInput || !canonicalInput) {
+            if (!isCreateMode || !titleInput || !pageKeyInput || !slugInput || !h1TitleInput || !seoTitleInput || !seoDescriptionInput || !ogTitleInput || !ogDescriptionInput || !canonicalInput) {
                 return;
             }
 
             var baseUrl = <?php echo json_encode($siteBaseUrlForJs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>;
             var manualFlags = {
-                pageKey: false,
                 slug: false,
                 h1Title: false,
                 seoTitle: false,
+                ogTitle: false,
+                ogDescription: false,
                 canonical: false
             };
 
@@ -992,6 +996,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             function syncDerivedFields() {
                 var sourceTitle = titleInput.value.trim();
+                var sourceDescription = seoDescriptionInput.value.trim();
                 var nextSlug = buildSlug(sourceTitle);
                 var nextPageKey = buildPageKey(sourceTitle);
                 var nextCanonicalUrl = buildCanonicalUrl(nextSlug);
@@ -1000,9 +1005,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     slugInput.value = nextSlug;
                 }
 
-                if (!manualFlags.pageKey) {
-                    pageKeyInput.value = nextPageKey;
-                }
+                pageKeyInput.value = nextPageKey;
 
                 if (!manualFlags.h1Title) {
                     h1TitleInput.value = sourceTitle;
@@ -1012,14 +1015,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     seoTitleInput.value = sourceTitle;
                 }
 
+                if (!manualFlags.ogTitle) {
+                    ogTitleInput.value = sourceTitle;
+                }
+
+                if (!manualFlags.ogDescription) {
+                    ogDescriptionInput.value = sourceDescription;
+                }
+
                 if (!manualFlags.canonical) {
                     canonicalInput.value = nextCanonicalUrl;
                 }
             }
-
-            pageKeyInput.addEventListener("input", function () {
-                manualFlags.pageKey = pageKeyInput.value.trim() !== "";
-            });
 
             slugInput.addEventListener("input", function () {
                 manualFlags.slug = slugInput.value.trim() !== "";
@@ -1035,6 +1042,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             seoTitleInput.addEventListener("input", function () {
                 manualFlags.seoTitle = seoTitleInput.value.trim() !== "";
+            });
+
+            seoDescriptionInput.addEventListener("input", function () {
+                if (!manualFlags.ogDescription) {
+                    ogDescriptionInput.value = seoDescriptionInput.value.trim();
+                }
+            });
+
+            ogTitleInput.addEventListener("input", function () {
+                manualFlags.ogTitle = ogTitleInput.value.trim() !== "";
+            });
+
+            ogDescriptionInput.addEventListener("input", function () {
+                manualFlags.ogDescription = ogDescriptionInput.value.trim() !== "";
             });
 
             canonicalInput.addEventListener("input", function () {
