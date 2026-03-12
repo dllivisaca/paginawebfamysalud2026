@@ -7,7 +7,34 @@ if (empty($_SESSION["csrf_token"])) {
 
 function buildCanonicalUrl(string $slug): string
 {
-    $baseUrl = "https://tudominio.com";
+    $configuredBaseUrl = "";
+
+    if (defined("SITE_BASE_URL") && is_string(SITE_BASE_URL) && trim(SITE_BASE_URL) !== "") {
+        $configuredBaseUrl = trim(SITE_BASE_URL);
+    } elseif (defined("APP_URL") && is_string(APP_URL) && trim(APP_URL) !== "") {
+        $configuredBaseUrl = trim(APP_URL);
+    } elseif (defined("BASE_URL") && is_string(BASE_URL) && trim(BASE_URL) !== "") {
+        $configuredBaseUrl = trim(BASE_URL);
+    }
+
+    if ($configuredBaseUrl !== "") {
+        $baseUrl = rtrim($configuredBaseUrl, "/");
+    } else {
+        $isHttps = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off";
+        $scheme = $isHttps ? "https" : "http";
+        $host = trim((string) ($_SERVER["HTTP_HOST"] ?? "localhost"));
+        $scriptName = str_replace("\\", "/", (string) ($_SERVER["SCRIPT_NAME"] ?? ""));
+        $scriptDir = rtrim(str_replace("\\", "/", dirname($scriptName)), "/");
+        $projectPath = preg_replace("#/admin/pages$#", "", $scriptDir);
+
+        if (!is_string($projectPath)) {
+            $projectPath = "";
+        }
+
+        $baseUrl = $scheme . "://" . $host . $projectPath;
+        $baseUrl = rtrim($baseUrl, "/");
+    }
+
     $slug = trim($slug);
 
     if ($slug === "" || $slug === "home") {
@@ -16,6 +43,8 @@ function buildCanonicalUrl(string $slug): string
 
     return $baseUrl . "/page.php?slug=" . rawurlencode($slug);
 }
+
+$siteBaseUrlForJs = rtrim(buildCanonicalUrl("home"), "/");
 
 $pageId = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
 $isCreateMode = $pageId <= 0 || ((string) ($_GET["action"] ?? "")) === "create";
@@ -796,8 +825,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                         <div class="form-grid">
                             <div class="field-group">
-                                <label class="field-label" for="title">T&iacute;tulo visible</label>
+                                <label class="field-label" for="title">Nombre de la p&aacute;gina</label>
                                 <input class="form-input" type="text" id="title" name="title" value="<?php echo htmlspecialchars($pageData["title"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                <p class="field-help">Este nombre te ayuda a identificar la p&aacute;gina dentro del panel administrativo.</p>
                             </div>
 
                             <div class="field-group">
@@ -838,6 +868,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     <p class="field-help">La URL amigable de Inicio queda bloqueada por seguridad.</p>
                                 <?php else: ?>
                                     <input class="form-input" type="text" id="slug" name="slug" value="<?php echo htmlspecialchars($pageData["slug"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                    <p class="field-help">Se usa en el enlace de la p&aacute;gina. Ejemplo: nosotros, servicios, contacto.</p>
                                 <?php endif; ?>
                             </div>
 
@@ -856,18 +887,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
 
                             <div class="field-group field-group-full">
-                                <label class="field-label" for="h1_title">T&iacute;tulo principal visible</label>
+                                <label class="field-label" for="h1_title">T&iacute;tulo principal que ver&aacute; el visitante</label>
                                 <input class="form-input" type="text" id="h1_title" name="h1_title" value="<?php echo htmlspecialchars($pageData["h1_title"], ENT_QUOTES, "UTF-8"); ?>">
+                                <p class="field-help">Este es el t&iacute;tulo grande que aparece dentro de la p&aacute;gina p&uacute;blica.</p>
                             </div>
 
                             <div class="field-group field-group-full">
                                 <label class="field-label" for="seo_title">T&iacute;tulo SEO</label>
                                 <input class="form-input" type="text" id="seo_title" name="seo_title" value="<?php echo htmlspecialchars($pageData["seo_title"], ENT_QUOTES, "UTF-8"); ?>">
+                                <p class="field-help">Es el t&iacute;tulo que pueden mostrar Google y otros buscadores en los resultados.</p>
                             </div>
 
                             <div class="field-group field-group-full">
                                 <label class="field-label" for="seo_description">Descripci&oacute;n SEO</label>
                                 <textarea class="form-textarea" id="seo_description" name="seo_description"><?php echo htmlspecialchars($pageData["seo_description"], ENT_QUOTES, "UTF-8"); ?></textarea>
+                                <p class="field-help">Es el resumen que pueden mostrar Google y otros buscadores debajo del t&iacute;tulo.</p>
                             </div>
 
                             <div class="field-group field-group-full">
@@ -891,7 +925,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <div class="field-group field-group-full">
                                 <label class="field-label" for="canonical_url">Enlace principal de esta p&aacute;gina</label>
                                 <input class="form-input" type="text" id="canonical_url" name="canonical_url" value="<?php echo htmlspecialchars($pageData["canonical_url"], ENT_QUOTES, "UTF-8"); ?>">
-                                <p class="field-help">Se llena autom&aacute;ticamente, pero puedes cambiarlo si lo necesitas.</p>
+                                <p class="field-help">Se completa autom&aacute;ticamente con el enlace principal de la p&aacute;gina, pero puedes cambiarlo si lo necesitas.</p>
                             </div>
                         </div>
 
@@ -913,7 +947,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 return;
             }
 
-            var baseUrl = "https://tudominio.com";
+            var baseUrl = <?php echo json_encode($siteBaseUrlForJs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>;
             var canonicalTouched = false;
 
             function buildCanonicalUrl(slug) {
