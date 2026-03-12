@@ -100,7 +100,11 @@ $flashMessage = trim((string) ($_GET["message"] ?? ""));
 
 $sitePages = [];
 $activePagesCount = 0;
-$result = $conn->query("SELECT id, title, page_key, slug, template_key, is_active FROM site_pages ORDER BY id ASC");
+$result = $conn->query(
+    "SELECT id, title, page_key, slug, template_key, is_active, created_at
+     FROM site_pages
+     ORDER BY CASE WHEN page_key = 'home' THEN 0 ELSE 1 END ASC, created_at ASC, id ASC"
+);
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
@@ -613,7 +617,7 @@ if ($result) {
                     <table class="pages-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>#</th>
                                 <th>T&iacute;tulo visible</th>
                                 <th>URL amigable</th>
                                 <th>Estado</th>
@@ -622,10 +626,10 @@ if ($result) {
                         </thead>
                         <tbody>
                             <?php if ($sitePages !== []): ?>
-                                <?php foreach ($sitePages as $pageItem): ?>
+                                <?php foreach ($sitePages as $index => $pageItem): ?>
                                     <?php $isActive = (int) $pageItem["is_active"] === 1; ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars((string) $pageItem["id"], ENT_QUOTES, "UTF-8"); ?></td>
+                                        <td><?php echo $index + 1; ?></td>
                                         <td>
                                             <?php echo htmlspecialchars((string) ($pageItem["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?>
                                             <?php if ($pageItem["is_home_page"]): ?>
