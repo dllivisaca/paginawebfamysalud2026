@@ -216,10 +216,10 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                     <table class="pages-table">
                         <thead>
                             <tr>
+                                <th>Posici&oacute;n</th>
                                 <th>Nombre visible</th>
                                 <th>Tipo de opci&oacute;n</th>
                                 <th>Direcci&oacute;n</th>
-                                <th>Posici&oacute;n</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -227,13 +227,13 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                         <tbody>
                             <?php if ($homeItem !== null): ?>
                                 <tr>
+                                    <td>1</td>
                                     <td>
                                         <?php echo htmlspecialchars((string) $homeItem["label"], ENT_QUOTES, "UTF-8"); ?>
                                         <div class="protected-badge">Opci&oacute;n protegida</div>
                                     </td>
                                     <td>P&aacute;gina interna</td>
                                     <td><?php echo htmlspecialchars((string) $homeItem["url"], ENT_QUOTES, "UTF-8"); ?></td>
-                                    <td>1</td>
                                     <td><span class="status-pill status-fixed">Fija</span></td>
                                     <td>
                                         <div class="actions-group">
@@ -247,10 +247,10 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                                 <?php foreach ($menuOptions as $item): ?>
                                     <?php $isActive = (int) ($item["is_active"] ?? 0) === 1; ?>
                                     <tr>
+                                        <td><?php echo (int) ($item["display_order"] ?? 0); ?></td>
                                         <td><?php echo htmlspecialchars((string) ($item["label"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
                                         <td><?php echo ($item["link_type"] ?? "custom") === "internal" ? "P&aacute;gina interna" : "Enlace personalizado"; ?></td>
                                         <td><?php echo htmlspecialchars((string) ($item["url"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
-                                        <td><?php echo (int) ($item["display_order"] ?? 0); ?></td>
                                         <td><span class="status-pill <?php echo $isActive ? "status-visible" : "status-hidden"; ?>"><?php echo $isActive ? "Visible" : "Oculta"; ?></span></td>
                                         <td>
                                             <div class="actions-group">
