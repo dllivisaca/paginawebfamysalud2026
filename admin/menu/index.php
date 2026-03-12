@@ -21,42 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $action = (string) ($_POST["action"] ?? "");
 
-    if ($action === "save_button") {
-        $buttonId = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
-        $text = textValue((string) ($_POST["button_text"] ?? ""));
-        $path = buttonPath((string) ($_POST["button_path"] ?? ""));
-        $target = menuTarget((string) ($_POST["target"] ?? "_self"));
-        $isActive = isset($_POST["is_active"]) ? 1 : 0;
-
-        if ($text === "" || $path === "") {
-            redirectToMenu("invalid");
-        }
-
-        if (($buttonId === false || $buttonId === null) && countByType($conn, 1) >= 1) {
-            redirectToMenu("limit_button");
-        }
-
-        if ($buttonId !== false && $buttonId !== null) {
-            $stmt = $conn->prepare("UPDATE menu_items SET label = ?, url = ?, is_active = ?, target = ?, updated_at = NOW() WHERE id = ? AND is_button = 1 LIMIT 1");
-            if (!$stmt) {
-                redirectToMenu("error");
-            }
-            $stmt->bind_param("ssisi", $text, $path, $isActive, $target, $buttonId);
-            $ok = $stmt->execute();
-            $stmt->close();
-            redirectToMenu($ok ? "updated" : "error");
-        }
-
-        $stmt = $conn->prepare("INSERT INTO menu_items (parent_id, label, url, display_order, is_active, is_button, target, created_at, updated_at) VALUES (NULL, ?, ?, 9, ?, 1, ?, NOW(), NOW())");
-        if (!$stmt) {
-            redirectToMenu("error");
-        }
-        $stmt->bind_param("ssis", $text, $path, $isActive, $target);
-        $ok = $stmt->execute();
-        $stmt->close();
-        redirectToMenu($ok ? "created" : "error");
-    }
-
     if ($action === "toggle") {
         $itemId = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
         $nextState = filter_input(INPUT_POST, "next_state", FILTER_VALIDATE_INT);
@@ -284,22 +248,35 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
 
             <section class="card">
                 <h2>Bot&oacute;n principal</h2>
-                <p>Este bot&oacute;n se mantiene en esta pantalla como configuraci&oacute;n r&aacute;pida independiente del listado principal.</p>
-                <form action="index.php" method="post">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
-                    <input type="hidden" name="action" value="save_button">
-                    <input type="hidden" name="id" value="<?php echo $primaryButton !== null ? (int) $primaryButton["id"] : ""; ?>">
-                    <div class="form-grid">
-                        <div class="form-group"><label for="button_text">Texto del bot&oacute;n</label><input type="text" id="button_text" name="button_text" maxlength="255" required value="<?php echo htmlspecialchars((string) ($primaryButton["label"] ?? ""), ENT_QUOTES, "UTF-8"); ?>"></div>
-                        <div class="form-group"><label for="button_path">Direcci&oacute;n del bot&oacute;n</label><input type="text" id="button_path" name="button_path" maxlength="255" required value="<?php echo htmlspecialchars((string) ($primaryButton["url"] ?? ""), ENT_QUOTES, "UTF-8"); ?>"><div class="helper">Aqu&iacute; puedes escribir un enlace completo real, por ejemplo: https://midominio.com/agendar o https://wa.me/593...</div></div>
-                        <div class="form-group"><label for="button_target">Abrir enlace</label><select id="button_target" name="target"><option value="_self" <?php echo (($primaryButton["target"] ?? "_self") === "_self") ? "selected" : ""; ?>>En la misma pesta&ntilde;a</option><option value="_blank" <?php echo (($primaryButton["target"] ?? "_self") === "_blank") ? "selected" : ""; ?>>En una pesta&ntilde;a nueva</option></select></div>
-                        <div class="form-group"><label>Mostrar bot&oacute;n principal</label><div class="checkbox-row"><input type="checkbox" id="button_active" name="is_active" value="1" <?php echo ((int) ($primaryButton["is_active"] ?? 1) === 1) ? "checked" : ""; ?>><label for="button_active" style="margin:0;font-weight:normal;">S&iacute;, mostrar</label></div></div>
-                    </div>
-                    <div class="actions-group" style="margin-top:20px;">
-                        <button type="submit" class="btn btn-primary"><?php echo $primaryButton !== null ? "Guardar bot&oacute;n principal" : "Crear bot&oacute;n principal"; ?></button>
-                    </div>
-                </form>
+                <p>Administra el bot&oacute;n destacado del encabezado con una vista resumida y acciones separadas para editarlo sin mezclar formularios en esta pantalla.</p>
+
                 <?php if ($primaryButton !== null): ?>
+                    <div class="pages-table-wrapper">
+                        <table class="pages-table" style="min-width:780px;">
+                            <thead>
+                                <tr>
+                                    <th>Texto del bot&oacute;n</th>
+                                    <th>Direcci&oacute;n</th>
+                                    <th>Abrir enlace</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><?php echo htmlspecialchars((string) ($primaryButton["label"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
+                                    <td><?php echo htmlspecialchars((string) ($primaryButton["url"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
+                                    <td><?php echo (($primaryButton["target"] ?? "_self") === "_blank") ? "En una pesta&ntilde;a nueva" : "En la misma pesta&ntilde;a"; ?></td>
+                                    <td><span class="status-pill <?php echo ((int) ($primaryButton["is_active"] ?? 0) === 1) ? "status-visible" : "status-hidden"; ?>"><?php echo ((int) ($primaryButton["is_active"] ?? 0) === 1) ? "Visible" : "Oculto"; ?></span></td>
+                                    <td>
+                                        <div class="actions-group">
+                                            <a href="button-edit.php?id=<?php echo (int) $primaryButton["id"]; ?>" class="btn btn-primary">Editar</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="actions-group" style="margin-top:12px;">
                         <form action="index.php" method="post" class="inline-form">
                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
@@ -314,6 +291,11 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                             <input type="hidden" name="id" value="<?php echo (int) $primaryButton["id"]; ?>">
                             <button type="submit" class="btn btn-danger">Eliminar</button>
                         </form>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-state">Todav&iacute;a no has configurado el bot&oacute;n principal del encabezado.</div>
+                    <div class="actions-group" style="margin-top:16px;">
+                        <a href="button-edit.php?action=create" class="btn btn-primary">Crear bot&oacute;n principal</a>
                     </div>
                 <?php endif; ?>
             </section>

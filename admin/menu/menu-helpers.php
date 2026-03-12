@@ -20,6 +20,20 @@ function redirectToMenuEdit(string $status, int $itemId = 0, bool $isCreate = fa
     exit;
 }
 
+function redirectToMenuButtonEdit(string $status, int $buttonId = 0, bool $isCreate = false): void
+{
+    $query = ["status" => $status];
+
+    if ($buttonId > 0) {
+        $query["id"] = $buttonId;
+    } elseif ($isCreate) {
+        $query["action"] = "create";
+    }
+
+    header("Location: button-edit.php?" . http_build_query($query));
+    exit;
+}
+
 function textValue(string $value, int $maxLength = 255): string
 {
     $value = trim($value);
