@@ -193,7 +193,7 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
 
             <?php if (in_array($status, ["created", "updated", "toggled", "deleted"], true)): ?><div class="alert alert-success">Los cambios se guardaron correctamente.</div><?php endif; ?>
             <?php if (in_array($status, ["invalid", "error"], true)): ?><div class="alert alert-error">No se pudo guardar la informaci&oacute;n. Revisa los datos e intenta nuevamente.</div><?php endif; ?>
-            <?php if ($status === "protected"): ?><div class="alert alert-error">La opci&oacute;n Inicio es fija del sistema y no se puede editar, ocultar ni eliminar.</div><?php endif; ?>
+            <?php if ($status === "protected"): ?><div class="alert alert-error">La opci&oacute;n Inicio es fija del sistema y no se puede ocultar ni eliminar.</div><?php endif; ?>
             <?php if ($status === "limit_button"): ?><div class="alert alert-error">Solo puedes tener un bot&oacute;n principal configurado.</div><?php endif; ?>
             <?php if ($status === "migration_required"): ?><div class="alert alert-error">Falta ejecutar la actualizaci&oacute;n de base de datos del men&uacute; para habilitar p&aacute;ginas internas.</div><?php endif; ?>
             <?php if (!$supportsMenuLinkTypes): ?><div class="alert alert-error">El listado ya est&aacute; preparado para p&aacute;ginas internas, pero primero debes ejecutar manualmente el SQL pendiente en <span class="muted">menu_items</span>.</div><?php endif; ?>
@@ -237,7 +237,11 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                                     <td><?php echo htmlspecialchars((string) $homeItem["url"], ENT_QUOTES, "UTF-8"); ?></td>
                                     <td>1</td>
                                     <td><span class="status-pill status-fixed">Fija</span></td>
-                                    <td class="muted">Sin acciones disponibles</td>
+                                    <td>
+                                        <div class="actions-group">
+                                            <a href="edit.php?id=<?php echo (int) $homeItem["id"]; ?>" class="btn btn-primary">Editar</a>
+                                        </div>
+                                    </td>
                                 </tr>
                             <?php endif; ?>
 

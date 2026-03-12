@@ -17,6 +17,7 @@ $isCreateMode = $itemId <= 0 || ((string) ($_GET["action"] ?? "")) === "create";
 $status = (string) ($_GET["status"] ?? "");
 $errors = [];
 $successMessage = "";
+$isHomeItem = false;
 
 $menuData = [
     "name" => "",
@@ -41,15 +42,14 @@ if (!$isCreateMode) {
 
     if (!$existingItem || (int) ($existingItem["is_button"] ?? 0) !== 0) {
         $errors[] = "La opcion del menu solicitada no existe.";
-    } elseif (isHomeMenuItem($existingItem)) {
-        redirectToMenu("protected");
     } else {
+        $isHomeItem = isHomeMenuItem($existingItem);
         $menuData = [
-            "name" => (string) ($existingItem["label"] ?? ""),
+            "name" => $isHomeItem ? "Inicio" : (string) ($existingItem["label"] ?? ""),
             "path" => (string) ($existingItem["url"] ?? ""),
-            "display_order" => (int) ($existingItem["display_order"] ?? 2),
+            "display_order" => $isHomeItem ? 1 : (int) ($existingItem["display_order"] ?? 2),
             "target" => menuTarget((string) ($existingItem["target"] ?? "_self")),
-            "is_active" => (int) ($existingItem["is_active"] ?? 1),
+            "is_active" => $isHomeItem ? 1 : (int) ($existingItem["is_active"] ?? 1),
             "link_type" => menuLinkType((string) ($existingItem["link_type"] ?? "custom"), $supportsMenuLinkTypes),
             "site_page_id" => (int) ($existingItem["site_page_id"] ?? 0),
         ];
@@ -64,7 +64,7 @@ if (!$isCreateMode && (int) $menuData["site_page_id"] > 0) {
 $sitePages = [];
 $sitePagesById = [];
 if ($supportsMenuLinkTypes) {
-    [$sitePages, $sitePagesById] = getMenuSitePages($conn, $linkedSitePageIds);
+    [$sitePages, $sitePagesById] = getMenuSitePages($conn, $linkedSitePageIds, $isHomeItem);
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -83,10 +83,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (!$isCreateSubmission) {
             if (!$existingItem || (int) ($existingItem["is_button"] ?? 0) !== 0) {
                 $errors[] = "La opcion del menu que intentas editar ya no existe.";
-            } elseif (isHomeMenuItem($existingItem)) {
-                $errors[] = "La opcion Inicio esta protegida y no se puede editar.";
             }
         }
+
+        $isHomeItem = !$isCreateSubmission && isHomeMenuItem($existingItem);
 
         $menuData = [
             "name" => textValue((string) ($_POST["name"] ?? "")),
@@ -97,6 +97,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "link_type" => menuLinkType((string) ($_POST["link_type"] ?? "custom"), $supportsMenuLinkTypes),
             "site_page_id" => (int) ($_POST["site_page_id"] ?? 0),
         ];
+
+        if ($isHomeItem) {
+            $menuData["name"] = "Inicio";
+            $menuData["display_order"] = 1;
+            $menuData["is_active"] = 1;
+        }
 
         if ($isCreateMode && countByType($conn, 0) >= 8) {
             $errors[] = "Ya tienes configuradas las 8 opciones permitidas para el menu.";
@@ -115,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $linkedPage = getSitePageById($conn, $menuData["site_page_id"]);
             }
 
-            if (!$linkedPage || ($linkedPage["page_key"] ?? "") === "home") {
+            if (!$linkedPage || (!$isHomeItem && ($linkedPage["page_key"] ?? "") === "home")) {
                 $errors[] = "La pagina seleccionada no es valida para el menu.";
             } else {
                 if ($menuData["name"] === "") {
@@ -137,7 +143,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $errors[] = "La direccion es obligatoria.";
         }
 
-        if ($menuData["display_order"] < 2 || $menuData["display_order"] > 8) {
+        if ($isHomeItem) {
+            $menuData["display_order"] = 1;
+            $menuData["is_active"] = 1;
+        } elseif ($menuData["display_order"] < 2 || $menuData["display_order"] > 8) {
             $errors[] = "La posicion seleccionada no es valida.";
         }
 
@@ -220,7 +229,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="topbar">
                 <div>
                     <h1 class="page-title"><?php echo $isCreateMode ? "Crear nueva opcion" : "Editar opcion del menu"; ?></h1>
-                    <p class="page-subtitle">Configura una opcion del menu de navegacion con un enlace personalizado o vinculada a una pagina real del sitio.</p>
+                    <p class="page-subtitle"><?php echo $isHomeItem ? "La opcion Inicio es fija del sistema. Aqui solo puedes cambiar su destino, tipo de enlace y forma de apertura." : "Configura una opcion del menu de navegacion con un enlace personalizado o vinculada a una pagina real del sitio."; ?></p>
                 </div>
                 <div class="topbar-actions">
                     <a href="index.php" class="btn btn-outline">Volver al menu</a>
@@ -246,7 +255,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <section class="card">
                 <h2><?php echo $isCreateMode ? "Datos de la opcion" : "Editar datos de la opcion"; ?></h2>
-                <p>Completa solo lo necesario. Si eliges una pagina interna, la direccion se completara automaticamente.</p>
+                <p><?php echo $isHomeItem ? "Inicio siempre permanece visible y en la primera posicion. Solo puedes actualizar a donde lleva el enlace." : "Completa solo lo necesario. Si eliges una pagina interna, la direccion se completara automaticamente."; ?></p>
 
                 <form action="edit.php<?php echo !$isCreateMode ? "?id=" . urlencode((string) $itemId) : "?action=create"; ?>" method="post" data-menu-form="edit-option">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
@@ -278,8 +287,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                         <div class="form-group">
                             <label for="name">Nombre visible</label>
-                            <input type="text" id="name" name="name" maxlength="255" required value="<?php echo htmlspecialchars($menuData["name"], ENT_QUOTES, "UTF-8"); ?>" data-menu-name>
-                            <div class="helper">Puedes ajustar el texto del menu aunque el item apunte a una pagina interna.</div>
+                            <?php if ($isHomeItem): ?>
+                                <div class="readonly-box">Inicio</div>
+                                <input type="hidden" id="name" name="name" value="Inicio" data-menu-name>
+                                <div class="helper">Esta opcion fija del sistema siempre conserva el nombre Inicio.</div>
+                            <?php else: ?>
+                                <input type="text" id="name" name="name" maxlength="255" required value="<?php echo htmlspecialchars($menuData["name"], ENT_QUOTES, "UTF-8"); ?>" data-menu-name>
+                                <div class="helper">Puedes ajustar el texto del menu aunque el item apunte a una pagina interna.</div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="form-group">
@@ -298,20 +313,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                         <div class="form-group">
                             <label for="display_order">Posici&oacute;n en el men&uacute;</label>
-                            <select id="display_order" name="display_order">
-                                <?php for ($i = 2; $i <= 8; $i++): ?>
-                                    <option value="<?php echo $i; ?>" <?php echo (int) $menuData["display_order"] === $i ? "selected" : ""; ?>><?php echo $i; ?></option>
-                                <?php endfor; ?>
-                            </select>
-                            <div class="helper">La posici&oacute;n 1 est&aacute; reservada para Inicio.</div>
+                            <?php if ($isHomeItem): ?>
+                                <div class="readonly-box">1</div>
+                                <input type="hidden" id="display_order" name="display_order" value="1">
+                                <div class="helper">Inicio siempre permanece en la primera posicion del menu.</div>
+                            <?php else: ?>
+                                <select id="display_order" name="display_order">
+                                    <?php for ($i = 2; $i <= 8; $i++): ?>
+                                        <option value="<?php echo $i; ?>" <?php echo (int) $menuData["display_order"] === $i ? "selected" : ""; ?>><?php echo $i; ?></option>
+                                    <?php endfor; ?>
+                                </select>
+                                <div class="helper">La posici&oacute;n 1 est&aacute; reservada para Inicio.</div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="form-group">
                             <label>Mostrar en el men&uacute;</label>
-                            <div class="checkbox-row">
-                                <input type="checkbox" id="is_active" name="is_active" value="1" <?php echo (int) $menuData["is_active"] === 1 ? "checked" : ""; ?>>
-                                <label for="is_active" style="margin:0;font-weight:normal;">S&iacute;, mostrar</label>
-                            </div>
+                            <?php if ($isHomeItem): ?>
+                                <div class="readonly-box">Visible siempre</div>
+                                <input type="hidden" id="is_active" name="is_active" value="1">
+                                <div class="helper">Esta opcion protegida siempre se mantiene visible.</div>
+                            <?php else: ?>
+                                <div class="checkbox-row">
+                                    <input type="checkbox" id="is_active" name="is_active" value="1" <?php echo (int) $menuData["is_active"] === 1 ? "checked" : ""; ?>>
+                                    <label for="is_active" style="margin:0;font-weight:normal;">S&iacute;, mostrar</label>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <?php if (!$isCreateMode): ?>

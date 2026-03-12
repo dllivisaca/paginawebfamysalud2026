@@ -204,14 +204,18 @@ function getSitePageById(mysqli $conn, int $pageId): ?array
     return $row ?: null;
 }
 
-function getMenuSitePages(mysqli $conn, array $linkedSitePageIds = []): array
+function getMenuSitePages(mysqli $conn, array $linkedSitePageIds = [], bool $includeHomePage = false): array
 {
     $sitePages = [];
     $sitePagesById = [];
 
     $sitePagesSql = "SELECT id, page_key, title, slug, is_active
                      FROM site_pages
-                     WHERE page_key <> 'home'";
+                     WHERE 1 = 1";
+
+    if (!$includeHomePage) {
+        $sitePagesSql .= " AND page_key <> 'home'";
+    }
 
     if ($linkedSitePageIds !== []) {
         $sitePagesSql .= " AND (is_active = 1 OR id IN (" . implode(",", array_map("intval", $linkedSitePageIds)) . "))";
