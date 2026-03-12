@@ -6,106 +6,20 @@ if (empty($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 }
 
-$expectedPages = [
-    [
-        "name" => "Inicio",
-        "expected_slug" => "home",
-        "page_keys" => ["home"],
-        "slug_aliases" => ["home", "inicio"],
-    ],
-    [
-        "name" => "Nosotros",
-        "expected_slug" => "nosotros",
-        "page_keys" => ["about"],
-        "slug_aliases" => ["nosotros"],
-    ],
-    [
-        "name" => "Especialidades",
-        "expected_slug" => "especialidades",
-        "page_keys" => ["specialties", "departments"],
-        "slug_aliases" => ["especialidades"],
-    ],
-    [
-        "name" => "Servicios",
-        "expected_slug" => "servicios",
-        "page_keys" => ["services"],
-        "slug_aliases" => ["servicios"],
-    ],
-    [
-        "name" => "Salud Ocupacional",
-        "expected_slug" => "salud-ocupacional",
-        "page_keys" => ["occupational_health", "salud_ocupacional"],
-        "slug_aliases" => ["salud-ocupacional"],
-    ],
-    [
-        "name" => "Doctores",
-        "expected_slug" => "doctores",
-        "page_keys" => ["doctors"],
-        "slug_aliases" => ["doctores"],
-    ],
-    [
-        "name" => "Promociones",
-        "expected_slug" => "promociones",
-        "page_keys" => ["promotions"],
-        "slug_aliases" => ["promociones"],
-    ],
-    [
-        "name" => "Contacto",
-        "expected_slug" => "contacto",
-        "page_keys" => ["contact"],
-        "slug_aliases" => ["contacto"],
-    ],
-];
-
 $sitePages = [];
-$sitePagesByKey = [];
-$sitePagesBySlug = [];
-$result = $conn->query("SELECT page_key, title, slug, template_key, is_active FROM site_pages ORDER BY id ASC");
+$activePagesCount = 0;
+$result = $conn->query("SELECT id, title, page_key, slug, template_key, is_active FROM site_pages ORDER BY id ASC");
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        $row["id"] = (int) ($row["id"] ?? 0);
+        $row["is_active"] = (int) ($row["is_active"] ?? 0);
         $sitePages[] = $row;
-        $pageKey = (string) ($row["page_key"] ?? "");
-        $slug = (string) ($row["slug"] ?? "");
 
-        if ($pageKey !== "") {
-            $sitePagesByKey[$pageKey] = $row;
-        }
-
-        if ($slug !== "") {
-            $sitePagesBySlug[$slug] = $row;
+        if ($row["is_active"] === 1) {
+            $activePagesCount++;
         }
     }
-}
-
-$pagesOverview = [];
-
-foreach ($expectedPages as $expectedPage) {
-    $matchedPage = null;
-
-    foreach ($expectedPage["page_keys"] as $pageKey) {
-        if (isset($sitePagesByKey[$pageKey])) {
-            $matchedPage = $sitePagesByKey[$pageKey];
-            break;
-        }
-    }
-
-    if ($matchedPage === null) {
-        foreach ($expectedPage["slug_aliases"] as $slugAlias) {
-            if (isset($sitePagesBySlug[$slugAlias])) {
-                $matchedPage = $sitePagesBySlug[$slugAlias];
-                break;
-            }
-        }
-    }
-
-    $pagesOverview[] = [
-        "name" => $expectedPage["name"],
-        "slug" => $matchedPage["slug"] ?? $expectedPage["expected_slug"],
-        "template_key" => $matchedPage["template_key"] ?? "Pendiente",
-        "status" => $matchedPage !== null ? "Configurada" : "Pendiente",
-        "is_configured" => $matchedPage !== null,
-    ];
 }
 ?>
 <!DOCTYPE html>
@@ -271,6 +185,15 @@ foreach ($expectedPages as $expectedPage) {
             background: #eef8f2;
         }
 
+        .btn-primary {
+            background: #198754;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #157347;
+        }
+
         .btn-logout {
             background: #dc3545;
             color: #ffffff;
@@ -358,14 +281,14 @@ foreach ($expectedPages as $expectedPage) {
             font-weight: bold;
         }
 
-        .status-configured {
+        .status-active {
             background: #e9f7ef;
             color: #146c43;
         }
 
-        .status-pending {
-            background: #fff4db;
-            color: #996b00;
+        .status-inactive {
+            background: #f3f4f6;
+            color: #4b5563;
         }
 
         .muted {
@@ -496,46 +419,61 @@ foreach ($expectedPages as $expectedPage) {
 
             <section class="card">
                 <h2>Resumen</h2>
-                <p>Vista inicial de las p&aacute;ginas objetivo del sitio y su estado actual dentro de la base de datos.</p>
+                <p>Resumen de las p&aacute;ginas registradas actualmente en la tabla <span class="muted">site_pages</span>.</p>
                 <div class="summary-grid">
                     <div class="summary-box">
-                        <div class="summary-label">P&aacute;ginas configuradas</div>
-                        <div class="summary-value"><?php echo count(array_filter($pagesOverview, static fn(array $page): bool => $page["is_configured"])); ?></div>
+                        <div class="summary-label">P&aacute;ginas registradas</div>
+                        <div class="summary-value"><?php echo count($sitePages); ?></div>
                     </div>
                     <div class="summary-box">
-                        <div class="summary-label">P&aacute;ginas pendientes</div>
-                        <div class="summary-value"><?php echo count(array_filter($pagesOverview, static fn(array $page): bool => !$page["is_configured"])); ?></div>
+                        <div class="summary-label">P&aacute;ginas activas</div>
+                        <div class="summary-value"><?php echo $activePagesCount; ?></div>
                     </div>
                 </div>
             </section>
 
             <section class="card">
-                <h2>Estado de p&aacute;ginas</h2>
-                <p>Las p&aacute;ginas ya existentes en <span class="muted">site_pages</span> aparecen como configuradas. Las dem&aacute;s quedan marcadas como pendientes para su siguiente fase de configuraci&oacute;n.</p>
+                <h2>P&aacute;ginas registradas</h2>
+                <p>Aqu&iacute; se muestran &uacute;nicamente las p&aacute;ginas reales existentes en <span class="muted">site_pages</span>.</p>
 
                 <div class="pages-table-wrapper">
                     <table class="pages-table">
                         <thead>
                             <tr>
-                                <th>Nombre visible</th>
+                                <th>ID</th>
+                                <th>T&iacute;tulo visible</th>
+                                <th>Page Key</th>
                                 <th>Slug</th>
-                                <th>Template actual</th>
+                                <th>Template Key</th>
                                 <th>Estado</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($pagesOverview as $pageItem): ?>
+                            <?php if ($sitePages !== []): ?>
+                                <?php foreach ($sitePages as $pageItem): ?>
+                                    <?php $isActive = (int) $pageItem["is_active"] === 1; ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars((string) $pageItem["id"], ENT_QUOTES, "UTF-8"); ?></td>
+                                        <td><?php echo htmlspecialchars((string) ($pageItem["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
+                                        <td><?php echo htmlspecialchars((string) ($pageItem["page_key"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
+                                        <td><?php echo htmlspecialchars((string) ($pageItem["slug"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
+                                        <td><?php echo htmlspecialchars((string) ($pageItem["template_key"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
+                                        <td>
+                                            <span class="status-pill <?php echo $isActive ? "status-active" : "status-inactive"; ?>">
+                                                <?php echo $isActive ? "Activa" : "Inactiva"; ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="edit.php?id=<?php echo urlencode((string) $pageItem["id"]); ?>" class="btn btn-primary">Editar</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($pageItem["name"], ENT_QUOTES, "UTF-8"); ?></td>
-                                    <td><?php echo htmlspecialchars($pageItem["slug"], ENT_QUOTES, "UTF-8"); ?></td>
-                                    <td><?php echo htmlspecialchars($pageItem["template_key"], ENT_QUOTES, "UTF-8"); ?></td>
-                                    <td>
-                                        <span class="status-pill <?php echo $pageItem["is_configured"] ? "status-configured" : "status-pending"; ?>">
-                                            <?php echo htmlspecialchars($pageItem["status"], ENT_QUOTES, "UTF-8"); ?>
-                                        </span>
-                                    </td>
+                                    <td colspan="7" class="muted">No hay p&aacute;ginas registradas en la tabla <span class="muted">site_pages</span>.</td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
