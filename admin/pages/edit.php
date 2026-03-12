@@ -5,6 +5,18 @@ if (empty($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 }
 
+function buildCanonicalUrl(string $slug): string
+{
+    $baseUrl = "https://tudominio.com";
+    $slug = trim($slug);
+
+    if ($slug === "" || $slug === "home") {
+        return $baseUrl . "/";
+    }
+
+    return $baseUrl . "/page.php?slug=" . rawurlencode($slug);
+}
+
 $pageId = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
 $isCreateMode = $pageId <= 0 || ((string) ($_GET["action"] ?? "")) === "create";
 $status = (string) ($_GET["status"] ?? "");
@@ -93,8 +105,12 @@ if (!$isCreateMode) {
             "meta_robots" => (string) ($existingPage["meta_robots"] ?? "index,follow"),
             "og_title" => (string) ($existingPage["og_title"] ?? ""),
             "og_description" => (string) ($existingPage["og_description"] ?? ""),
-            "canonical_url" => (string) ($existingPage["canonical_url"] ?? ""),
+            "canonical_url" => trim((string) ($existingPage["canonical_url"] ?? "")),
         ];
+
+        if ($pageData["canonical_url"] === "") {
+            $pageData["canonical_url"] = buildCanonicalUrl($pageData["slug"]);
+        }
     } else {
         $errors[] = "La pagina solicitada no existe.";
     }
@@ -166,6 +182,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($isHomePage && $existingPage) {
             $pageData["slug"] = (string) ($existingPage["slug"] ?? "");
             $pageData["is_active"] = 1;
+        }
+
+        if ($pageData["canonical_url"] === "") {
+            $pageData["canonical_url"] = buildCanonicalUrl($pageData["slug"]);
         }
 
         if ($pageData["title"] === "") {
@@ -851,23 +871,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
 
                             <div class="field-group field-group-full">
-                                <label class="field-label" for="seo_keywords">Palabras clave SEO</label>
+                                <label class="field-label" for="seo_keywords">Palabras clave para buscadores</label>
                                 <textarea class="form-textarea" id="seo_keywords" name="seo_keywords"><?php echo htmlspecialchars($pageData["seo_keywords"], ENT_QUOTES, "UTF-8"); ?></textarea>
+                                <p class="field-help">Opcional. Separa las palabras con comas.</p>
                             </div>
 
                             <div class="field-group field-group-full">
-                                <label class="field-label" for="og_title">T&iacute;tulo Open Graph</label>
+                                <label class="field-label" for="og_title">T&iacute;tulo al compartir</label>
                                 <input class="form-input" type="text" id="og_title" name="og_title" value="<?php echo htmlspecialchars($pageData["og_title"], ENT_QUOTES, "UTF-8"); ?>">
+                                <p class="field-help">As&iacute; se ver&aacute; el t&iacute;tulo cuando compartas la p&aacute;gina en redes sociales.</p>
                             </div>
 
                             <div class="field-group field-group-full">
-                                <label class="field-label" for="og_description">Descripci&oacute;n Open Graph</label>
+                                <label class="field-label" for="og_description">Descripci&oacute;n al compartir</label>
                                 <textarea class="form-textarea" id="og_description" name="og_description"><?php echo htmlspecialchars($pageData["og_description"], ENT_QUOTES, "UTF-8"); ?></textarea>
+                                <p class="field-help">Texto breve que acompa&ntilde;ar&aacute; el enlace al compartirlo.</p>
                             </div>
 
                             <div class="field-group field-group-full">
-                                <label class="field-label" for="canonical_url">URL can&oacute;nica</label>
+                                <label class="field-label" for="canonical_url">Enlace principal de esta p&aacute;gina</label>
                                 <input class="form-input" type="text" id="canonical_url" name="canonical_url" value="<?php echo htmlspecialchars($pageData["canonical_url"], ENT_QUOTES, "UTF-8"); ?>">
+                                <p class="field-help">Se llena autom&aacute;ticamente, pero puedes cambiarlo si lo necesitas.</p>
                             </div>
                         </div>
 
@@ -880,5 +904,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <?php endif; ?>
         </main>
     </div>
+    <script>
+        (function () {
+            var slugInput = document.getElementById("slug");
+            var canonicalInput = document.getElementById("canonical_url");
+
+            if (!slugInput || !canonicalInput) {
+                return;
+            }
+
+            var baseUrl = "https://tudominio.com";
+            var canonicalTouched = false;
+
+            function buildCanonicalUrl(slug) {
+                slug = slug.trim();
+
+                if (slug === "" || slug === "home") {
+                    return baseUrl + "/";
+                }
+
+                return baseUrl + "/page.php?slug=" + encodeURIComponent(slug);
+            }
+
+            canonicalInput.addEventListener("input", function () {
+                canonicalTouched = canonicalInput.value.trim() !== "";
+            });
+
+            slugInput.addEventListener("input", function () {
+                if (canonicalTouched) {
+                    return;
+                }
+
+                canonicalInput.value = buildCanonicalUrl(slugInput.value);
+            });
+        }());
+    </script>
 </body>
 </html>
