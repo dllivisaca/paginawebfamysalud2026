@@ -6,6 +6,98 @@ if (empty($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 }
 
+function redirectToPagesIndex(string $status, string $message = ""): void
+{
+    $query = ["status" => $status];
+
+    if ($message !== "") {
+        $query["message"] = $message;
+    }
+
+    header("Location: index.php?" . http_build_query($query));
+    exit;
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $csrfToken = (string) ($_POST["csrf_token"] ?? "");
+
+    if (!hash_equals($_SESSION["csrf_token"], $csrfToken)) {
+        redirectToPagesIndex("error", "No se pudo validar la solicitud. Intenta de nuevo.");
+    }
+
+    $action = (string) ($_POST["action"] ?? "");
+    $pageId = isset($_POST["page_id"]) ? (int) $_POST["page_id"] : 0;
+
+    if ($pageId <= 0) {
+        redirectToPagesIndex("error", "La pagina seleccionada no es valida.");
+    }
+
+    $pageStmt = $conn->prepare("SELECT id, title, page_key, is_active FROM site_pages WHERE id = ? LIMIT 1");
+
+    if (!$pageStmt) {
+        redirectToPagesIndex("error", "No fue posible consultar la pagina seleccionada.");
+    }
+
+    $pageStmt->bind_param("i", $pageId);
+    $pageStmt->execute();
+    $pageResult = $pageStmt->get_result();
+    $selectedPage = $pageResult ? $pageResult->fetch_assoc() : null;
+    $pageStmt->close();
+
+    if (!$selectedPage) {
+        redirectToPagesIndex("error", "La pagina seleccionada ya no existe.");
+    }
+
+    $isHomePage = ((string) ($selectedPage["page_key"] ?? "")) === "home";
+
+    if ($action === "toggle_active") {
+        $newState = isset($_POST["new_state"]) ? (int) $_POST["new_state"] : -1;
+
+        if ($newState !== 0 && $newState !== 1) {
+            redirectToPagesIndex("error", "El estado solicitado no es valido.");
+        }
+
+        if ($isHomePage && $newState === 0) {
+            redirectToPagesIndex("error", "La pagina Inicio esta protegida y no se puede desactivar.");
+        }
+
+        $toggleStmt = $conn->prepare("UPDATE site_pages SET is_active = ? WHERE id = ? LIMIT 1");
+
+        if (!$toggleStmt) {
+            redirectToPagesIndex("error", "No fue posible actualizar el estado de la pagina.");
+        }
+
+        $toggleStmt->bind_param("ii", $newState, $pageId);
+        $toggleStmt->execute();
+        $toggleStmt->close();
+
+        redirectToPagesIndex($newState === 1 ? "activated" : "deactivated");
+    }
+
+    if ($action === "delete") {
+        if ($isHomePage) {
+            redirectToPagesIndex("error", "La pagina Inicio esta protegida y no se puede eliminar.");
+        }
+
+        $deleteStmt = $conn->prepare("DELETE FROM site_pages WHERE id = ? LIMIT 1");
+
+        if (!$deleteStmt) {
+            redirectToPagesIndex("error", "No fue posible eliminar la pagina seleccionada.");
+        }
+
+        $deleteStmt->bind_param("i", $pageId);
+        $deleteStmt->execute();
+        $deleteStmt->close();
+
+        redirectToPagesIndex("deleted");
+    }
+
+    redirectToPagesIndex("error", "La accion solicitada no es valida.");
+}
+
+$flashStatus = (string) ($_GET["status"] ?? "");
+$flashMessage = trim((string) ($_GET["message"] ?? ""));
+
 $sitePages = [];
 $activePagesCount = 0;
 $result = $conn->query("SELECT id, title, page_key, slug, template_key, is_active FROM site_pages ORDER BY id ASC");
@@ -14,6 +106,7 @@ if ($result) {
     while ($row = $result->fetch_assoc()) {
         $row["id"] = (int) ($row["id"] ?? 0);
         $row["is_active"] = (int) ($row["is_active"] ?? 0);
+        $row["is_home_page"] = ((string) ($row["page_key"] ?? "")) === "home";
         $sitePages[] = $row;
 
         if ($row["is_active"] === 1) {
@@ -194,6 +287,24 @@ if ($result) {
             background: #157347;
         }
 
+        .btn-warning {
+            background: #f59e0b;
+            color: #ffffff;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: #ffffff;
+        }
+
+        .btn-danger:hover {
+            background: #bb2d3b;
+        }
+
         .btn-logout {
             background: #dc3545;
             color: #ffffff;
@@ -221,6 +332,25 @@ if ($result) {
             margin: 0 0 18px;
             line-height: 1.6;
             color: #6b7280;
+        }
+
+        .flash-message {
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .flash-success {
+            background: #e9f7ef;
+            border-color: #cfe7d8;
+            color: #146c43;
+        }
+
+        .flash-error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #b91c1c;
         }
 
         .summary-grid {
@@ -293,6 +423,29 @@ if ($result) {
 
         .muted {
             color: #6b7280;
+        }
+
+        .protected-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #4338ca;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .actions-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .inline-form {
+            margin: 0;
         }
 
         @media (max-width: 991px) {
@@ -408,6 +561,7 @@ if ($result) {
                 </div>
 
                 <div class="topbar-actions">
+                    <a href="edit.php?action=create" class="btn btn-primary">Crear nueva p&aacute;gina</a>
                     <a href="../dashboard.php" class="btn btn-outline">Volver al panel</a>
 
                     <form action="../logout.php" method="post" style="margin: 0;">
@@ -416,6 +570,25 @@ if ($result) {
                     </form>
                 </div>
             </div>
+
+            <?php if ($flashStatus !== "" || $flashMessage !== ""): ?>
+                <?php
+                $resolvedMessage = $flashMessage;
+
+                if ($resolvedMessage === "") {
+                    if ($flashStatus === "activated") {
+                        $resolvedMessage = "La pagina se activo correctamente.";
+                    } elseif ($flashStatus === "deactivated") {
+                        $resolvedMessage = "La pagina se desactivo correctamente.";
+                    } elseif ($flashStatus === "deleted") {
+                        $resolvedMessage = "La pagina se elimino correctamente.";
+                    }
+                }
+                ?>
+                <div class="flash-message <?php echo $flashStatus === "error" ? "flash-error" : "flash-success"; ?>">
+                    <?php echo htmlspecialchars($resolvedMessage, ENT_QUOTES, "UTF-8"); ?>
+                </div>
+            <?php endif; ?>
 
             <section class="card">
                 <h2>Resumen</h2>
@@ -442,9 +615,9 @@ if ($result) {
                             <tr>
                                 <th>ID</th>
                                 <th>T&iacute;tulo visible</th>
-                                <th>Page Key</th>
-                                <th>Slug</th>
-                                <th>Template Key</th>
+                                <th>Clave interna</th>
+                                <th>URL amigable</th>
+                                <th>Plantilla</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -455,7 +628,12 @@ if ($result) {
                                     <?php $isActive = (int) $pageItem["is_active"] === 1; ?>
                                     <tr>
                                         <td><?php echo htmlspecialchars((string) $pageItem["id"], ENT_QUOTES, "UTF-8"); ?></td>
-                                        <td><?php echo htmlspecialchars((string) ($pageItem["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
+                                        <td>
+                                            <?php echo htmlspecialchars((string) ($pageItem["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?>
+                                            <?php if ($pageItem["is_home_page"]): ?>
+                                                <div class="protected-badge">P&aacute;gina protegida</div>
+                                            <?php endif; ?>
+                                        </td>
                                         <td><?php echo htmlspecialchars((string) ($pageItem["page_key"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
                                         <td><?php echo htmlspecialchars((string) ($pageItem["slug"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
                                         <td><?php echo htmlspecialchars((string) ($pageItem["template_key"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
@@ -465,7 +643,28 @@ if ($result) {
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="edit.php?id=<?php echo urlencode((string) $pageItem["id"]); ?>" class="btn btn-primary">Editar</a>
+                                            <div class="actions-group">
+                                                <a href="edit.php?id=<?php echo urlencode((string) $pageItem["id"]); ?>" class="btn btn-primary">Editar</a>
+
+                                                <?php if (!$pageItem["is_home_page"]): ?>
+                                                    <form action="index.php" method="post" class="inline-form">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
+                                                        <input type="hidden" name="action" value="toggle_active">
+                                                        <input type="hidden" name="page_id" value="<?php echo htmlspecialchars((string) $pageItem["id"], ENT_QUOTES, "UTF-8"); ?>">
+                                                        <input type="hidden" name="new_state" value="<?php echo $isActive ? "0" : "1"; ?>">
+                                                        <button type="submit" class="btn btn-warning">
+                                                            <?php echo $isActive ? "Desactivar" : "Activar"; ?>
+                                                        </button>
+                                                    </form>
+
+                                                    <form action="index.php" method="post" class="inline-form" onsubmit="return confirm('¿Seguro que deseas eliminar esta página? Esta acción no se puede deshacer.');">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="page_id" value="<?php echo htmlspecialchars((string) $pageItem["id"], ENT_QUOTES, "UTF-8"); ?>">
+                                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                    </form>
+                                                <?php endif; ?>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
