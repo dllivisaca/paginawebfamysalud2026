@@ -52,6 +52,67 @@ function buttonPath(string $value): string
     return textValue(trim($value), 255);
 }
 
+function publicPageUrl(string $slug, string $pageKey = ""): string
+{
+    $slug = trim($slug, "/");
+    $pageKey = trim($pageKey);
+
+    if ($slug === "" || $slug === "inicio" || $slug === "home" || $pageKey === "home") {
+        return "index.php";
+    }
+
+    return "page.php?slug=" . rawurlencode($slug);
+}
+
+function menuCustomUrl(string $value): string
+{
+    $value = textValue(str_replace("\\", "/", trim($value)), 255);
+
+    if ($value === "") {
+        return "";
+    }
+
+    if (
+        preg_match('#^https?://#i', $value)
+        || str_starts_with($value, "#")
+        || preg_match('#^(mailto:|tel:)#i', $value)
+        || preg_match('/\.php(?:[?#].*)?$/i', $value)
+        || preg_match('/\.[a-z0-9]{2,5}(?:[?#].*)?$/i', $value)
+    ) {
+        return $value;
+    }
+
+    return menuPath($value);
+}
+
+function menuLinkType(string $value, bool $supportsLinkedPages): string
+{
+    if (!$supportsLinkedPages) {
+        return "custom";
+    }
+
+    return $value === "internal" ? "internal" : "custom";
+}
+
+function getMenuItemsLinkSupport(mysqli $conn): array
+{
+    $fields = [];
+    $result = $conn->query("SHOW COLUMNS FROM menu_items");
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $fieldName = (string) ($row["Field"] ?? "");
+            if ($fieldName !== "") {
+                $fields[$fieldName] = true;
+            }
+        }
+    }
+
+    return [
+        "link_type" => isset($fields["link_type"]),
+        "site_page_id" => isset($fields["site_page_id"]),
+    ];
+}
+
 function countByType(mysqli $conn, int $isButton): int
 {
     $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM menu_items WHERE is_button = ?");
@@ -84,7 +145,16 @@ function ensureHomeMenuItem(mysqli $conn): void
 
 function getMenuItemById(mysqli $conn, int $id): ?array
 {
-    $stmt = $conn->prepare("SELECT id, item_key, is_button FROM menu_items WHERE id = ? LIMIT 1");
+    $schema = getMenuItemsLinkSupport($conn);
+    $selectFields = "id, item_key, is_button";
+    if ($schema["link_type"]) {
+        $selectFields .= ", link_type";
+    }
+    if ($schema["site_page_id"]) {
+        $selectFields .= ", site_page_id";
+    }
+
+    $stmt = $conn->prepare("SELECT {$selectFields} FROM menu_items WHERE id = ? LIMIT 1");
     if (!$stmt) {
         return null;
     }
@@ -103,9 +173,27 @@ function isHomeMenuItem(?array $item): bool
     return is_array($item) && (($item["item_key"] ?? "") === "home");
 }
 
+function getSitePageById(mysqli $conn, int $pageId): ?array
+{
+    $stmt = $conn->prepare("SELECT id, page_key, title, slug, is_active FROM site_pages WHERE id = ? LIMIT 1");
+    if (!$stmt) {
+        return null;
+    }
+
+    $stmt->bind_param("i", $pageId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    return $row ?: null;
+}
+
 $status = $_GET["status"] ?? "";
 
 ensureHomeMenuItem($conn);
+$menuLinkSchema = getMenuItemsLinkSupport($conn);
+$supportsMenuLinkTypes = $menuLinkSchema["link_type"] && $menuLinkSchema["site_page_id"];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $csrfToken = $_POST["csrf_token"] ?? "";
@@ -121,20 +209,56 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         $name = textValue($_POST["name"] ?? "");
-        $path = menuPath($_POST["path"] ?? "");
         $position = filter_input(INPUT_POST, "display_order", FILTER_VALIDATE_INT);
         $target = menuTarget($_POST["target"] ?? "_self");
         $isActive = isset($_POST["is_active"]) ? 1 : 0;
+        $linkType = menuLinkType((string) ($_POST["link_type"] ?? "custom"), $supportsMenuLinkTypes);
+        $sitePageId = filter_input(INPUT_POST, "site_page_id", FILTER_VALIDATE_INT);
+        $linkedPage = null;
+
+        if ($linkType === "internal" && !$supportsMenuLinkTypes) {
+            redirectToMenu("migration_required");
+        }
+
+        if ($linkType === "internal") {
+            if ($sitePageId === false || $sitePageId === null) {
+                redirectToMenu("invalid");
+            }
+
+            $linkedPage = getSitePageById($conn, (int) $sitePageId);
+            if (!$linkedPage || ($linkedPage["page_key"] ?? "") === "home") {
+                redirectToMenu("invalid");
+            }
+
+            if ($name === "") {
+                $name = textValue((string) ($linkedPage["title"] ?? ""));
+            }
+
+            $path = publicPageUrl((string) ($linkedPage["slug"] ?? ""), (string) ($linkedPage["page_key"] ?? ""));
+        } else {
+            $path = menuCustomUrl($_POST["path"] ?? "");
+            $sitePageId = null;
+        }
 
         if ($name === "" || $path === "" || $position === false || $position < 2 || $position > 8) {
             redirectToMenu("invalid");
         }
 
-        $stmt = $conn->prepare("INSERT INTO menu_items (parent_id, label, url, display_order, is_active, is_button, target, created_at, updated_at) VALUES (NULL, ?, ?, ?, ?, 0, ?, NOW(), NOW())");
+        if ($supportsMenuLinkTypes) {
+            $stmt = $conn->prepare("INSERT INTO menu_items (parent_id, label, link_type, site_page_id, url, display_order, is_active, is_button, target, created_at, updated_at) VALUES (NULL, ?, ?, ?, ?, ?, ?, 0, ?, NOW(), NOW())");
+        } else {
+            $stmt = $conn->prepare("INSERT INTO menu_items (parent_id, label, url, display_order, is_active, is_button, target, created_at, updated_at) VALUES (NULL, ?, ?, ?, ?, 0, ?, NOW(), NOW())");
+        }
+
         if (!$stmt) {
             redirectToMenu("error");
         }
-        $stmt->bind_param("ssiis", $name, $path, $position, $isActive, $target);
+
+        if ($supportsMenuLinkTypes) {
+            $stmt->bind_param("ssisiis", $name, $linkType, $sitePageId, $path, $position, $isActive, $target);
+        } else {
+            $stmt->bind_param("ssiis", $name, $path, $position, $isActive, $target);
+        }
         $ok = $stmt->execute();
         $stmt->close();
         redirectToMenu($ok ? "created" : "error");
@@ -179,8 +303,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($action === "update_option") {
         $itemId = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
         $name = textValue($_POST["name"] ?? "");
-        $path = menuPath($_POST["path"] ?? "");
         $position = filter_input(INPUT_POST, "display_order", FILTER_VALIDATE_INT);
+        $linkType = menuLinkType((string) ($_POST["link_type"] ?? "custom"), $supportsMenuLinkTypes);
+        $sitePageId = filter_input(INPUT_POST, "site_page_id", FILTER_VALIDATE_INT);
+        $linkedPage = null;
 
         if ($itemId === false || $itemId === null) {
             redirectToMenu("invalid");
@@ -195,15 +321,49 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             redirectToMenu("protected");
         }
 
+        if ($linkType === "internal" && !$supportsMenuLinkTypes) {
+            redirectToMenu("migration_required");
+        }
+
+        if ($linkType === "internal") {
+            if ($sitePageId === false || $sitePageId === null) {
+                redirectToMenu("invalid");
+            }
+
+            $linkedPage = getSitePageById($conn, (int) $sitePageId);
+            if (!$linkedPage || ($linkedPage["page_key"] ?? "") === "home") {
+                redirectToMenu("invalid");
+            }
+
+            if ($name === "") {
+                $name = textValue((string) ($linkedPage["title"] ?? ""));
+            }
+
+            $path = publicPageUrl((string) ($linkedPage["slug"] ?? ""), (string) ($linkedPage["page_key"] ?? ""));
+        } else {
+            $path = menuCustomUrl($_POST["path"] ?? "");
+            $sitePageId = null;
+        }
+
         if ($name === "" || $path === "" || $position === false || $position < 2 || $position > 8) {
             redirectToMenu("invalid");
         }
 
-        $stmt = $conn->prepare("UPDATE menu_items SET label = ?, url = ?, display_order = ?, updated_at = NOW() WHERE id = ? AND is_button = 0 LIMIT 1");
+        if ($supportsMenuLinkTypes) {
+            $stmt = $conn->prepare("UPDATE menu_items SET label = ?, link_type = ?, site_page_id = ?, url = ?, display_order = ?, updated_at = NOW() WHERE id = ? AND is_button = 0 LIMIT 1");
+        } else {
+            $stmt = $conn->prepare("UPDATE menu_items SET label = ?, url = ?, display_order = ?, updated_at = NOW() WHERE id = ? AND is_button = 0 LIMIT 1");
+        }
+
         if (!$stmt) {
             redirectToMenu("error");
         }
-        $stmt->bind_param("ssii", $name, $path, $position, $itemId);
+
+        if ($supportsMenuLinkTypes) {
+            $stmt->bind_param("ssisii", $name, $linkType, $sitePageId, $path, $position, $itemId);
+        } else {
+            $stmt->bind_param("ssii", $name, $path, $position, $itemId);
+        }
         $ok = $stmt->execute();
         $stmt->close();
         redirectToMenu($ok ? "updated" : "error");
@@ -269,9 +429,20 @@ $items = [];
 $menuOptions = [];
 $primaryButton = null;
 $homeItem = null;
-$result = $conn->query("SELECT id, item_key, label, url, display_order, is_active, is_button, target FROM menu_items ORDER BY is_button ASC, display_order ASC, id ASC");
+$selectFields = "id, item_key, label, url, display_order, is_active, is_button, target";
+if ($supportsMenuLinkTypes) {
+    $selectFields .= ", link_type, site_page_id";
+}
+$result = $conn->query("SELECT {$selectFields} FROM menu_items ORDER BY is_button ASC, display_order ASC, id ASC");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        if ($supportsMenuLinkTypes) {
+            $row["link_type"] = ($row["link_type"] ?? "custom") === "internal" ? "internal" : "custom";
+            $row["site_page_id"] = isset($row["site_page_id"]) ? (int) $row["site_page_id"] : 0;
+        } else {
+            $row["link_type"] = "custom";
+            $row["site_page_id"] = 0;
+        }
         $items[] = $row;
     }
 }
@@ -289,6 +460,48 @@ foreach ($items as $item) {
         }
     }
 }
+
+$linkedSitePageIds = [];
+foreach ($menuOptions as $item) {
+    if (($item["link_type"] ?? "custom") === "internal" && (int) ($item["site_page_id"] ?? 0) > 0) {
+        $linkedSitePageIds[] = (int) $item["site_page_id"];
+    }
+}
+
+$linkedSitePageIds = array_values(array_unique($linkedSitePageIds));
+$sitePages = [];
+$sitePagesById = [];
+
+if ($supportsMenuLinkTypes) {
+    $sitePagesSql = "SELECT id, page_key, title, slug, is_active
+                     FROM site_pages
+                     WHERE page_key <> 'home'";
+
+    if ($linkedSitePageIds !== []) {
+        $sitePagesSql .= " AND (is_active = 1 OR id IN (" . implode(",", $linkedSitePageIds) . "))";
+    } else {
+        $sitePagesSql .= " AND is_active = 1";
+    }
+
+    $sitePagesSql .= " ORDER BY is_active DESC, title ASC, id ASC";
+    $sitePagesResult = $conn->query($sitePagesSql);
+
+    if ($sitePagesResult) {
+        while ($row = $sitePagesResult->fetch_assoc()) {
+            $row["id"] = (int) ($row["id"] ?? 0);
+            $row["is_active"] = (int) ($row["is_active"] ?? 0);
+            $row["public_url"] = publicPageUrl((string) ($row["slug"] ?? ""), (string) ($row["page_key"] ?? ""));
+            $sitePages[] = $row;
+            $sitePagesById[$row["id"]] = $row;
+        }
+    }
+}
+
+foreach ($menuOptions as &$item) {
+    $linkedPageId = (int) ($item["site_page_id"] ?? 0);
+    $item["linked_page"] = $linkedPageId > 0 && isset($sitePagesById[$linkedPageId]) ? $sitePagesById[$linkedPageId] : null;
+}
+unset($item);
 
 $buttonConfigured = $primaryButton !== null;
 ?>
@@ -321,6 +534,8 @@ $buttonConfigured = $primaryButton !== null;
             <?php if ($status === "protected"): ?><div class="alert alert-error">La opci&oacute;n Inicio es fija del sistema y no se puede editar, ocultar ni eliminar.</div><?php endif; ?>
             <?php if ($status === "limit_options"): ?><div class="alert alert-error">Ya tienes configuradas las 8 opciones permitidas para el men&uacute;.</div><?php endif; ?>
             <?php if ($status === "limit_button"): ?><div class="alert alert-error">Solo puedes tener un bot&oacute;n principal configurado.</div><?php endif; ?>
+            <?php if ($status === "migration_required"): ?><div class="alert alert-error">Falta ejecutar la actualizaci&oacute;n de base de datos del men&uacute; para habilitar p&aacute;ginas internas.</div><?php endif; ?>
+            <?php if (!$supportsMenuLinkTypes): ?><div class="alert alert-error">El formulario ya est&aacute; preparado para p&aacute;ginas internas, pero primero debes ejecutar manualmente el SQL de actualizaci&oacute;n en <span class="muted">menu_items</span>.</div><?php endif; ?>
 
             <section class="card">
                 <h2>Resumen</h2>
@@ -336,9 +551,11 @@ $buttonConfigured = $primaryButton !== null;
                 <form action="index.php" method="post">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
                     <input type="hidden" name="action" value="create_option">
-                    <div class="form-grid">
-                        <div class="form-group"><label for="new_name">Nombre de la p&aacute;gina</label><input type="text" id="new_name" name="name" maxlength="255" required data-slug-source="menu-option"></div>
-                        <div class="form-group"><label for="new_path">Direcci&oacute;n de la p&aacute;gina</label><div class="input-prefix"><span>/</span><input type="text" id="new_path" name="path" maxlength="255" required data-slug-target="menu-option"></div><div class="helper">Se genera autom&aacute;ticamente, pero puedes editarla manualmente si lo necesitas.</div></div>
+                    <div class="form-grid" data-menu-form="create-option">
+                        <div class="form-group"><label for="new_link_type">Tipo de opci&oacute;n</label><select id="new_link_type" name="link_type" data-menu-link-type><option value="custom">Enlace personalizado</option><option value="internal" <?php echo !$supportsMenuLinkTypes || $sitePages === [] ? "disabled" : ""; ?>>P&aacute;gina interna</option></select><div class="helper"><?php echo $supportsMenuLinkTypes ? "Elige una p&aacute;gina real del sitio o escribe un enlace manual." : "Primero ejecuta el SQL pendiente para habilitar p&aacute;ginas internas."; ?></div></div>
+                        <div class="form-group" data-menu-page-group style="display:none;"><label for="new_site_page_id">P&aacute;gina del sitio</label><select id="new_site_page_id" name="site_page_id" data-menu-page-select><option value="">Selecciona una p&aacute;gina</option><?php foreach ($sitePages as $page): ?><option value="<?php echo (int) $page["id"]; ?>" data-page-title="<?php echo htmlspecialchars((string) $page["title"], ENT_QUOTES, "UTF-8"); ?>" data-page-url="<?php echo htmlspecialchars((string) $page["public_url"], ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) $page["title"], ENT_QUOTES, "UTF-8"); ?><?php echo (int) $page["is_active"] === 1 ? "" : " (inactiva)"; ?></option><?php endforeach; ?></select><div class="helper"><?php echo $sitePages === [] ? "No hay p&aacute;ginas activas disponibles para vincular." : "Selecciona una p&aacute;gina real del sitio."; ?></div></div>
+                        <div class="form-group"><label for="new_name">Nombre del item del men&uacute;</label><input type="text" id="new_name" name="name" maxlength="255" required data-menu-name><div class="helper">Puedes ajustar el texto aunque el item apunte a una p&aacute;gina interna.</div></div>
+                        <div class="form-group"><label for="new_path">Direcci&oacute;n de la p&aacute;gina</label><input type="text" id="new_path" name="path" maxlength="255" required data-menu-url><div class="helper" data-menu-url-help>Escribe la direcci&oacute;n manualmente si se trata de un enlace personalizado.</div></div>
                         <div class="form-group"><label for="new_target">Abrir enlace</label><select id="new_target" name="target"><option value="_self">En la misma pesta&ntilde;a</option><option value="_blank">En una pesta&ntilde;a nueva</option></select></div>
                         <div class="form-group"><label for="new_order">Posici&oacute;n en el men&uacute;</label><select id="new_order" name="display_order"><?php for ($i = 2; $i <= 8; $i++): ?><option value="<?php echo $i; ?>"><?php echo $i; ?></option><?php endfor; ?></select><div class="helper">La posici&oacute;n 1 est&aacute; reservada para Inicio.</div></div>
                         <div class="form-group"><label>Mostrar en el men&uacute;</label><div class="checkbox-row"><input type="checkbox" id="new_active" name="is_active" value="1" checked><label for="new_active" style="margin:0;font-weight:normal;">S&iacute;, mostrar</label></div></div>
@@ -399,7 +616,8 @@ $buttonConfigured = $primaryButton !== null;
                             <article class="menu-item">
                                 <div class="item-header"><h4 class="item-title"><?php echo htmlspecialchars($item["label"], ENT_QUOTES, "UTF-8"); ?></h4><span class="status-pill <?php echo (int) $item["is_active"] === 1 ? "status-visible" : "status-hidden"; ?>"><?php echo (int) $item["is_active"] === 1 ? "Visible" : "Oculta"; ?></span></div>
                                 <div class="meta-grid">
-                                    <div class="meta-box"><div class="meta-label">Direcci&oacute;n</div><div class="meta-value">/<?php echo htmlspecialchars($item["url"], ENT_QUOTES, "UTF-8"); ?></div></div>
+                                    <div class="meta-box"><div class="meta-label">Direcci&oacute;n</div><div class="meta-value"><?php echo htmlspecialchars($item["url"], ENT_QUOTES, "UTF-8"); ?></div></div>
+                                    <div class="meta-box"><div class="meta-label">Tipo</div><div class="meta-value"><?php echo ($item["link_type"] ?? "custom") === "internal" ? "P&aacute;gina interna" : "Enlace personalizado"; ?></div></div>
                                     <div class="meta-box"><div class="meta-label">Posici&oacute;n</div><div class="meta-value"><?php echo (int) $item["display_order"]; ?></div></div>
                                     <div class="meta-box"><div class="meta-label">Apertura</div><div class="meta-value"><?php echo ($item["target"] ?? "_self") === "_blank" ? "En una pesta&ntilde;a nueva" : "En la misma pesta&ntilde;a"; ?></div></div>
                                 </div>
@@ -407,9 +625,11 @@ $buttonConfigured = $primaryButton !== null;
                                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
                                     <input type="hidden" name="action" value="update_option">
                                     <input type="hidden" name="id" value="<?php echo (int) $item["id"]; ?>">
-                                    <div class="form-grid-compact">
-                                        <div class="form-group"><label for="name_<?php echo (int) $item["id"]; ?>">Nombre visible</label><input type="text" id="name_<?php echo (int) $item["id"]; ?>" name="name" maxlength="255" required value="<?php echo htmlspecialchars($item["label"], ENT_QUOTES, "UTF-8"); ?>" data-slug-source="option-<?php echo (int) $item["id"]; ?>"></div>
-                                        <div class="form-group"><label for="path_<?php echo (int) $item["id"]; ?>">Direcci&oacute;n</label><div class="input-prefix"><span>/</span><input type="text" id="path_<?php echo (int) $item["id"]; ?>" name="path" maxlength="255" required value="<?php echo htmlspecialchars($item["url"], ENT_QUOTES, "UTF-8"); ?>" data-slug-target="option-<?php echo (int) $item["id"]; ?>"></div></div>
+                                    <div class="form-grid" data-menu-form="option-<?php echo (int) $item["id"]; ?>">
+                                        <div class="form-group"><label for="link_type_<?php echo (int) $item["id"]; ?>">Tipo de opci&oacute;n</label><select id="link_type_<?php echo (int) $item["id"]; ?>" name="link_type" data-menu-link-type><option value="custom" <?php echo ($item["link_type"] ?? "custom") === "custom" ? "selected" : ""; ?>>Enlace personalizado</option><option value="internal" <?php echo ($item["link_type"] ?? "custom") === "internal" ? "selected" : ""; ?> <?php echo !$supportsMenuLinkTypes || $sitePages === [] ? "disabled" : ""; ?>>P&aacute;gina interna</option></select></div>
+                                        <div class="form-group" data-menu-page-group style="<?php echo ($item["link_type"] ?? "custom") === "internal" ? "" : "display:none;"; ?>"><label for="site_page_id_<?php echo (int) $item["id"]; ?>">P&aacute;gina del sitio</label><select id="site_page_id_<?php echo (int) $item["id"]; ?>" name="site_page_id" data-menu-page-select><option value="">Selecciona una p&aacute;gina</option><?php foreach ($sitePages as $page): ?><option value="<?php echo (int) $page["id"]; ?>" data-page-title="<?php echo htmlspecialchars((string) $page["title"], ENT_QUOTES, "UTF-8"); ?>" data-page-url="<?php echo htmlspecialchars((string) $page["public_url"], ENT_QUOTES, "UTF-8"); ?>" <?php echo (int) ($item["site_page_id"] ?? 0) === (int) $page["id"] ? "selected" : ""; ?>><?php echo htmlspecialchars((string) $page["title"], ENT_QUOTES, "UTF-8"); ?><?php echo (int) $page["is_active"] === 1 ? "" : " (inactiva)"; ?></option><?php endforeach; ?></select></div>
+                                        <div class="form-group"><label for="name_<?php echo (int) $item["id"]; ?>">Nombre visible</label><input type="text" id="name_<?php echo (int) $item["id"]; ?>" name="name" maxlength="255" required value="<?php echo htmlspecialchars($item["label"], ENT_QUOTES, "UTF-8"); ?>" data-menu-name></div>
+                                        <div class="form-group"><label for="path_<?php echo (int) $item["id"]; ?>">Direcci&oacute;n</label><input type="text" id="path_<?php echo (int) $item["id"]; ?>" name="path" maxlength="255" required value="<?php echo htmlspecialchars($item["url"], ENT_QUOTES, "UTF-8"); ?>" data-menu-url <?php echo ($item["link_type"] ?? "custom") === "internal" ? "readonly" : ""; ?>><div class="helper" data-menu-url-help><?php echo ($item["link_type"] ?? "custom") === "internal" ? "Se completa autom&aacute;ticamente seg&uacute;n la p&aacute;gina seleccionada." : "Puedes escribir una URL, un anchor o un enlace externo."; ?></div></div>
                                         <div class="form-group"><label for="order_<?php echo (int) $item["id"]; ?>">Posici&oacute;n</label><select id="order_<?php echo (int) $item["id"]; ?>" name="display_order"><?php for ($i = 2; $i <= 8; $i++): ?><option value="<?php echo $i; ?>" <?php echo (int) $item["display_order"] === $i ? "selected" : ""; ?>><?php echo $i; ?></option><?php endfor; ?></select></div>
                                         <div class="form-group"><button type="submit" class="btn btn-primary">Editar</button></div>
                                     </div>
@@ -456,26 +676,95 @@ $buttonConfigured = $primaryButton !== null;
                 return normalized.replace(/^-+|-+$/g, "");
             }
 
-            document.querySelectorAll("[data-slug-target]").forEach(function (input) {
-                input.dataset.touched = input.value.trim() !== "" ? "true" : "false";
-                input.addEventListener("input", function () {
-                    input.dataset.touched = "true";
-                    input.value = normalizeSlug(input.value);
-                });
-            });
+            function bindMenuForm(form) {
+                var linkTypeSelect = form.querySelector("[data-menu-link-type]");
+                var pageSelect = form.querySelector("[data-menu-page-select]");
+                var pageGroup = form.querySelector("[data-menu-page-group]");
+                var nameInput = form.querySelector("[data-menu-name]");
+                var urlInput = form.querySelector("[data-menu-url]");
+                var urlHelp = form.querySelector("[data-menu-url-help]");
 
-            document.querySelectorAll("[data-slug-source]").forEach(function (input) {
-                input.addEventListener("input", function () {
-                    var key = input.getAttribute("data-slug-source");
-                    var target = document.querySelector('[data-slug-target="' + key + '"]');
-                    if (!target) {
+                if (!linkTypeSelect || !nameInput || !urlInput) {
+                    return;
+                }
+
+                var nameTouched = false;
+
+                function currentLinkType() {
+                    return linkTypeSelect.value === "internal" ? "internal" : "custom";
+                }
+
+                function selectedPageOption() {
+                    return pageSelect ? pageSelect.options[pageSelect.selectedIndex] : null;
+                }
+
+                function syncFromSelectedPage() {
+                    if (currentLinkType() !== "internal" || !pageSelect) {
                         return;
                     }
-                    if (target.dataset.touched === "true" && target.value.trim() !== "") {
+
+                    var option = selectedPageOption();
+                    if (!option || option.value === "") {
+                        urlInput.value = "";
                         return;
                     }
-                    target.value = normalizeSlug(input.value);
+
+                    if (!nameTouched || nameInput.value.trim() === "") {
+                        nameInput.value = option.getAttribute("data-page-title") || "";
+                    }
+
+                    urlInput.value = option.getAttribute("data-page-url") || "";
+                }
+
+                function syncFormState() {
+                    var internalMode = currentLinkType() === "internal";
+
+                    if (pageGroup) {
+                        pageGroup.style.display = internalMode ? "" : "none";
+                    }
+
+                    if (pageSelect) {
+                        pageSelect.disabled = !internalMode;
+                    }
+
+                    urlInput.readOnly = internalMode;
+
+                    if (urlHelp) {
+                        urlHelp.textContent = internalMode
+                            ? "Se completa automaticamente segun la pagina seleccionada."
+                            : "Puedes escribir una URL, un anchor o un enlace externo.";
+                    }
+
+                    if (internalMode) {
+                        syncFromSelectedPage();
+                    }
+                }
+
+                nameInput.addEventListener("input", function () {
+                    nameTouched = nameInput.value.trim() !== "";
                 });
+
+                urlInput.addEventListener("input", function () {
+                    if (!urlInput.readOnly) {
+                        urlInput.value = urlInput.value.trim();
+                    }
+                });
+
+                if (pageSelect) {
+                    pageSelect.addEventListener("change", function () {
+                        syncFromSelectedPage();
+                    });
+                }
+
+                linkTypeSelect.addEventListener("change", function () {
+                    syncFormState();
+                });
+
+                syncFormState();
+            }
+
+            document.querySelectorAll("[data-menu-form]").forEach(function (form) {
+                bindMenuForm(form);
             });
         }());
     </script>

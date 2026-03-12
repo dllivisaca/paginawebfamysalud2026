@@ -23,6 +23,31 @@ if (!function_exists("isAbsoluteMenuUrl")) {
     }
 }
 
+if (!function_exists("isDirectMenuUrl")) {
+    function isDirectMenuUrl(string $url): bool
+    {
+        $url = trim($url);
+
+        if ($url === "" || $url === "index.php") {
+            return true;
+        }
+
+        if (isAbsoluteMenuUrl($url)) {
+            return true;
+        }
+
+        if (str_starts_with($url, "#") || preg_match('#^(mailto:|tel:)#i', $url)) {
+            return true;
+        }
+
+        if (preg_match('/\.php(?:[?#].*)?$/i', $url)) {
+            return true;
+        }
+
+        return (bool) preg_match('/\.[a-z0-9]{2,5}(?:[?#].*)?$/i', $url);
+    }
+}
+
 if (!function_exists("resolveMenuItemHref")) {
     function resolveMenuItemHref(string $url, bool $isButton = false): string
     {
@@ -32,11 +57,7 @@ if (!function_exists("resolveMenuItemHref")) {
             return "index.php";
         }
 
-        if (isAbsoluteMenuUrl($url)) {
-            return $url;
-        }
-
-        if (preg_match('/\.php$/i', $url)) {
+        if (isDirectMenuUrl($url)) {
             return $url;
         }
 
@@ -48,6 +69,27 @@ if (!function_exists("resolveMenuItemTarget")) {
     function resolveMenuItemTarget(string $target): string
     {
         return $target === "_blank" ? "_blank" : "_self";
+    }
+}
+
+if (!function_exists("resolveMenuItemSlug")) {
+    function resolveMenuItemSlug(string $url): string
+    {
+        $url = trim($url);
+
+        if ($url === "" || $url === "index.php") {
+            return "";
+        }
+
+        if (preg_match('/^page\.php\?slug=([^&]+)/i', $url, $matches) === 1) {
+            return rawurldecode((string) $matches[1]);
+        }
+
+        if (isDirectMenuUrl($url)) {
+            return "";
+        }
+
+        return trim($url, "/");
     }
 }
 
@@ -177,10 +219,11 @@ $currentPublicSlug = (string) ($currentPublicSlug ?? "");
             $menuItemUrl = resolveMenuItemHref((string) ($menuItem["url"] ?? ""));
             $menuItemTarget = resolveMenuItemTarget((string) ($menuItem["target"] ?? "_self"));
             $menuItemKey = (string) ($menuItem["item_key"] ?? "");
-            $menuIsHome = $menuItemUrl === "index.php" || $menuItemKey === "home";
+            $menuItemSlug = resolveMenuItemSlug((string) ($menuItem["url"] ?? ""));
+            $menuIsHome = $menuItemUrl === "index.php" || $menuItemKey === "home" || in_array($menuItemSlug, ["", "inicio", "home"], true);
             $menuIsActive = $menuIsHome
                 ? in_array($currentPublicSlug, ["", "inicio", "home"], true)
-                : trim((string) ($menuItem["url"] ?? ""), "/") === $currentPublicSlug;
+                : $menuItemSlug !== "" && $menuItemSlug === $currentPublicSlug;
             ?>
             <li>
               <a href="<?php echo htmlspecialchars($menuItemUrl, ENT_QUOTES, "UTF-8"); ?>" target="<?php echo htmlspecialchars($menuItemTarget, ENT_QUOTES, "UTF-8"); ?>"<?php echo $menuIsActive ? ' class="active"' : ""; ?>>
