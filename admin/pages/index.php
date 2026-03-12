@@ -615,9 +615,7 @@ if ($result) {
                             <tr>
                                 <th>ID</th>
                                 <th>T&iacute;tulo visible</th>
-                                <th>Clave interna</th>
                                 <th>URL amigable</th>
-                                <th>Plantilla</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -634,9 +632,7 @@ if ($result) {
                                                 <div class="protected-badge">P&aacute;gina protegida</div>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?php echo htmlspecialchars((string) ($pageItem["page_key"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
                                         <td><?php echo htmlspecialchars((string) ($pageItem["slug"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
-                                        <td><?php echo htmlspecialchars((string) ($pageItem["template_key"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
                                         <td>
                                             <span class="status-pill <?php echo $isActive ? "status-active" : "status-inactive"; ?>">
                                                 <?php echo $isActive ? "Activa" : "Inactiva"; ?>
@@ -670,7 +666,7 @@ if ($result) {
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="7" class="muted">No hay p&aacute;ginas registradas en la tabla <span class="muted">site_pages</span>.</td>
+                                    <td colspan="5" class="muted">No hay p&aacute;ginas registradas en la tabla <span class="muted">site_pages</span>.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

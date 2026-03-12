@@ -132,8 +132,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "canonical_url" => trim((string) ($_POST["canonical_url"] ?? "")),
         ];
 
-        if ($isHomePage && $existingPage) {
+        if (!$isCreateMode && $existingPage) {
             $pageData["page_key"] = (string) ($existingPage["page_key"] ?? "home");
+        }
+
+        if ($isHomePage && $existingPage) {
             $pageData["slug"] = (string) ($existingPage["slug"] ?? "");
             $pageData["is_active"] = 1;
         }
@@ -754,13 +757,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
 
                             <div class="field-group">
-                                <label class="field-label" for="page_key">Clave interna</label>
-                                <?php if ($isHomePage): ?>
+                                <label class="field-label" for="page_key">Clave interna del sistema</label>
+                                <?php if ($isCreateMode): ?>
+                                    <input class="form-input" type="text" id="page_key" name="page_key" value="<?php echo htmlspecialchars($pageData["page_key"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                    <p class="field-help">Identificador interno &uacute;nico de la p&aacute;gina. Despu&eacute;s de crearla ya no se podr&aacute; editar.</p>
+                                <?php else: ?>
                                     <div class="readonly-box"><?php echo htmlspecialchars($pageData["page_key"], ENT_QUOTES, "UTF-8"); ?></div>
                                     <input type="hidden" name="page_key" value="<?php echo htmlspecialchars($pageData["page_key"], ENT_QUOTES, "UTF-8"); ?>">
-                                    <p class="field-help">La p&aacute;gina Inicio mantiene esta clave protegida.</p>
-                                <?php else: ?>
-                                    <input class="form-input" type="text" id="page_key" name="page_key" value="<?php echo htmlspecialchars($pageData["page_key"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                    <p class="field-help">Esta clave interna pertenece al sistema y no se puede modificar.</p>
                                 <?php endif; ?>
                             </div>
 
