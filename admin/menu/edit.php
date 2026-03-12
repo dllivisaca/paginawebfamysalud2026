@@ -25,7 +25,7 @@ $menuData = [
     "display_order" => 2,
     "target" => "_self",
     "is_active" => 1,
-    "link_type" => "custom",
+    "link_type" => "internal",
     "site_page_id" => 0,
 ];
 
@@ -65,6 +65,10 @@ $sitePages = [];
 $sitePagesById = [];
 if ($supportsMenuLinkTypes) {
     [$sitePages, $sitePagesById] = getMenuSitePages($conn, $linkedSitePageIds, $isHomeItem);
+}
+
+if ($isCreateMode && $_SERVER["REQUEST_METHOD"] !== "POST" && ($sitePages === [] || !$supportsMenuLinkTypes)) {
+    $menuData["link_type"] = "custom";
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -266,8 +270,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <div class="form-group">
                             <label for="link_type">Tipo de opci&oacute;n</label>
                             <select id="link_type" name="link_type" data-menu-link-type>
-                                <option value="custom" <?php echo $menuData["link_type"] === "custom" ? "selected" : ""; ?>>Enlace personalizado</option>
                                 <option value="internal" <?php echo $menuData["link_type"] === "internal" ? "selected" : ""; ?> <?php echo !$supportsMenuLinkTypes || $sitePages === [] ? "disabled" : ""; ?>>P&aacute;gina interna</option>
+                                <option value="custom" <?php echo $menuData["link_type"] === "custom" ? "selected" : ""; ?>>Enlace personalizado</option>
                             </select>
                             <div class="helper"><?php echo $supportsMenuLinkTypes ? "Elige una pagina real del sitio o escribe un enlace manual." : "Las paginas internas se habilitaran cuando ejecutes el SQL pendiente."; ?></div>
                         </div>
