@@ -296,23 +296,25 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                     </div>
                     <div class="actions-group" style="margin-top:20px;">
                         <button type="submit" class="btn btn-primary"><?php echo $primaryButton !== null ? "Guardar bot&oacute;n principal" : "Crear bot&oacute;n principal"; ?></button>
-                        <?php if ($primaryButton !== null): ?>
-                            <form action="index.php" method="post" class="inline-form">
-                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
-                                <input type="hidden" name="action" value="toggle">
-                                <input type="hidden" name="id" value="<?php echo (int) $primaryButton["id"]; ?>">
-                                <input type="hidden" name="next_state" value="<?php echo ((int) ($primaryButton["is_active"] ?? 0) === 1) ? 0 : 1; ?>">
-                                <button type="submit" class="btn btn-soft"><?php echo ((int) ($primaryButton["is_active"] ?? 0) === 1) ? "Ocultar" : "Mostrar"; ?></button>
-                            </form>
-                            <form action="index.php" method="post" class="inline-form" onsubmit="return confirm('¿Seguro que deseas eliminar este botón principal?');">
-                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
-                                <input type="hidden" name="action" value="delete">
-                                <input type="hidden" name="id" value="<?php echo (int) $primaryButton["id"]; ?>">
-                                <button type="submit" class="btn btn-danger">Eliminar</button>
-                            </form>
-                        <?php endif; ?>
                     </div>
                 </form>
+                <?php if ($primaryButton !== null): ?>
+                    <div class="actions-group" style="margin-top:12px;">
+                        <form action="index.php" method="post" class="inline-form">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
+                            <input type="hidden" name="action" value="toggle">
+                            <input type="hidden" name="id" value="<?php echo (int) $primaryButton["id"]; ?>">
+                            <input type="hidden" name="next_state" value="<?php echo ((int) ($primaryButton["is_active"] ?? 0) === 1) ? 0 : 1; ?>">
+                            <button type="submit" class="btn btn-soft"><?php echo ((int) ($primaryButton["is_active"] ?? 0) === 1) ? "Ocultar" : "Mostrar"; ?></button>
+                        </form>
+                        <form action="index.php" method="post" class="inline-form" onsubmit="return confirm('¿Seguro que deseas eliminar este botón principal?');">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id" value="<?php echo (int) $primaryButton["id"]; ?>">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
+                <?php endif; ?>
             </section>
         </main>
     </div>
