@@ -288,6 +288,32 @@ if (($schema["template_key"] ?? "") === "about") {
             "url_key" => "secondary_cta_url",
         ],
     ];
+    $imageFieldGroups = [
+        [
+            "title" => "Imagen principal",
+            "items" => [
+                [
+                    "image_key" => "main_image",
+                    "alt_key" => "main_image_alt",
+                ],
+            ],
+        ],
+        [
+            "title" => "Imágenes secundarias",
+            "items" => [
+                [
+                    "item_title" => "Imagen secundaria 1",
+                    "image_key" => "grid_image_1",
+                    "alt_key" => "grid_image_1_alt",
+                ],
+                [
+                    "item_title" => "Imagen secundaria 2",
+                    "image_key" => "grid_image_2",
+                    "alt_key" => "grid_image_2_alt",
+                ],
+            ],
+        ],
+    ];
 }
 ?>
 <!DOCTYPE html>
@@ -352,6 +378,12 @@ if (($schema["template_key"] ?? "") === "about") {
         .button-link-card h5 { margin: 0; font-size: 16px; color: #1f2937; }
         .button-destination-box { border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; background: #fff; display: grid; gap: 12px; }
         .button-destination-grid { display: grid; gap: 12px; }
+        .image-groups { display: grid; gap: 16px; }
+        .image-section-card { border: 1px solid #dbe4dc; border-radius: 14px; padding: 16px; background: #f9fafb; display: grid; gap: 14px; }
+        .image-section-card h5 { margin: 0; font-size: 16px; color: #1f2937; }
+        .image-items { display: grid; gap: 14px; }
+        .image-item-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; background: #fff; display: grid; gap: 12px; }
+        .image-item-card h6 { margin: 0; font-size: 14px; color: #374151; }
         .is-hidden { display: none; }
         .toggle-row { display: inline-flex; align-items: center; gap: 8px; min-height: 0; font-size: 13px; color: #4b5563; white-space: nowrap; padding: 4px 8px; border-radius: 999px; background: #f3f4f6; border: 1px solid #e5e7eb; }
         .toggle-row input { margin: 0; }
@@ -459,6 +491,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                             <?php endif; ?>
 
                                             <?php $isButtonsGroup = ((string) ($groupConfig["title"] ?? "")) === "Botones"; ?>
+                                            <?php $isImagesGroup = ((string) ($groupConfig["title"] ?? "")) === "Imágenes"; ?>
                                             <?php if ($isButtonsGroup): ?>
                                                 <div class="button-groups">
                                                     <?php foreach ($buttonFieldGroups as $buttonConfig): ?>
@@ -551,6 +584,128 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         </div>
                                                     <?php endforeach; ?>
                                                 </div>
+                                            <?php elseif ($isImagesGroup): ?>
+                                                <div class="image-groups">
+                                                    <?php foreach ($imageFieldGroups as $imageGroupConfig): ?>
+                                                        <div class="image-section-card">
+                                                            <h5><?php echo escapeAdminFieldLabel((string) ($imageGroupConfig["title"] ?? "Imágenes")); ?></h5>
+                                                            <?php if (count((array) ($imageGroupConfig["items"] ?? [])) === 1): ?>
+                                                                <?php $imageItemConfig = $imageGroupConfig["items"][0] ?? []; ?>
+                                                                <?php
+                                                                $imageKey = (string) ($imageItemConfig["image_key"] ?? "");
+                                                                $altKey = (string) ($imageItemConfig["alt_key"] ?? "");
+                                                                $imageFieldConfig = null;
+                                                                $altFieldConfig = null;
+                                                                foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                    $simpleFieldKey = (string) ($simpleFieldConfig["field_key"] ?? "");
+                                                                    if ($simpleFieldKey === $imageKey) {
+                                                                        $imageFieldConfig = $simpleFieldConfig;
+                                                                    } elseif ($simpleFieldKey === $altKey) {
+                                                                        $altFieldConfig = $simpleFieldConfig;
+                                                                    }
+                                                                }
+                                                                if (!is_array($imageFieldConfig) || !is_array($altFieldConfig)) {
+                                                                    continue;
+                                                                }
+                                                                $imageFieldData = $contentData["simple_fields"][$imageKey] ?? null;
+                                                                $altFieldData = $contentData["simple_fields"][$altKey] ?? null;
+                                                                $imageValue = (string) ($imageFieldData["field_value"] ?? "");
+                                                                $imageVisible = (int) ($imageFieldData["is_visible"] ?? 1) === 1;
+                                                                $altValue = (string) ($altFieldData["field_value"] ?? "");
+                                                                $altVisible = (int) ($altFieldData["is_visible"] ?? 1) === 1;
+                                                                ?>
+                                                                <div class="field-grid">
+                                                                    <div class="field-group">
+                                                                        <div class="field-header">
+                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($imageFieldConfig["label"] ?? $imageKey)); ?></label>
+                                                                            <label class="toggle-row">
+                                                                                <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $imageVisible ? " checked" : ""; ?>>
+                                                                                <span>Mostrar</span>
+                                                                            </label>
+                                                                        </div>
+                                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($imageValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                        <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($imageValue !== "" ? basename($imageValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
+                                                                        <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
+                                                                        <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                                                                        <?php if ($imageValue !== ""): ?>
+                                                                            <img src="../../<?php echo htmlspecialchars(ltrim($imageValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
+                                                                        <?php endif; ?>
+                                                                    </div>
+                                                                    <div class="field-group">
+                                                                        <div class="field-header">
+                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?></label>
+                                                                            <label class="toggle-row">
+                                                                                <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $altVisible ? " checked" : ""; ?>>
+                                                                                <span>Mostrar</span>
+                                                                            </label>
+                                                                        </div>
+                                                                        <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($altValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                    </div>
+                                                                </div>
+                                                            <?php else: ?>
+                                                                <div class="image-items">
+                                                                    <?php foreach (($imageGroupConfig["items"] ?? []) as $imageItemConfig): ?>
+                                                                        <?php
+                                                                        $itemTitle = (string) ($imageItemConfig["item_title"] ?? "Imagen");
+                                                                        $imageKey = (string) ($imageItemConfig["image_key"] ?? "");
+                                                                        $altKey = (string) ($imageItemConfig["alt_key"] ?? "");
+                                                                        $imageFieldConfig = null;
+                                                                        $altFieldConfig = null;
+                                                                        foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                            $simpleFieldKey = (string) ($simpleFieldConfig["field_key"] ?? "");
+                                                                            if ($simpleFieldKey === $imageKey) {
+                                                                                $imageFieldConfig = $simpleFieldConfig;
+                                                                            } elseif ($simpleFieldKey === $altKey) {
+                                                                                $altFieldConfig = $simpleFieldConfig;
+                                                                            }
+                                                                        }
+                                                                        if (!is_array($imageFieldConfig) || !is_array($altFieldConfig)) {
+                                                                            continue;
+                                                                        }
+                                                                        $imageFieldData = $contentData["simple_fields"][$imageKey] ?? null;
+                                                                        $altFieldData = $contentData["simple_fields"][$altKey] ?? null;
+                                                                        $imageValue = (string) ($imageFieldData["field_value"] ?? "");
+                                                                        $imageVisible = (int) ($imageFieldData["is_visible"] ?? 1) === 1;
+                                                                        $altValue = (string) ($altFieldData["field_value"] ?? "");
+                                                                        $altVisible = (int) ($altFieldData["is_visible"] ?? 1) === 1;
+                                                                        ?>
+                                                                        <div class="image-item-card">
+                                                                            <h6><?php echo escapeAdminFieldLabel($itemTitle); ?></h6>
+                                                                            <div class="field-grid">
+                                                                                <div class="field-group">
+                                                                                    <div class="field-header">
+                                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($imageFieldConfig["label"] ?? $imageKey)); ?></label>
+                                                                                        <label class="toggle-row">
+                                                                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $imageVisible ? " checked" : ""; ?>>
+                                                                                            <span>Mostrar</span>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                    <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($imageValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                    <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($imageValue !== "" ? basename($imageValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
+                                                                                    <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
+                                                                                    <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                                                                                    <?php if ($imageValue !== ""): ?>
+                                                                                        <img src="../../<?php echo htmlspecialchars(ltrim($imageValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
+                                                                                    <?php endif; ?>
+                                                                                </div>
+                                                                                <div class="field-group">
+                                                                                    <div class="field-header">
+                                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?></label>
+                                                                                        <label class="toggle-row">
+                                                                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $altVisible ? " checked" : ""; ?>>
+                                                                                            <span>Mostrar</span>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($altValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    <?php endforeach; ?>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                </div>
                                             <?php else: ?>
                                                 <div class="field-grid">
                                                     <?php foreach ($groupConfig["field_keys"] as $groupFieldKey): ?>
@@ -597,7 +752,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             <?php elseif ($isImage): ?>
                                                                 <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                 <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($fieldValue !== "" ? basename($fieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
-                                                                <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>">Seleccionar nueva imagen</label>
+                                                                <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
                                                                 <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                                                             <?php else: ?>
                                                                 <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
@@ -639,7 +794,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                             <?php elseif ($isImage): ?>
                                                 <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                                 <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($fieldValue !== "" ? basename($fieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
-                                                <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>">Seleccionar nueva imagen</label>
+                                                <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
                                                 <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                                             <?php else: ?>
                                                 <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
@@ -732,6 +887,12 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
