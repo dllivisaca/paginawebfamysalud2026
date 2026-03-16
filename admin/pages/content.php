@@ -144,6 +144,9 @@ $contentData = ($page && $schema)
     ? getPageContentData($conn, (int) $page["id"], $schema)
     : ["simple_fields" => [], "repeaters" => []];
 
+$linkableSitePages = [];
+$linkableSitePagesById = [];
+$buttonFieldGroups = [];
 $simpleFieldGroups = [];
 
 if (($schema["template_key"] ?? "") === "about") {
@@ -156,7 +159,7 @@ if (($schema["template_key"] ?? "") === "about") {
         [
             "title" => "Botones",
             "description" => "Textos y enlaces de los llamados a la acción.",
-            "field_keys" => ["primary_cta_text", "primary_cta_url", "secondary_cta_text", "secondary_cta_url"],
+            "field_keys" => ["primary_cta_text", "primary_cta_link_type", "primary_cta_page_id", "primary_cta_url", "secondary_cta_text", "secondary_cta_link_type", "secondary_cta_page_id", "secondary_cta_url"],
         ],
         [
             "title" => "Imágenes",
@@ -167,6 +170,24 @@ if (($schema["template_key"] ?? "") === "about") {
             "title" => "Certificaciones",
             "description" => "Encabezado del bloque de certificaciones antes de los logos repetibles.",
             "field_keys" => ["certifications_title", "certifications_text"],
+        ],
+    ];
+
+    [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
+    $buttonFieldGroups = [
+        "primary_cta" => [
+            "title" => "Botón principal",
+            "text_key" => "primary_cta_text",
+            "link_type_key" => "primary_cta_link_type",
+            "page_id_key" => "primary_cta_page_id",
+            "url_key" => "primary_cta_url",
+        ],
+        "secondary_cta" => [
+            "title" => "Botón secundario",
+            "text_key" => "secondary_cta_text",
+            "link_type_key" => "secondary_cta_link_type",
+            "page_id_key" => "secondary_cta_page_id",
+            "url_key" => "secondary_cta_url",
         ],
     ];
 }
@@ -226,8 +247,14 @@ if (($schema["template_key"] ?? "") === "about") {
         .field-group-full { grid-column: 1 / -1; }
         .field-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 28px; }
         .field-label { font-size: 14px; font-weight: bold; color: #374151; margin: 0; }
-        .form-input, .form-textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; font-size: 14px; background: #fff; }
+        .form-input, .form-textarea, .form-select { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; font-size: 14px; background: #fff; }
         .form-textarea { min-height: 110px; resize: vertical; }
+        .button-groups { display: grid; gap: 16px; }
+        .button-link-card { border: 1px solid #dbe4dc; border-radius: 14px; padding: 16px; background: #f9fafb; display: grid; gap: 14px; }
+        .button-link-card h5 { margin: 0; font-size: 16px; color: #1f2937; }
+        .button-destination-box { border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; background: #fff; display: grid; gap: 12px; }
+        .button-destination-grid { display: grid; gap: 12px; }
+        .is-hidden { display: none; }
         .toggle-row { display: inline-flex; align-items: center; gap: 8px; min-height: 0; font-size: 13px; color: #4b5563; white-space: nowrap; padding: 4px 8px; border-radius: 999px; background: #f3f4f6; border: 1px solid #e5e7eb; }
         .toggle-row input { margin: 0; }
         .item-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -333,58 +360,153 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <p><?php echo htmlspecialchars((string) $groupConfig["description"], ENT_QUOTES, "UTF-8"); ?></p>
                                             <?php endif; ?>
 
-                                            <div class="field-grid">
-                                                <?php foreach ($groupConfig["field_keys"] as $groupFieldKey): ?>
-                                                    <?php
-                                                    $fieldConfig = null;
+                                            <?php $isButtonsGroup = ((string) ($groupConfig["title"] ?? "")) === "Botones"; ?>
+                                            <?php if ($isButtonsGroup): ?>
+                                                <div class="button-groups">
+                                                    <?php foreach ($buttonFieldGroups as $buttonConfig): ?>
+                                                        <?php
+                                                        $textKey = (string) $buttonConfig["text_key"];
+                                                        $linkTypeKey = (string) $buttonConfig["link_type_key"];
+                                                        $pageIdKey = (string) $buttonConfig["page_id_key"];
+                                                        $urlKey = (string) $buttonConfig["url_key"];
+                                                        $textConfig = null;
+                                                        $linkTypeConfig = null;
+                                                        $pageIdConfig = null;
+                                                        $urlConfig = null;
 
-                                                    foreach ($schema["simple_fields"] as $simpleFieldConfig) {
-                                                        if ((string) ($simpleFieldConfig["field_key"] ?? "") === $groupFieldKey) {
-                                                            $fieldConfig = $simpleFieldConfig;
-                                                            break;
+                                                        foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                            $simpleFieldKey = (string) ($simpleFieldConfig["field_key"] ?? "");
+
+                                                            if ($simpleFieldKey === $textKey) {
+                                                                $textConfig = $simpleFieldConfig;
+                                                            } elseif ($simpleFieldKey === $linkTypeKey) {
+                                                                $linkTypeConfig = $simpleFieldConfig;
+                                                            } elseif ($simpleFieldKey === $pageIdKey) {
+                                                                $pageIdConfig = $simpleFieldConfig;
+                                                            } elseif ($simpleFieldKey === $urlKey) {
+                                                                $urlConfig = $simpleFieldConfig;
+                                                            }
                                                         }
-                                                    }
 
-                                                    if (!is_array($fieldConfig)) {
-                                                        continue;
-                                                    }
+                                                        if (!is_array($textConfig) || !is_array($linkTypeConfig) || !is_array($pageIdConfig) || !is_array($urlConfig)) {
+                                                            continue;
+                                                        }
 
-                                                    $fieldData = $contentData["simple_fields"][$groupFieldKey] ?? null;
-                                                    $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
-                                                    $fieldValue = (string) ($fieldData["field_value"] ?? "");
-                                                    $fieldVisible = (int) ($fieldData["is_visible"] ?? 1) === 1;
-                                                    $isTextarea = $fieldType === "textarea";
-                                                    $isImage = $fieldType === "image";
-                                                    $displayLabel = (string) ($fieldConfig["label"] ?? $groupFieldKey);
-                                                    $displayLabelHtml = escapeAdminFieldLabel($displayLabel);
+                                                        $textData = $contentData["simple_fields"][$textKey] ?? null;
+                                                        $linkTypeData = $contentData["simple_fields"][$linkTypeKey] ?? null;
+                                                        $pageIdData = $contentData["simple_fields"][$pageIdKey] ?? null;
+                                                        $urlData = $contentData["simple_fields"][$urlKey] ?? null;
+                                                        $textValue = (string) ($textData["field_value"] ?? "");
+                                                        $textVisible = (int) ($textData["is_visible"] ?? 1) === 1;
+                                                        $linkTypeValue = trim((string) ($linkTypeData["field_value"] ?? "custom"));
+                                                        $pageIdValue = trim((string) ($pageIdData["field_value"] ?? ""));
+                                                        $urlValue = (string) ($urlData["field_value"] ?? "");
 
-                                                    if ($isIntroGroup && $groupFieldKey === "intro_text_1") {
-                                                        $displayLabelHtml = "P&aacute;rrafo 1";
-                                                    } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
-                                                        $displayLabelHtml = "P&aacute;rrafo 2";
-                                                    }
-                                                    ?>
-                                                    <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
-                                                        <div class="field-header">
-                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $displayLabelHtml; ?></label>
-                                                            <label class="toggle-row">
-                                                                <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
-                                                                <span>Mostrar</span>
-                                                            </label>
+                                                        if ($linkTypeValue !== "internal" && $linkTypeValue !== "custom") {
+                                                            $linkTypeValue = $pageIdValue !== "" ? "internal" : "custom";
+                                                        }
+                                                        ?>
+                                                        <div class="button-link-card">
+                                                            <h5><?php echo escapeAdminFieldLabel((string) ($buttonConfig["title"] ?? "Botón")); ?></h5>
+
+                                                            <div class="field-group">
+                                                                <div class="field-header">
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($textConfig["label"] ?? $textKey)); ?></label>
+                                                                    <label class="toggle-row">
+                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $textVisible ? " checked" : ""; ?>>
+                                                                        <span>Mostrar</span>
+                                                                    </label>
+                                                                </div>
+                                                                <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($textValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                            </div>
+
+                                                            <div class="button-destination-box">
+                                                                <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+                                                                <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+                                                                <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+
+                                                                <div class="field-group field-group-full">
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
+                                                                    <select class="form-select js-link-type" id="simple_<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>][value]" data-link-scope="<?php echo htmlspecialchars((string) array_search($buttonConfig, $buttonFieldGroups, true), ENT_QUOTES, "UTF-8"); ?>">
+                                                                        <option value="internal"<?php echo $linkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                                                        <option value="custom"<?php echo $linkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                <div class="button-destination-grid">
+                                                                    <div class="field-group field-group-full js-link-panel <?php echo $linkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars((string) array_search($buttonConfig, $buttonFieldGroups, true), ENT_QUOTES, "UTF-8"); ?>">
+                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
+                                                                        <select class="form-select" id="simple_<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>][value]">
+                                                                            <option value="">Selecciona una p&aacute;gina</option>
+                                                                            <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                                                <option value="<?php echo (int) ($sitePageOption["id"] ?? 0); ?>"<?php echo (string) ($sitePageOption["id"] ?? "") === $pageIdValue ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                                            <?php endforeach; ?>
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="field-group field-group-full js-link-panel <?php echo $linkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars((string) array_search($buttonConfig, $buttonFieldGroups, true), ENT_QUOTES, "UTF-8"); ?>">
+                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                                                        <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($urlValue, ENT_QUOTES, "UTF-8"); ?>" placeholder="https://wa.me/... o https://youtube.com/...">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="field-grid">
+                                                    <?php foreach ($groupConfig["field_keys"] as $groupFieldKey): ?>
+                                                        <?php
+                                                        $fieldConfig = null;
 
-                                                        <?php if ($isTextarea): ?>
-                                                            <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
-                                                        <?php else: ?>
-                                                            <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
-                                                        <?php endif; ?>
+                                                        foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                            if ((string) ($simpleFieldConfig["field_key"] ?? "") === $groupFieldKey) {
+                                                                $fieldConfig = $simpleFieldConfig;
+                                                                break;
+                                                            }
+                                                        }
 
-                                                        <?php if ($isImage && $fieldValue !== ""): ?>
-                                                            <img src="../../<?php echo htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
-                                                        <?php endif; ?>
-                                                    </div>
-                                                <?php endforeach; ?>
-                                            </div>
+                                                        if (!is_array($fieldConfig)) {
+                                                            continue;
+                                                        }
+
+                                                        $fieldData = $contentData["simple_fields"][$groupFieldKey] ?? null;
+                                                        $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
+                                                        $fieldValue = (string) ($fieldData["field_value"] ?? "");
+                                                        $fieldVisible = (int) ($fieldData["is_visible"] ?? 1) === 1;
+                                                        $isTextarea = $fieldType === "textarea";
+                                                        $isImage = $fieldType === "image";
+                                                        $displayLabel = (string) ($fieldConfig["label"] ?? $groupFieldKey);
+                                                        $displayLabelHtml = escapeAdminFieldLabel($displayLabel);
+
+                                                        if ($isIntroGroup && $groupFieldKey === "intro_text_1") {
+                                                            $displayLabelHtml = "P&aacute;rrafo 1";
+                                                        } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
+                                                            $displayLabelHtml = "P&aacute;rrafo 2";
+                                                        }
+                                                        ?>
+                                                        <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
+                                                            <div class="field-header">
+                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $displayLabelHtml; ?></label>
+                                                                <label class="toggle-row">
+                                                                    <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                                                    <span>Mostrar</span>
+                                                                </label>
+                                                            </div>
+
+                                                            <?php if ($isTextarea): ?>
+                                                                <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                            <?php else: ?>
+                                                                <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                            <?php endif; ?>
+
+                                                            <?php if ($isImage && $fieldValue !== ""): ?>
+                                                                <img src="../../<?php echo htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
@@ -480,8 +602,37 @@ if (($schema["template_key"] ?? "") === "about") {
         </main>
     </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var selectors = document.querySelectorAll(".js-link-type");
+
+            selectors.forEach(function (selector) {
+                var syncPanels = function () {
+                    var scope = selector.getAttribute("data-link-scope");
+                    var value = selector.value === "internal" ? "internal" : "custom";
+                    var panels = document.querySelectorAll('.js-link-panel[data-link-scope="' + scope + '"]');
+
+                    panels.forEach(function (panel) {
+                        panel.classList.toggle("is-hidden", panel.getAttribute("data-link-panel") !== value);
+                    });
+                };
+
+                selector.addEventListener("change", syncPanels);
+                syncPanels();
+            });
+        });
+    </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
 
 

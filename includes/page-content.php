@@ -5,6 +5,18 @@ if (!isset($conn) || !($conn instanceof mysqli)) {
 }
 
 require_once __DIR__ . "/../templates/page-schemas/registry.php";
+if (!function_exists("publicPageUrl")) {
+    function publicPageUrl(string $slug): string
+    {
+        $slug = trim($slug, "/");
+
+        if ($slug === "" || $slug === "inicio") {
+            return "index.php";
+        }
+
+        return "page.php?slug=" . rawurlencode($slug);
+    }
+}
 
 function getPageContentTemplateSchema(string $templateKey): ?array
 {
@@ -312,3 +324,60 @@ function buildPageContentView(array $schema, array $contentData): array
         "repeaters" => $repeatersView,
     ];
 }
+function getPageContentLinkablePages(mysqli $conn, bool $includeHomePage = true): array
+{
+    static $cache = [];
+
+    $cacheKey = $includeHomePage ? "with_home" : "without_home";
+
+    if (isset($cache[$cacheKey])) {
+        return $cache[$cacheKey];
+    }
+
+    $pages = [];
+    $pagesById = [];
+    $sql = "SELECT id, page_key, title, slug, is_active
+            FROM site_pages
+            WHERE is_active = 1";
+
+    if (!$includeHomePage) {
+        $sql .= " AND page_key <> 'home'";
+    }
+
+    $sql .= " ORDER BY title ASC, id ASC";
+    $result = $conn->query($sql);
+
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $row["id"] = (int) ($row["id"] ?? 0);
+            $row["public_url"] = publicPageUrl((string) ($row["slug"] ?? ""));
+            $pages[] = $row;
+            $pagesById[$row["id"]] = $row;
+        }
+    }
+
+    $cache[$cacheKey] = [$pages, $pagesById];
+    return $cache[$cacheKey];
+}
+
+function resolvePageContentLinkHref(mysqli $conn, array $simpleFields, string $prefix, string $fallbackUrl = ""): string
+{
+    $linkType = trim((string) ($simpleFields[$prefix . "_link_type"]["value"] ?? ""));
+    $pageId = (int) trim((string) ($simpleFields[$prefix . "_page_id"]["value"] ?? "0"));
+    $customUrl = trim((string) ($simpleFields[$prefix . "_url"]["value"] ?? ""));
+
+    if ($linkType === "internal" && $pageId > 0) {
+        [, $pagesById] = getPageContentLinkablePages($conn, true);
+
+        if (isset($pagesById[$pageId])) {
+            return (string) ($pagesById[$pageId]["public_url"] ?? "");
+        }
+    }
+
+    if ($customUrl !== "") {
+        return $customUrl;
+    }
+
+    return $fallbackUrl;
+}
+

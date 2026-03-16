@@ -26,9 +26,9 @@ $introTitle = aboutFieldValue($aboutFields, "intro_title", "Comprometidos con la
 $introText1 = aboutFieldValue($aboutFields, "intro_text_1", "Brindamos atención integral con enfoque humano, tecnología adecuada y procesos orientados al bienestar de cada paciente y su familia.");
 $introText2 = aboutFieldValue($aboutFields, "intro_text_2", "Nuestro equipo trabaja para ofrecer una experiencia confiable, cercana y profesional, con servicios pensados para acompañarte en cada etapa de cuidado.");
 $primaryCtaText = aboutFieldValue($aboutFields, "primary_cta_text", "Conoce a nuestros doctores");
-$primaryCtaUrl = aboutFieldValue($aboutFields, "primary_cta_url", "doctors.html");
+$primaryCtaUrl = resolvePageContentLinkHref($conn, $aboutFields, "primary_cta", "doctors.html");
 $secondaryCtaText = aboutFieldValue($aboutFields, "secondary_cta_text", "Ver servicios");
-$secondaryCtaUrl = aboutFieldValue($aboutFields, "secondary_cta_url", "services.html");
+$secondaryCtaUrl = resolvePageContentLinkHref($conn, $aboutFields, "secondary_cta", "services.html");
 $mainImage = aboutFieldValue($aboutFields, "main_image", "assets/img/health/consultation-3.webp");
 $mainImageAlt = aboutFieldValue($aboutFields, "main_image_alt", "Consulta de salud");
 $gridImage1 = aboutFieldValue($aboutFields, "grid_image_1", "assets/img/health/facilities-2.webp");
@@ -167,3 +167,4 @@ require __DIR__ . "/../../includes/header.php";
   </main>
 
 <?php require __DIR__ . "/../../includes/footer.php"; ?>
+

@@ -8,8 +8,12 @@ return [
         ["field_key" => "intro_text_1", "label" => "Párrafo 1", "field_type" => "textarea", "default" => "Brindamos atención integral con enfoque humano, tecnología adecuada y procesos orientados al bienestar de cada paciente y su familia.", "default_visible" => 1],
         ["field_key" => "intro_text_2", "label" => "Párrafo 2", "field_type" => "textarea", "default" => "Nuestro equipo trabaja para ofrecer una experiencia confiable, cercana y profesional, con servicios pensados para acompañarte en cada etapa de cuidado.", "default_visible" => 1],
         ["field_key" => "primary_cta_text", "label" => "Texto botón principal", "field_type" => "text", "default" => "Conoce a nuestros doctores", "default_visible" => 1],
+        ["field_key" => "primary_cta_link_type", "label" => "Tipo de enlace botón principal", "field_type" => "text", "default" => "custom", "default_visible" => 1],
+        ["field_key" => "primary_cta_page_id", "label" => "Página interna botón principal", "field_type" => "text", "default" => "", "default_visible" => 1],
         ["field_key" => "primary_cta_url", "label" => "URL botón principal", "field_type" => "url", "default" => "doctors.html", "default_visible" => 1],
         ["field_key" => "secondary_cta_text", "label" => "Texto botón secundario", "field_type" => "text", "default" => "Ver servicios", "default_visible" => 1],
+        ["field_key" => "secondary_cta_link_type", "label" => "Tipo de enlace botón secundario", "field_type" => "text", "default" => "custom", "default_visible" => 1],
+        ["field_key" => "secondary_cta_page_id", "label" => "Página interna botón secundario", "field_type" => "text", "default" => "", "default_visible" => 1],
         ["field_key" => "secondary_cta_url", "label" => "URL botón secundario", "field_type" => "url", "default" => "services.html", "default_visible" => 1],
         ["field_key" => "main_image", "label" => "Imagen principal", "field_type" => "image", "default" => "assets/img/health/consultation-3.webp", "default_visible" => 1],
         ["field_key" => "main_image_alt", "label" => "Texto alternativo imagen principal", "field_type" => "text", "default" => "Consulta de salud", "default_visible" => 1],
@@ -52,3 +56,4 @@ return [
         ],
     ],
 ];
+
