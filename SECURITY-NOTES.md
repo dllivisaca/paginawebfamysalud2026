@@ -151,3 +151,48 @@
 
 ### Como retomar en una nueva sesion
 - Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-12".
+
+## Sesion 2026-03-16
+
+### Cambios realizados hoy
+- Se implemento edicion de contenido por pagina para la plantilla `about` usando `site_page_content_fields`, `site_page_content_repeater_items` y `site_page_content_repeater_item_fields`, sin alterar la metadata base de `site_pages`.
+- Se agrego `admin/pages/content.php` como pantalla de administracion del contenido por plantilla, con soporte inicial para campos simples y bloques repetibles fijos del `about`.
+- Se creo el registro/schema de contenido para `about` y se conecto a helpers reutilizables en `includes/page-content.php`.
+- `page.php` y `templates/pages/about.php` quedaron leyendo contenido dinamico desde BD con fallback a valores por defecto cuando no existe contenido guardado.
+- Se agrego soporte para CTA con `Pagina interna` o `URL personalizada` en el bloque `Botones`, reutilizando `site_pages` y resolviendo la URL publica con `publicPageUrl()` sin romper compatibilidad con `*_cta_url` ya guardados.
+- Se mejoro la UX de `admin/pages/content.php` con agrupacion visual por subbloques (`Texto introductorio`, `Botones`, `Imágenes`, `Certificaciones`) y labels mas claros para el administrador.
+- Se agrego subida de imagenes en el editor de contenido para campos `image`, validando extension/MIME, guardando la ruta relativa en `assets/img/uploads/pages/` y preservando la ruta previa si no se sube un archivo nuevo.
+- Se agrego preview inmediata en admin para imagenes usando `FileReader`, sin esperar a guardar el formulario.
+- Se corrigieron varios detalles de render del admin para evitar duplicacion de titulos, toggles mal ubicados y previews vacios en campos no image.
+
+### Archivos creados
+- `admin/pages/content.php`
+- `includes/page-content.php`
+- `templates/page-schemas/registry.php`
+- `templates/page-schemas/about.php`
+- `database/site-page-content.sql`
+
+### Archivos modificados
+- `admin/pages/index.php`
+- `admin/pages/edit.php`
+- `admin/pages/content.php`
+- `includes/page-content.php`
+- `page.php`
+- `templates/pages/about.php`
+- `templates/page-schemas/about.php`
+
+### Verificacion realizada
+- Se ejecuto `php -l` sobre los archivos PHP creados o modificados en las iteraciones principales del dia.
+- Los archivos validados quedaron sin errores de sintaxis en las comprobaciones ejecutadas.
+- Se confirmo que el editor conserva la ruta previa de una imagen cuando no se selecciona un archivo nuevo.
+- Se confirmo que la preview del admin puede actualizarse en navegador al elegir una nueva imagen antes de guardar.
+
+### Pendientes recomendados
+- Probar manualmente en navegador el flujo completo de contenido `about`: guardado, toggles, uploads y lectura en frontend.
+- Revisar si conviene extraer helpers visuales del editor de contenido para reducir duplicacion antes de extender el sistema a otras plantillas.
+- Verificar permisos de escritura del directorio `assets/img/uploads/pages/` en todos los entornos.
+- Corregir textos heredados con codificacion rota que todavia aparezcan en algunas pantallas del admin.
+- Antes de sumar nuevas plantillas, definir el criterio estable para bloques especiales como CTA internos/externos e imagenes con preview.
+
+### Como retomar en una nueva sesion
+- Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-16".
