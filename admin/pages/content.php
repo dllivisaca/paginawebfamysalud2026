@@ -123,6 +123,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $page && $schema) {
 $contentData = ($page && $schema)
     ? getPageContentData($conn, (int) $page["id"], $schema)
     : ["simple_fields" => [], "repeaters" => []];
+
+$simpleFieldGroups = [];
+
+if (($schema["template_key"] ?? "") === "about") {
+    $simpleFieldGroups = [
+        [
+            "title" => "Texto introductorio",
+            "description" => "Contenido principal que acompaña el inicio de la sección.",
+            "field_keys" => ["intro_title", "intro_text_1", "intro_text_2"],
+        ],
+        [
+            "title" => "Botones",
+            "description" => "Textos y enlaces de los llamados a la acción.",
+            "field_keys" => ["primary_cta_text", "primary_cta_url", "secondary_cta_text", "secondary_cta_url"],
+        ],
+        [
+            "title" => "Imágenes",
+            "description" => "Imagen principal y las dos imágenes secundarias de apoyo.",
+            "field_keys" => ["main_image", "main_image_alt", "grid_image_1", "grid_image_1_alt", "grid_image_2", "grid_image_2_alt"],
+        ],
+        [
+            "title" => "Certificaciones",
+            "description" => "Encabezado del bloque de certificaciones antes de los logos repetibles.",
+            "field_keys" => ["certifications_title", "certifications_text"],
+        ],
+    ];
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -165,6 +192,10 @@ $contentData = ($page && $schema)
         .flash-error { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
         .section-block { border: 1px solid #e5e7eb; border-radius: 14px; padding: 18px; margin-bottom: 16px; background: #f9fafb; }
         .section-block h3 { margin: 0 0 8px; font-size: 18px; }
+        .section-groups { display: grid; gap: 16px; }
+        .content-subgroup { background: #fff; border: 1px solid #dbe4dc; border-radius: 14px; padding: 18px; }
+        .content-subgroup h4 { margin: 0 0 6px; font-size: 17px; color: #1f2937; }
+        .content-subgroup p { margin: 0 0 16px; color: #6b7280; font-size: 14px; line-height: 1.5; }
         .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; }
         .field-group { display: flex; flex-direction: column; gap: 8px; }
         .field-group-full { grid-column: 1 / -1; }
@@ -263,38 +294,95 @@ $contentData = ($page && $schema)
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
 
                         <div class="section-block">
-                            <h3>Campos simples</h3>
-                            <div class="field-grid">
-                                <?php foreach ($schema["simple_fields"] as $fieldConfig): ?>
-                                    <?php
-                                    $fieldKey = (string) $fieldConfig["field_key"];
-                                    $fieldData = $contentData["simple_fields"][$fieldKey] ?? null;
-                                    $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
-                                    $fieldValue = (string) ($fieldData["field_value"] ?? "");
-                                    $fieldVisible = (int) ($fieldData["is_visible"] ?? 1) === 1;
-                                    $isTextarea = $fieldType === "textarea";
-                                    $isImage = $fieldType === "image";
-                                    ?>
-                                    <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
-                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $fieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                            <h3>Contenido básico</h3>
+                            <?php if ($simpleFieldGroups !== []): ?>
+                                <div class="section-groups">
+                                    <?php foreach ($simpleFieldGroups as $groupConfig): ?>
+                                        <div class="content-subgroup">
+                                            <h4><?php echo htmlspecialchars((string) ($groupConfig["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h4>
+                                            <?php if (((string) ($groupConfig["description"] ?? "")) !== ""): ?>
+                                                <p><?php echo htmlspecialchars((string) $groupConfig["description"], ENT_QUOTES, "UTF-8"); ?></p>
+                                            <?php endif; ?>
 
-                                        <?php if ($isTextarea): ?>
-                                            <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
-                                        <?php else: ?>
-                                            <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
-                                        <?php endif; ?>
+                                            <div class="field-grid">
+                                                <?php foreach ($groupConfig["field_keys"] as $groupFieldKey): ?>
+                                                    <?php
+                                                    $fieldConfig = null;
 
-                                        <label class="toggle-row">
-                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
-                                            <span>Mostrar este campo</span>
-                                        </label>
+                                                    foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                        if ((string) ($simpleFieldConfig["field_key"] ?? "") === $groupFieldKey) {
+                                                            $fieldConfig = $simpleFieldConfig;
+                                                            break;
+                                                        }
+                                                    }
 
-                                        <?php if ($isImage && $fieldValue !== ""): ?>
-                                            <img src="../../<?php echo htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
+                                                    if (!is_array($fieldConfig)) {
+                                                        continue;
+                                                    }
+
+                                                    $fieldData = $contentData["simple_fields"][$groupFieldKey] ?? null;
+                                                    $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
+                                                    $fieldValue = (string) ($fieldData["field_value"] ?? "");
+                                                    $fieldVisible = (int) ($fieldData["is_visible"] ?? 1) === 1;
+                                                    $isTextarea = $fieldType === "textarea";
+                                                    $isImage = $fieldType === "image";
+                                                    ?>
+                                                    <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
+                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $groupFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+
+                                                        <?php if ($isTextarea): ?>
+                                                            <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                        <?php else: ?>
+                                                            <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                        <?php endif; ?>
+
+                                                        <label class="toggle-row">
+                                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                                            <span>Mostrar este campo</span>
+                                                        </label>
+
+                                                        <?php if ($isImage && $fieldValue !== ""): ?>
+                                                            <img src="../../<?php echo htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
+                                                        <?php endif; ?>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="field-grid">
+                                    <?php foreach ($schema["simple_fields"] as $fieldConfig): ?>
+                                        <?php
+                                        $fieldKey = (string) $fieldConfig["field_key"];
+                                        $fieldData = $contentData["simple_fields"][$fieldKey] ?? null;
+                                        $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
+                                        $fieldValue = (string) ($fieldData["field_value"] ?? "");
+                                        $fieldVisible = (int) ($fieldData["is_visible"] ?? 1) === 1;
+                                        $isTextarea = $fieldType === "textarea";
+                                        $isImage = $fieldType === "image";
+                                        ?>
+                                        <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
+                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $fieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+
+                                            <?php if ($isTextarea): ?>
+                                                <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                            <?php else: ?>
+                                                <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                            <?php endif; ?>
+
+                                            <label class="toggle-row">
+                                                <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                                <span>Mostrar este campo</span>
+                                            </label>
+
+                                            <?php if ($isImage && $fieldValue !== ""): ?>
+                                                <img src="../../<?php echo htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <?php foreach ($schema["repeaters"] as $repeaterConfig): ?>

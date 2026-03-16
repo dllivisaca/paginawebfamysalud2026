@@ -4,7 +4,7 @@ return [
     "template_key" => "about",
     "template_name" => "Nosotros",
     "simple_fields" => [
-        ["field_key" => "intro_title", "label" => "Título de introducción", "field_type" => "text", "default" => "Comprometidos con la excelencia en salud", "default_visible" => 1],
+        ["field_key" => "intro_title", "label" => "Subtítulo de la página", "field_type" => "text", "default" => "Comprometidos con la excelencia en salud", "default_visible" => 1],
         ["field_key" => "intro_text_1", "label" => "Párrafo 1", "field_type" => "textarea", "default" => "Brindamos atención integral con enfoque humano, tecnología adecuada y procesos orientados al bienestar de cada paciente y su familia.", "default_visible" => 1],
         ["field_key" => "intro_text_2", "label" => "Párrafo 2", "field_type" => "textarea", "default" => "Nuestro equipo trabaja para ofrecer una experiencia confiable, cercana y profesional, con servicios pensados para acompañarte en cada etapa de cuidado.", "default_visible" => 1],
         ["field_key" => "primary_cta_text", "label" => "Texto botón principal", "field_type" => "text", "default" => "Conoce a nuestros doctores", "default_visible" => 1],
@@ -17,8 +17,8 @@ return [
         ["field_key" => "grid_image_1_alt", "label" => "Texto alternativo imagen secundaria 1", "field_type" => "text", "default" => "Instalaciones médicas", "default_visible" => 1],
         ["field_key" => "grid_image_2", "label" => "Imagen secundaria 2", "field_type" => "image", "default" => "assets/img/health/staff-5.webp", "default_visible" => 1],
         ["field_key" => "grid_image_2_alt", "label" => "Texto alternativo imagen secundaria 2", "field_type" => "text", "default" => "Personal médico", "default_visible" => 1],
-        ["field_key" => "certifications_title", "label" => "Título certificaciones", "field_type" => "text", "default" => "Acreditaciones y certificaciones", "default_visible" => 1],
-        ["field_key" => "certifications_text", "label" => "Texto certificaciones", "field_type" => "textarea", "default" => "Contamos con respaldos y estándares de calidad que fortalecen la confianza de nuestros pacientes.", "default_visible" => 1],
+        ["field_key" => "certifications_title", "label" => "Título de certificaciones", "field_type" => "text", "default" => "Acreditaciones y certificaciones", "default_visible" => 1],
+        ["field_key" => "certifications_text", "label" => "Texto de certificaciones", "field_type" => "textarea", "default" => "Contamos con respaldos y estándares de calidad que fortalecen la confianza de nuestros pacientes.", "default_visible" => 1],
     ],
     "repeaters" => [
         [
