@@ -633,13 +633,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                         <?php endif; ?>
                                                                     </div>
                                                                     <div class="field-group">
-                                                                        <div class="field-header">
-                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?></label>
-                                                                            <label class="toggle-row">
-                                                                                <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $altVisible ? " checked" : ""; ?>>
-                                                                                <span>Mostrar</span>
-                                                                            </label>
-                                                                        </div>
+                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?></label>
                                                                         <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($altValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                     </div>
                                                                 </div>
@@ -690,13 +684,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                                     <?php endif; ?>
                                                                                 </div>
                                                                                 <div class="field-group">
-                                                                                    <div class="field-header">
-                                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?></label>
-                                                                                        <label class="toggle-row">
-                                                                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $altVisible ? " checked" : ""; ?>>
-                                                                                            <span>Mostrar</span>
-                                                                                        </label>
-                                                                                    </div>
+                                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?></label>
                                                                                     <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($altValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                                 </div>
                                                                             </div>
@@ -888,6 +876,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
