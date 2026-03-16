@@ -23,6 +23,88 @@ function escapeAdminFieldLabel($value)
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8");
 }
 
+function getSimpleFieldUpload(array $files, string $fieldKey): ?array
+{
+    if (!isset($files["simple_fields"])) {
+        return null;
+    }
+
+    $fieldFiles = $files["simple_fields"];
+
+    if (!isset($fieldFiles["name"][$fieldKey]["upload"])) {
+        return null;
+    }
+
+    return [
+        "name" => (string) ($fieldFiles["name"][$fieldKey]["upload"] ?? ""),
+        "type" => (string) ($fieldFiles["type"][$fieldKey]["upload"] ?? ""),
+        "tmp_name" => (string) ($fieldFiles["tmp_name"][$fieldKey]["upload"] ?? ""),
+        "error" => (int) ($fieldFiles["error"][$fieldKey]["upload"] ?? UPLOAD_ERR_NO_FILE),
+        "size" => (int) ($fieldFiles["size"][$fieldKey]["upload"] ?? 0),
+    ];
+}
+
+function storeSimpleFieldImageUpload(array $file, string $fieldKey, string $templateKey): array
+{
+    if (($file["error"] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return ["ok" => true, "path" => null, "error" => ""];
+    }
+
+    if (($file["error"] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        return ["ok" => false, "path" => null, "error" => "No fue posible subir la imagen seleccionada."];
+    }
+
+    $tmpName = (string) ($file["tmp_name"] ?? "");
+
+    if ($tmpName === "" || !is_uploaded_file($tmpName)) {
+        return ["ok" => false, "path" => null, "error" => "No se encontró un archivo válido para la subida."];
+    }
+
+    $originalName = (string) ($file["name"] ?? "");
+    $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+    $allowedExtensions = ["jpg", "jpeg", "png", "webp"];
+
+    if (!in_array($extension, $allowedExtensions, true)) {
+        return ["ok" => false, "path" => null, "error" => "La imagen debe estar en formato JPG, JPEG, PNG o WEBP."];
+    }
+
+    $finfo = function_exists("finfo_open") ? finfo_open(FILEINFO_MIME_TYPE) : false;
+    $mimeType = $finfo ? (string) finfo_file($finfo, $tmpName) : "";
+
+    if ($finfo) {
+        finfo_close($finfo);
+    }
+
+    $allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if ($mimeType !== "" && !in_array($mimeType, $allowedMimeTypes, true)) {
+        return ["ok" => false, "path" => null, "error" => "El archivo seleccionado no es una imagen válida."];
+    }
+
+    $uploadDirectory = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "img" . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_SEPARATOR . "pages";
+
+    if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0775, true) && !is_dir($uploadDirectory)) {
+        return ["ok" => false, "path" => null, "error" => "No fue posible preparar la carpeta de imágenes."];
+    }
+
+    $safeTemplateKey = preg_replace('/[^a-z0-9]+/i', '-', strtolower($templateKey));
+    $safeFieldKey = preg_replace('/[^a-z0-9]+/i', '-', strtolower($fieldKey));
+    $safeTemplateKey = trim((string) $safeTemplateKey, '-');
+    $safeFieldKey = trim((string) $safeFieldKey, '-');
+    $fileName = ($safeTemplateKey !== '' ? $safeTemplateKey . '-' : '') . $safeFieldKey . '-' . date('Ymd-His') . '-' . bin2hex(random_bytes(3)) . '.' . $extension;
+    $targetAbsolutePath = $uploadDirectory . DIRECTORY_SEPARATOR . $fileName;
+
+    if (!move_uploaded_file($tmpName, $targetAbsolutePath)) {
+        return ["ok" => false, "path" => null, "error" => "No fue posible guardar la imagen en el servidor."];
+    }
+
+    return [
+        "ok" => true,
+        "path" => "assets/img/uploads/pages/" . $fileName,
+        "error" => "",
+    ];
+}
+
 if (empty($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 }
@@ -84,6 +166,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $page && $schema) {
             $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
             $fieldValue = trim((string) ($_POST["simple_fields"][$fieldKey]["value"] ?? ""));
             $isVisible = isset($_POST["simple_fields"][$fieldKey]["is_visible"]) ? 1 : 0;
+
+            if ($fieldType === "image") {
+                $uploadedFile = getSimpleFieldUpload($_FILES, $fieldKey);
+                $uploadResult = is_array($uploadedFile)
+                    ? storeSimpleFieldImageUpload($uploadedFile, $fieldKey, $templateKey)
+                    : ["ok" => true, "path" => null, "error" => ""];
+
+                if (!($uploadResult["ok"] ?? false)) {
+                    $errors[] = (string) ($uploadResult["error"] ?? "No fue posible subir la imagen.");
+                    break;
+                }
+
+                if (!empty($uploadResult["path"])) {
+                    $fieldValue = (string) $uploadResult["path"];
+                }
+            }
 
             if (!upsertPageContentField($conn, (int) $page["id"], $fieldKey, $fieldType, $fieldValue, $isVisible)) {
                 $errors[] = "No fue posible guardar todos los campos simples.";
@@ -343,7 +441,7 @@ if (($schema["template_key"] ?? "") === "about") {
                     <h2>Contenido de la plantilla <?php echo htmlspecialchars((string) ($schema["template_name"] ?? $templateKey), ENT_QUOTES, "UTF-8"); ?></h2>
                     <p>Los bloques repetibles tienen cantidad fija definida por la plantilla. Aqu&iacute; solo puedes editar valores y mostrar u ocultar cada elemento.</p>
 
-                    <form action="content.php?id=<?php echo (int) $page["id"]; ?>" method="post">
+                    <form action="content.php?id=<?php echo (int) $page["id"]; ?>" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
 
                         <div class="section-block">
@@ -496,6 +594,11 @@ if (($schema["template_key"] ?? "") === "about") {
 
                                                             <?php if ($isTextarea): ?>
                                                                 <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                            <?php elseif ($isImage): ?>
+                                                                <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($fieldValue !== "" ? basename($fieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
+                                                                <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>">Seleccionar nueva imagen</label>
+                                                                <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                                                             <?php else: ?>
                                                                 <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                                             <?php endif; ?>
@@ -533,6 +636,11 @@ if (($schema["template_key"] ?? "") === "about") {
 
                                             <?php if ($isTextarea): ?>
                                                 <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                            <?php elseif ($isImage): ?>
+                                                <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($fieldValue !== "" ? basename($fieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
+                                                <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>">Seleccionar nueva imagen</label>
+                                                <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                                             <?php else: ?>
                                                 <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                             <?php endif; ?>
@@ -624,6 +732,10 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
+
+
+
 
 
 
