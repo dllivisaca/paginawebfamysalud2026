@@ -199,6 +199,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .content-subgroup-intro h4 { margin-bottom: 4px; }
         .content-subgroup p { margin: 0 0 16px; color: #6b7280; font-size: 14px; line-height: 1.5; }
         .content-subgroup-intro p { margin-bottom: 10px; }
+        .intro-group-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .intro-group-heading h4 { margin: 0; }
         .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; }
         .content-subgroup-intro .field-grid { gap: 12px 20px; }
         .field-group { display: flex; flex-direction: column; gap: 8px; }
@@ -306,7 +308,21 @@ if (($schema["template_key"] ?? "") === "about") {
                                     <?php foreach ($simpleFieldGroups as $groupConfig): ?>
                                         <?php $isIntroGroup = ((string) ($groupConfig["title"] ?? "")) === "Texto introductorio"; ?>
                                         <div class="content-subgroup <?php echo $isIntroGroup ? "content-subgroup-intro" : ""; ?>">
-                                            <h4><?php echo htmlspecialchars((string) ($groupConfig["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h4>
+                                            <?php if ($isIntroGroup): ?>
+                                                <?php
+                                                $introFieldData = $contentData["simple_fields"]["intro_title"] ?? null;
+                                                $introFieldVisible = (int) ($introFieldData["is_visible"] ?? 1) === 1;
+                                                ?>
+                                                <div class="intro-group-heading">
+                                                    <h4><?php echo htmlspecialchars((string) ($groupConfig["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h4>
+                                                    <label class="toggle-row">
+                                                        <input type="checkbox" name="simple_fields[intro_title][is_visible]" value="1"<?php echo $introFieldVisible ? " checked" : ""; ?>>
+                                                        <span>Mostrar</span>
+                                                    </label>
+                                                </div>
+                                            <?php else: ?>
+                                                <h4><?php echo htmlspecialchars((string) ($groupConfig["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h4>
+                                            <?php endif; ?>
                                             <?php if (!$isIntroGroup && ((string) ($groupConfig["description"] ?? "")) !== ""): ?>
                                                 <p><?php echo htmlspecialchars((string) $groupConfig["description"], ENT_QUOTES, "UTF-8"); ?></p>
                                             <?php endif; ?>
@@ -335,13 +351,17 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     $isImage = $fieldType === "image";
                                                     ?>
                                                     <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
-                                                        <div class="field-header">
+                                                        <?php if (!($isIntroGroup && $groupFieldKey === "intro_title")): ?>
+                                                            <div class="field-header">
+                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $groupFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                <label class="toggle-row">
+                                                                    <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                                                    <span>Mostrar</span>
+                                                                </label>
+                                                            </div>
+                                                        <?php else: ?>
                                                             <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $groupFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
-                                                            <label class="toggle-row">
-                                                                <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
-                                                                <span>Mostrar</span>
-                                                            </label>
-                                                        </div>
+                                                        <?php endif; ?>
 
                                                         <?php if ($isTextarea): ?>
                                                             <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
@@ -452,6 +472,9 @@ if (($schema["template_key"] ?? "") === "about") {
 
 </body>
 </html>
+
+
+
 
 
 
