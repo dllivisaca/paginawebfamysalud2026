@@ -392,6 +392,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .toggle-row input { margin: 0; }
         .item-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
         .preview-image { max-width: 180px; border: 1px solid #d1d5db; border-radius: 12px; padding: 6px; background: #fff; }
+        .preview-image.is-empty { display: none; }
         .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
         .muted { color: #6b7280; }
         @media (max-width: 991px) {
@@ -628,10 +629,8 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                         <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($imageValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                         <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($imageValue !== "" ? basename($imageValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
                                                                         <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
-                                                                        <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-                                                                        <?php if ($imageValue !== ""): ?>
-                                                                            <img src="../../<?php echo htmlspecialchars(ltrim($imageValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
-                                                                        <?php endif; ?>
+                                                                        <input class="form-file js-image-upload" type="file" id="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>">
+                                                                        <img id="preview_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $imageValue !== "" ? "../../" . htmlspecialchars(ltrim($imageValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $imageValue !== "" ? "" : " is-empty"; ?>">
                                                                     </div>
                                                                     <div class="field-group">
                                                                         <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?></label>
@@ -679,7 +678,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                                     <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($imageValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                                     <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($imageValue !== "" ? basename($imageValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
                                                                                     <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
-                                                                                    <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                                                                                    <input class="form-file js-image-upload" type="file" id="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>">
                                                                                     <?php if ($imageValue !== ""): ?>
                                                                                         <img src="../../<?php echo htmlspecialchars(ltrim($imageValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
                                                                                     <?php endif; ?>
@@ -743,14 +742,12 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                 <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($fieldValue !== "" ? basename($fieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
                                                                 <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
-                                                                <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                                                                <input class="form-file js-image-upload" type="file" id="simple_file_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>">
                                                             <?php else: ?>
                                                                 <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                                             <?php endif; ?>
 
-                                                            <?php if ($isImage && $fieldValue !== ""): ?>
-                                                                <img src="../../<?php echo htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
-                                                            <?php endif; ?>
+                                                            <img id="preview_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
                                                         </div>
                                                     <?php endforeach; ?>
                                                 </div>
@@ -785,14 +782,12 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                                 <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($fieldValue !== "" ? basename($fieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
                                                 <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
-                                                <input class="form-file" type="file" id="simple_file_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                                                <input class="form-file js-image-upload" type="file" id="simple_file_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>">
                                             <?php else: ?>
                                                 <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                             <?php endif; ?>
 
-                                            <?php if ($isImage && $fieldValue !== ""): ?>
-                                                <img src="../../<?php echo htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
-                                            <?php endif; ?>
+                                            <img id="preview_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
@@ -873,10 +868,37 @@ if (($schema["template_key"] ?? "") === "about") {
                 selector.addEventListener("change", syncPanels);
                 syncPanels();
             });
+
+            var imageInputs = document.querySelectorAll(".js-image-upload");
+
+            imageInputs.forEach(function (input) {
+                input.addEventListener("change", function () {
+                    var targetId = input.getAttribute("data-preview-target");
+                    var preview = targetId ? document.getElementById(targetId) : null;
+                    var file = input.files && input.files[0] ? input.files[0] : null;
+
+                    if (!preview || !file) {
+                        return;
+                    }
+
+                    if (file.type && file.type.indexOf("image/") !== 0) {
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function (event) {
+                        preview.src = String(event.target && event.target.result ? event.target.result : "");
+                        preview.classList.remove("is-empty");
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
         });
     </script>
 </body>
 </html>
+
+
 
 
 
