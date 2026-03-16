@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/db.php";
+require_once __DIR__ . "/includes/page-content.php";
 
 function publicPageUrl(string $slug): string
 {
@@ -176,5 +177,17 @@ if ($canonicalUrl === "") {
 
 $currentPublicSlug = (string) ($page["slug"] ?? "");
 $bodyClass = ((string) ($page["page_key"] ?? "site")) . "-page";
+$pageContent = [];
+
+if (pageContentSchemaSupportsTemplate((string) ($page["template_key"] ?? ""))) {
+    $pageContentSchema = getPageContentTemplateSchema((string) $page["template_key"]);
+
+    if (is_array($pageContentSchema)) {
+        ensurePageContentRepeaterItems($conn, (int) ($page["id"] ?? 0), $pageContentSchema);
+        $pageContentData = getPageContentData($conn, (int) ($page["id"] ?? 0), $pageContentSchema);
+        $pageContent = buildPageContentView($pageContentSchema, $pageContentData);
+    }
+}
 
 require $templatePath;
+

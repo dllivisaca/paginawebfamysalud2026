@@ -1,5 +1,6 @@
 <?php
 require_once "../auth-check.php";
+require_once "../../includes/page-content.php";
 
 if (empty($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
@@ -778,6 +779,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <div class="topbar-actions">
                     <a href="index.php" class="btn btn-outline">Volver a p&aacute;ginas</a>
+                    <?php if (!$isCreateMode && pageContentSchemaSupportsTemplate((string) ($pageData["template_key"] ?? ""))): ?>
+                        <a href="content.php?id=<?php echo urlencode((string) $pageId); ?>" class="btn btn-outline">Editar contenido</a>
+                    <?php endif; ?>
 
                     <form action="../logout.php" method="post" style="margin: 0;">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
@@ -1071,3 +1075,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </script>
 </body>
 </html>
+

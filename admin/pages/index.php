@@ -1,6 +1,7 @@
 <?php
 require_once "../auth-check.php";
 require_once "../../db.php";
+require_once "../../includes/page-content.php";
 
 if (empty($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
@@ -645,6 +646,9 @@ if ($result) {
                                         <td>
                                             <div class="actions-group">
                                                 <a href="edit.php?id=<?php echo urlencode((string) $pageItem["id"]); ?>" class="btn btn-primary">Editar</a>
+                                                <?php if (pageContentSchemaSupportsTemplate((string) ($pageItem["template_key"] ?? ""))): ?>
+                                                    <a href="content.php?id=<?php echo urlencode((string) $pageItem["id"]); ?>" class="btn btn-outline">Editar contenido</a>
+                                                <?php endif; ?>
 
                                                 <?php if (!$pageItem["is_home_page"]): ?>
                                                     <form action="index.php" method="post" class="inline-form">
@@ -681,3 +685,4 @@ if ($result) {
     </div>
 </body>
 </html>
+
