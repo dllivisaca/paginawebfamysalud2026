@@ -349,18 +349,26 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     $fieldVisible = (int) ($fieldData["is_visible"] ?? 1) === 1;
                                                     $isTextarea = $fieldType === "textarea";
                                                     $isImage = $fieldType === "image";
+                                                    $displayLabel = (string) ($fieldConfig["label"] ?? $groupFieldKey);
+                                                    $displayLabelHtml = htmlspecialchars($displayLabel, ENT_QUOTES, "UTF-8");
+
+                                                    if ($isIntroGroup && $groupFieldKey === "intro_text_1") {
+                                                        $displayLabelHtml = "P&aacute;rrafo 1";
+                                                    } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
+                                                        $displayLabelHtml = "P&aacute;rrafo 2";
+                                                    }
                                                     ?>
                                                     <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
                                                         <?php if (!($isIntroGroup && $groupFieldKey === "intro_title")): ?>
                                                             <div class="field-header">
-                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $groupFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $displayLabelHtml; ?></label>
                                                                 <label class="toggle-row">
                                                                     <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
                                                                     <span>Mostrar</span>
                                                                 </label>
                                                             </div>
                                                         <?php else: ?>
-                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $groupFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars($displayLabel, ENT_QUOTES, "UTF-8"); ?></label>
                                                         <?php endif; ?>
 
                                                         <?php if ($isTextarea): ?>
@@ -472,6 +480,8 @@ if (($schema["template_key"] ?? "") === "about") {
 
 </body>
 </html>
+
+
 
 
 
