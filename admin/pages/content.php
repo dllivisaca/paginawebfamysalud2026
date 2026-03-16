@@ -2,6 +2,26 @@
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
+function escapeAdminFieldLabel($value)
+{
+    $value = (string) $value;
+
+    if ($value === "") {
+        return "";
+    }
+
+    if (preg_match('//u', $value) === 1) {
+        return htmlspecialchars($value, ENT_QUOTES, "UTF-8");
+    }
+
+    $converted = function_exists("iconv") ? @iconv("Windows-1252", "UTF-8//IGNORE", $value) : false;
+
+    if (is_string($converted) && $converted !== "") {
+        return htmlspecialchars($converted, ENT_QUOTES, "UTF-8");
+    }
+
+    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8");
+}
 
 if (empty($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
@@ -350,7 +370,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     $isTextarea = $fieldType === "textarea";
                                                     $isImage = $fieldType === "image";
                                                     $displayLabel = (string) ($fieldConfig["label"] ?? $groupFieldKey);
-                                                    $displayLabelHtml = htmlspecialchars($displayLabel, ENT_QUOTES, "UTF-8");
+                                                    $displayLabelHtml = escapeAdminFieldLabel($displayLabel);
 
                                                     if ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                         $displayLabelHtml = "P&aacute;rrafo 1";
@@ -368,7 +388,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 </label>
                                                             </div>
                                                         <?php else: ?>
-                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars($displayLabel, ENT_QUOTES, "UTF-8"); ?></label>
+                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $displayLabelHtml; ?></label>
                                                         <?php endif; ?>
 
                                                         <?php if ($isTextarea): ?>
@@ -480,6 +500,8 @@ if (($schema["template_key"] ?? "") === "about") {
 
 </body>
 </html>
+
+
 
 
 
