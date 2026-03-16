@@ -370,6 +370,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .content-subgroup-intro .field-group { gap: 6px; }
         .field-group-full { grid-column: 1 / -1; }
         .field-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 28px; }
+        .field-header-actions { justify-content: flex-end; }
         .field-label { font-size: 14px; font-weight: bold; color: #374151; margin: 0; }
         .form-input, .form-textarea, .form-select { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; font-size: 14px; background: #fff; }
         .form-textarea { min-height: 110px; resize: vertical; }
@@ -616,8 +617,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 ?>
                                                                 <div class="field-grid">
                                                                     <div class="field-group">
-                                                                        <div class="field-header">
-                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($imageFieldConfig["label"] ?? $imageKey)); ?></label>
+                                                                        <div class="field-header field-header-actions">
                                                                             <label class="toggle-row">
                                                                                 <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $imageVisible ? " checked" : ""; ?>>
                                                                                 <span>Mostrar</span>
@@ -673,8 +673,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                             <h6><?php echo escapeAdminFieldLabel($itemTitle); ?></h6>
                                                                             <div class="field-grid">
                                                                                 <div class="field-group">
-                                                                                    <div class="field-header">
-                                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($imageFieldConfig["label"] ?? $imageKey)); ?></label>
+                                                                                    <div class="field-header field-header-actions">
                                                                                         <label class="toggle-row">
                                                                                             <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $imageVisible ? " checked" : ""; ?>>
                                                                                             <span>Mostrar</span>
@@ -887,6 +886,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
