@@ -386,6 +386,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .image-items { display: grid; gap: 14px; }
         .image-item-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; background: #fff; display: grid; gap: 12px; }
         .image-item-card h6 { margin: 0; font-size: 14px; color: #374151; }
+        .image-item-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .is-hidden { display: none; }
         .toggle-row { display: inline-flex; align-items: center; gap: 8px; min-height: 0; font-size: 13px; color: #4b5563; white-space: nowrap; padding: 4px 8px; border-radius: 999px; background: #f3f4f6; border: 1px solid #e5e7eb; }
         .toggle-row input { margin: 0; }
@@ -666,15 +667,15 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                         $altVisible = (int) ($altFieldData["is_visible"] ?? 1) === 1;
                                                                         ?>
                                                                         <div class="image-item-card">
-                                                                            <h6><?php echo escapeAdminFieldLabel($itemTitle); ?></h6>
+                                                                            <div class="image-item-head">
+                                                                                <h6><?php echo escapeAdminFieldLabel($itemTitle); ?></h6>
+                                                                                <label class="toggle-row">
+                                                                                    <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $imageVisible ? " checked" : ""; ?>>
+                                                                                    <span>Mostrar</span>
+                                                                                </label>
+                                                                            </div>
                                                                             <div class="field-grid">
                                                                                 <div class="field-group">
-                                                                                    <div class="field-header field-header-actions">
-                                                                                        <label class="toggle-row">
-                                                                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $imageVisible ? " checked" : ""; ?>>
-                                                                                            <span>Mostrar</span>
-                                                                                        </label>
-                                                                                    </div>
                                                                                     <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($imageValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                                     <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($imageValue !== "" ? basename($imageValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
                                                                                     <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
@@ -876,6 +877,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
