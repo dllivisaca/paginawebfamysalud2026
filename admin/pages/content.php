@@ -589,7 +589,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .field-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 28px; }
         .field-header-actions { justify-content: flex-end; }
         .field-label { font-size: 14px; font-weight: bold; color: #374151; margin: 0; }
-        .form-input, .form-textarea, .form-select { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; font-size: 14px; background: #fff; }
+        .form-input, .form-textarea, .form-select { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; font-size: 14px; font-family: inherit; font-weight: inherit; line-height: 1.5; background: #fff; }
         .form-textarea { min-height: 110px; resize: vertical; }
         .button-groups { display: grid; gap: 16px; }
         .button-link-card { border: 1px solid #dbe4dc; border-radius: 14px; padding: 16px; background: #f9fafb; display: grid; gap: 14px; }
