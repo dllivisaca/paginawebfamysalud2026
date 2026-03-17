@@ -303,6 +303,7 @@ $aboutStatsRepeaterConfig = null;
 $linkableSitePages = [];
 $linkableSitePagesById = [];
 $buttonFieldGroups = [];
+$imageFieldGroups = [];
 $simpleFieldGroups = [];
 
 if (($schema["template_key"] ?? "") === "about") {
@@ -373,6 +374,160 @@ if (($schema["template_key"] ?? "") === "about") {
         ],
     ];
     $aboutStatsRepeaterConfig = $schema["repeaters"][0] ?? null;
+} elseif (($schema["template_key"] ?? "") === "home") {
+    [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
+    $simpleFieldGroups = [
+        [
+            "title" => "Hero",
+            "description" => "Textos principales y badges del hero.",
+            "field_keys" => ["hero_badge", "hero_title", "hero_text", "hero_emergency_label", "hero_emergency_value", "hero_hours_label", "hero_hours_value"],
+        ],
+        [
+            "title" => "Hero - Botones",
+            "description" => "Llamados a la acción del hero.",
+            "render_mode" => "buttons",
+            "button_groups" => [
+                "hero_primary_cta" => [
+                    "title" => "Botón principal",
+                    "text_key" => "hero_primary_cta_text",
+                    "link_type_key" => "hero_primary_cta_link_type",
+                    "page_id_key" => "hero_primary_cta_page_id",
+                    "url_key" => "hero_primary_cta_url",
+                ],
+                "hero_secondary_cta" => [
+                    "title" => "Botón secundario",
+                    "text_key" => "hero_secondary_cta_text",
+                    "link_type_key" => "hero_secondary_cta_link_type",
+                    "page_id_key" => "hero_secondary_cta_page_id",
+                    "url_key" => "hero_secondary_cta_url",
+                ],
+            ],
+            "field_keys" => ["hero_primary_cta_text", "hero_primary_cta_link_type", "hero_primary_cta_page_id", "hero_primary_cta_url", "hero_secondary_cta_text", "hero_secondary_cta_link_type", "hero_secondary_cta_page_id", "hero_secondary_cta_url"],
+        ],
+        [
+            "title" => "Hero - Imagen",
+            "description" => "Imagen principal del hero.",
+            "render_mode" => "images",
+            "image_groups" => [
+                [
+                    "title" => "Imagen principal",
+                    "items" => [
+                        [
+                            "image_key" => "hero_image",
+                            "alt_key" => "hero_image_alt",
+                        ],
+                    ],
+                ],
+            ],
+            "field_keys" => ["hero_image", "hero_image_alt"],
+        ],
+        [
+            "title" => "Home About",
+            "description" => "Contenido principal del bloque Home About.",
+            "field_keys" => ["home_about_experience_years", "home_about_experience_text", "home_about_title", "home_about_lead", "home_about_text"],
+        ],
+        [
+            "title" => "Home About - Botones",
+            "description" => "Botones del bloque Home About.",
+            "render_mode" => "buttons",
+            "button_groups" => [
+                "home_about_primary_cta" => [
+                    "title" => "Botón principal",
+                    "text_key" => "home_about_primary_cta_text",
+                    "link_type_key" => "home_about_primary_cta_link_type",
+                    "page_id_key" => "home_about_primary_cta_page_id",
+                    "url_key" => "home_about_primary_cta_url",
+                ],
+                "home_about_secondary_cta" => [
+                    "title" => "Botón secundario",
+                    "text_key" => "home_about_secondary_cta_text",
+                    "link_type_key" => "home_about_secondary_cta_link_type",
+                    "page_id_key" => "home_about_secondary_cta_page_id",
+                    "url_key" => "home_about_secondary_cta_url",
+                ],
+            ],
+            "field_keys" => ["home_about_primary_cta_text", "home_about_primary_cta_link_type", "home_about_primary_cta_page_id", "home_about_primary_cta_url", "home_about_secondary_cta_text", "home_about_secondary_cta_link_type", "home_about_secondary_cta_page_id", "home_about_secondary_cta_url"],
+        ],
+        [
+            "title" => "Home About - Imagen",
+            "description" => "Imagen del bloque Home About.",
+            "render_mode" => "images",
+            "image_groups" => [
+                [
+                    "title" => "Imagen principal",
+                    "items" => [
+                        [
+                            "image_key" => "home_about_image",
+                            "alt_key" => "home_about_image_alt",
+                        ],
+                    ],
+                ],
+            ],
+            "field_keys" => ["home_about_image", "home_about_image_alt"],
+        ],
+        [
+            "title" => "Certificaciones Home",
+            "description" => "Encabezado del bloque de certificaciones de Home.",
+            "field_keys" => ["home_about_certifications_title"],
+        ],
+        [
+            "title" => "Featured Departments",
+            "description" => "Encabezado del bloque de departamentos destacados.",
+            "field_keys" => ["featured_departments_title", "featured_departments_text"],
+        ],
+        [
+            "title" => "Featured Services",
+            "description" => "Encabezado del bloque de servicios destacados.",
+            "field_keys" => ["featured_services_title", "featured_services_text"],
+        ],
+        [
+            "title" => "Find A Doctor",
+            "description" => "Textos y controles del buscador de doctores.",
+            "field_keys" => ["find_doctor_title", "find_doctor_text", "doctor_search_placeholder", "doctor_specialty_placeholder", "doctor_search_button_text"],
+        ],
+        [
+            "title" => "Call To Action",
+            "description" => "Contenido principal del llamado a la acción.",
+            "field_keys" => ["cta_title", "cta_text"],
+        ],
+        [
+            "title" => "Call To Action - Botones",
+            "description" => "Botones principales del llamado a la acción.",
+            "render_mode" => "buttons",
+            "button_groups" => [
+                "cta_primary" => [
+                    "title" => "Botón principal",
+                    "text_key" => "cta_primary_text",
+                    "link_type_key" => "cta_primary_link_type",
+                    "page_id_key" => "cta_primary_page_id",
+                    "url_key" => "cta_primary_url",
+                ],
+                "cta_secondary" => [
+                    "title" => "Botón secundario",
+                    "text_key" => "cta_secondary_text",
+                    "link_type_key" => "cta_secondary_link_type",
+                    "page_id_key" => "cta_secondary_page_id",
+                    "url_key" => "cta_secondary_url",
+                ],
+            ],
+            "field_keys" => ["cta_primary_text", "cta_primary_link_type", "cta_primary_page_id", "cta_primary_url", "cta_secondary_text", "cta_secondary_link_type", "cta_secondary_page_id", "cta_secondary_url"],
+        ],
+        [
+            "title" => "Call To Action - Emergencia",
+            "description" => "Bloque secundario de emergencia del llamado a la acción.",
+            "field_keys" => ["cta_emergency_title", "cta_emergency_text", "cta_emergency_button_text", "cta_emergency_button_url"],
+        ],
+        [
+            "title" => "Emergency Info",
+            "description" => "Encabezados del bloque de información de emergencia.",
+            "field_keys" => ["emergency_info_title", "emergency_info_text", "quick_actions_title", "emergency_tips_title"],
+        ],
+        [
+            "title" => "Emergency Banner",
+            "description" => "Banner principal del bloque de emergencia.",
+            "field_keys" => ["emergency_banner_title", "emergency_banner_text", "emergency_banner_button_text", "emergency_banner_button_url"],
+        ],
+    ];
 }
 ?>
 <!DOCTYPE html>
@@ -557,11 +712,16 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <p><?php echo htmlspecialchars((string) $groupConfig["description"], ENT_QUOTES, "UTF-8"); ?></p>
                                             <?php endif; ?>
 
-                                            <?php $isButtonsGroup = ((string) ($groupConfig["title"] ?? "")) === "Botones"; ?>
-                                            <?php $isImagesGroup = ((string) ($groupConfig["title"] ?? "")) === "Imágenes"; ?>
+                                            <?php
+                                            $groupRenderMode = (string) ($groupConfig["render_mode"] ?? "");
+                                            $groupButtonFieldGroups = isset($groupConfig["button_groups"]) && is_array($groupConfig["button_groups"]) ? $groupConfig["button_groups"] : $buttonFieldGroups;
+                                            $groupImageFieldGroups = isset($groupConfig["image_groups"]) && is_array($groupConfig["image_groups"]) ? $groupConfig["image_groups"] : $imageFieldGroups;
+                                            $isButtonsGroup = $groupRenderMode === "buttons" || ((string) ($groupConfig["title"] ?? "")) === "Botones";
+                                            $isImagesGroup = $groupRenderMode === "images" || ((string) ($groupConfig["title"] ?? "")) === "Imágenes";
+                                            ?>
                                             <?php if ($isButtonsGroup): ?>
                                                 <div class="button-groups">
-                                                    <?php foreach ($buttonFieldGroups as $buttonConfig): ?>
+                                                    <?php foreach ($groupButtonFieldGroups as $buttonConfig): ?>
                                                         <?php
                                                         $textKey = (string) $buttonConfig["text_key"];
                                                         $linkTypeKey = (string) $buttonConfig["link_type_key"];
@@ -625,14 +785,14 @@ if (($schema["template_key"] ?? "") === "about") {
 
                                                                 <div class="field-group field-group-full">
                                                                     <label class="field-label" for="simple_<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
-                                                                    <select class="form-select js-link-type" id="simple_<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>][value]" data-link-scope="<?php echo htmlspecialchars((string) array_search($buttonConfig, $buttonFieldGroups, true), ENT_QUOTES, "UTF-8"); ?>">
+                                                                    <select class="form-select js-link-type" id="simple_<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>][value]" data-link-scope="<?php echo htmlspecialchars((string) array_search($buttonConfig, $groupButtonFieldGroups, true), ENT_QUOTES, "UTF-8"); ?>">
                                                                         <option value="internal"<?php echo $linkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
                                                                         <option value="custom"<?php echo $linkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
                                                                     </select>
                                                                 </div>
 
                                                                 <div class="button-destination-grid">
-                                                                    <div class="field-group field-group-full js-link-panel <?php echo $linkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars((string) array_search($buttonConfig, $buttonFieldGroups, true), ENT_QUOTES, "UTF-8"); ?>">
+                                                                    <div class="field-group field-group-full js-link-panel <?php echo $linkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars((string) array_search($buttonConfig, $groupButtonFieldGroups, true), ENT_QUOTES, "UTF-8"); ?>">
                                                                         <label class="field-label" for="simple_<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
                                                                         <select class="form-select" id="simple_<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>][value]">
                                                                             <option value="">Selecciona una p&aacute;gina</option>
@@ -642,7 +802,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                         </select>
                                                                     </div>
 
-                                                                    <div class="field-group field-group-full js-link-panel <?php echo $linkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars((string) array_search($buttonConfig, $buttonFieldGroups, true), ENT_QUOTES, "UTF-8"); ?>">
+                                                                    <div class="field-group field-group-full js-link-panel <?php echo $linkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars((string) array_search($buttonConfig, $groupButtonFieldGroups, true), ENT_QUOTES, "UTF-8"); ?>">
                                                                         <label class="field-label" for="simple_<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
                                                                         <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($urlValue, ENT_QUOTES, "UTF-8"); ?>" placeholder="https://wa.me/... o https://youtube.com/...">
                                                                     </div>
@@ -653,7 +813,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 </div>
                                             <?php elseif ($isImagesGroup): ?>
                                                 <div class="image-groups">
-                                                    <?php foreach ($imageFieldGroups as $imageGroupConfig): ?>
+                                                    <?php foreach ($groupImageFieldGroups as $imageGroupConfig): ?>
                                                         <div class="image-section-card">
                                                             <?php if (count((array) ($imageGroupConfig["items"] ?? [])) === 1): ?>
                                                                 <?php $imageItemConfig = $imageGroupConfig["items"][0] ?? []; ?>
