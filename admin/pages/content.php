@@ -137,9 +137,13 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $fieldKey = (string) ($fieldConfig["field_key"] ?? "");
                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                         $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
+                        $fieldLabel = (string) ($fieldConfig["label"] ?? $fieldKey);
+                        if ($repeaterKey === "about_stats" && $fieldKey === "value") {
+                            $fieldLabel = "Valor";
+                        }
                         ?>
                         <div class="field-group">
-                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $fieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
                             <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
 
                             <?php if ($fieldType === "image" && $fieldValue !== ""): ?>
