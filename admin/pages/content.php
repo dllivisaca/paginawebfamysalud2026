@@ -104,12 +104,12 @@ function storeSimpleFieldImageUpload(array $file, string $fieldKey, string $temp
         "error" => "",
     ];
 }
-function renderAdminRepeaterSection(array $repeaterConfig, array $contentData): void
+function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, string $sectionClass = ""): void
 {
     $repeaterKey = (string) ($repeaterConfig["repeater_key"] ?? "");
     $repeaterItems = $contentData["repeaters"][$repeaterKey] ?? [];
     ?>
-    <div class="section-block">
+    <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?>">
         <h3><?php echo htmlspecialchars((string) ($repeaterConfig["label"] ?? $repeaterKey), ENT_QUOTES, "UTF-8"); ?></h3>
 
         <?php foreach ($repeaterConfig["items"] as $itemConfig): ?>
@@ -404,6 +404,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .flash-success { background: #e9f7ef; border-color: #cfe7d8; color: #146c43; }
         .flash-error { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
         .section-block { border: 1px solid #e5e7eb; border-radius: 14px; padding: 18px; margin-bottom: 16px; background: #f9fafb; }
+        .about-stats-section { background: #fff; }
         .section-block h3 { margin: 0 0 8px; font-size: 18px; }
         .section-groups { display: grid; gap: 16px; }
         .content-subgroup { background: #fff; border: 1px solid #dbe4dc; border-radius: 14px; padding: 18px; }
@@ -528,7 +529,7 @@ if (($schema["template_key"] ?? "") === "about") {
                     <form action="content.php?id=<?php echo (int) $page["id"]; ?>" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
 
-                        <div class="section-block">
+                        <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?>">
                             <h3>Contenido b&aacute;sico</h3>
                             <?php if ($simpleFieldGroups !== []): ?>
                                 <div class="section-groups">
@@ -804,7 +805,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                             <?php endif; ?>
                                         </div>
                                             <?php if ($isIntroGroup && is_array($aboutStatsRepeaterConfig)): ?>
-                                                <?php renderAdminRepeaterSection($aboutStatsRepeaterConfig, $contentData); ?>
+                                                <?php renderAdminRepeaterSection($aboutStatsRepeaterConfig, $contentData, "about-stats-section"); ?>
                                             <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
@@ -913,6 +914,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
