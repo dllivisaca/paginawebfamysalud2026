@@ -443,6 +443,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .toggle-row { display: inline-flex; align-items: center; gap: 8px; min-height: 0; font-size: 13px; color: #4b5563; white-space: nowrap; padding: 4px 8px; border-radius: 999px; background: #f3f4f6; border: 1px solid #e5e7eb; }
         .toggle-row input { margin: 0; }
         .item-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .about-stats-section .item-title h3 { margin: 0; font-size: 16px; color: #1f2937; }
         .preview-image { max-width: 180px; border: 1px solid #d1d5db; border-radius: 12px; padding: 6px; background: #fff; }
         .preview-image.is-empty { display: none; }
         .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
