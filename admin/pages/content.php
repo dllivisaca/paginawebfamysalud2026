@@ -416,7 +416,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .flash-success { background: #e9f7ef; border-color: #cfe7d8; color: #146c43; }
         .flash-error { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
         .section-block { border: 1px solid #e5e7eb; border-radius: 14px; padding: 18px; margin-bottom: 16px; background: #f9fafb; }
-        .repeater-after-certifications { margin-top: 24px; }
+        .repeater-after-certifications { margin-top: 24px; background: #fff; }
+        .repeater-after-certifications .card { background: #f9fafb; }
         .section-block h3 { margin: 0 0 8px; font-size: 18px; }
         .section-groups { display: grid; gap: 16px; }
         .content-subgroup { background: #fff; border: 1px solid #dbe4dc; border-radius: 14px; padding: 18px; }
