@@ -858,7 +858,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                         <img id="preview_<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $imageValue !== "" ? "../../" . htmlspecialchars(ltrim($imageValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $imageValue !== "" ? "" : " is-empty"; ?>">
                                                                     </div>
                                                                     <div class="field-group">
-                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?></label>
+                                                                        <?php $altLabelHtml = escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?>
+                                                                        <?php if ($templateKey === "home" && $altKey === "hero_image_alt") { $altLabelHtml = "Texto alternativo imagen principal"; } ?>
+                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $altLabelHtml; ?></label>
                                                                         <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($altValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                     </div>
                                                                 </div>
