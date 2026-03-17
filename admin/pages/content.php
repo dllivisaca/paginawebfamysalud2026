@@ -378,13 +378,13 @@ if (($schema["template_key"] ?? "") === "about") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
     $simpleFieldGroups = [
         [
-            "title" => "Hero",
-            "description" => "Textos principales y badges del hero.",
+            "title" => "Portada",
+            "description" => "Contenido principal que aparece al inicio de la página.",
             "field_keys" => ["hero_badge", "hero_title", "hero_text", "hero_emergency_label", "hero_emergency_value", "hero_hours_label", "hero_hours_value"],
         ],
         [
-            "title" => "Hero - Botones",
-            "description" => "Llamados a la acción del hero.",
+            "title" => "Portada - Botones",
+            "description" => "Llamados a la acción de la portada.",
             "render_mode" => "buttons",
             "button_groups" => [
                 "hero_primary_cta" => [
@@ -405,8 +405,8 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["hero_primary_cta_text", "hero_primary_cta_link_type", "hero_primary_cta_page_id", "hero_primary_cta_url", "hero_secondary_cta_text", "hero_secondary_cta_link_type", "hero_secondary_cta_page_id", "hero_secondary_cta_url"],
         ],
         [
-            "title" => "Hero - Imagen",
-            "description" => "Imagen principal del hero.",
+            "title" => "Portada - Imagen",
+            "description" => "Imagen principal de la portada.",
             "render_mode" => "images",
             "image_groups" => [
                 [
@@ -944,7 +944,21 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         $displayLabel = (string) ($fieldConfig["label"] ?? $groupFieldKey);
                                                         $displayLabelHtml = escapeAdminFieldLabel($displayLabel);
 
-                                                        if ($isIntroGroup && $groupFieldKey === "intro_text_1") {
+                                                        if ($templateKey === "home" && $groupFieldKey === "hero_badge") {
+                                                            $displayLabelHtml = "Etiqueta destacada";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "hero_title") {
+                                                            $displayLabelHtml = "Título principal";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "hero_text") {
+                                                            $displayLabelHtml = "Texto principal";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "hero_emergency_label") {
+                                                            $displayLabelHtml = "Texto informativo 1";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "hero_emergency_value") {
+                                                            $displayLabelHtml = "Dato informativo 1";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "hero_hours_label") {
+                                                            $displayLabelHtml = "Texto informativo 2";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "hero_hours_value") {
+                                                            $displayLabelHtml = "Dato informativo 2";
+                                                        } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
                                                             $displayLabelHtml = "P&aacute;rrafo 2";
