@@ -769,7 +769,9 @@ if (($schema["template_key"] ?? "") === "about") {
 
                                                             <div class="field-group">
                                                                 <div class="field-header">
-                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($textConfig["label"] ?? $textKey)); ?></label>
+                                                                    <?php $buttonTextLabel = escapeAdminFieldLabel((string) ($textConfig["label"] ?? $textKey)); ?>
+                                                                    <?php if ($templateKey === "home" && $textKey === "hero_primary_cta_text") { $buttonTextLabel = "Texto del botón principal"; } elseif ($templateKey === "home" && $textKey === "hero_secondary_cta_text") { $buttonTextLabel = "Texto del botón secundario"; } ?>
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $buttonTextLabel; ?></label>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $textVisible ? " checked" : ""; ?>>
                                                                         <span>Mostrar</span>
