@@ -57,7 +57,7 @@ function storeSimpleFieldImageUpload(array $file, string $fieldKey, string $temp
     $tmpName = (string) ($file["tmp_name"] ?? "");
 
     if ($tmpName === "" || !is_uploaded_file($tmpName)) {
-        return ["ok" => false, "path" => null, "error" => "No se encontr� un archivo v�lido para la subida."];
+        return ["ok" => false, "path" => null, "error" => "No se encontró un archivo válido para la subida."];
     }
 
     $originalName = (string) ($file["name"] ?? "");
@@ -78,13 +78,13 @@ function storeSimpleFieldImageUpload(array $file, string $fieldKey, string $temp
     $allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
 
     if ($mimeType !== "" && !in_array($mimeType, $allowedMimeTypes, true)) {
-        return ["ok" => false, "path" => null, "error" => "El archivo seleccionado no es una imagen v�lida."];
+        return ["ok" => false, "path" => null, "error" => "El archivo seleccionado no es una imagen válida."];
     }
 
     $uploadDirectory = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "img" . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_SEPARATOR . "pages";
 
     if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0775, true) && !is_dir($uploadDirectory)) {
-        return ["ok" => false, "path" => null, "error" => "No fue posible preparar la carpeta de im�genes."];
+        return ["ok" => false, "path" => null, "error" => "No fue posible preparar la carpeta de imágenes."];
     }
 
     $safeTemplateKey = preg_replace('/[^a-z0-9]+/i', '-', strtolower($templateKey));
@@ -115,13 +115,16 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
         <?php foreach ($repeaterConfig["items"] as $itemConfig): ?>
             <?php
             $itemIndex = (int) $itemConfig["item_index"];
-            $itemLabel = (string) ($itemConfig["item_label"] ?? ("Item " . ($itemIndex + 1)));
+            $itemTitle = trim((string) ($itemConfig["item_label"] ?? ""));
+            if ($itemTitle === "") {
+                $itemTitle = "Estadística " . ($itemIndex + 1);
+            }
             $itemData = $repeaterItems[$itemIndex] ?? ["fields" => [], "is_visible" => 1];
             $itemVisible = (int) ($itemData["is_visible"] ?? 1) === 1;
             ?>
             <div class="card">
                 <div class="item-title">
-                    <h3><?php echo htmlspecialchars($itemLabel, ENT_QUOTES, "UTF-8"); ?></h3>
+                    <h3><?php echo htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8"); ?></h3>
                     <label class="toggle-row">
                         <input type="checkbox" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][is_visible]" value="1"<?php echo $itemVisible ? " checked" : ""; ?>>
                         <span>Mostrar este bloque</span>
@@ -298,17 +301,17 @@ if (($schema["template_key"] ?? "") === "about") {
     $simpleFieldGroups = [
         [
             "title" => "Texto introductorio",
-            "description" => "Contenido principal que acompa�a el inicio de la secci�n.",
+            "description" => "Contenido principal que acompaña el inicio de la sección.",
             "field_keys" => ["intro_title", "intro_text_1", "intro_text_2"],
         ],
         [
             "title" => "Botones",
-            "description" => "Textos y enlaces de los llamados a la acci�n.",
+            "description" => "Textos y enlaces de los llamados a la acción.",
             "field_keys" => ["primary_cta_text", "primary_cta_link_type", "primary_cta_page_id", "primary_cta_url", "secondary_cta_text", "secondary_cta_link_type", "secondary_cta_page_id", "secondary_cta_url"],
         ],
         [
-            "title" => "Im�genes",
-            "description" => "Imagen principal y las dos im�genes secundarias de apoyo.",
+            "title" => "Imágenes",
+            "description" => "Imagen principal y las dos imágenes secundarias de apoyo.",
             "field_keys" => ["main_image", "main_image_alt", "grid_image_1", "grid_image_1_alt", "grid_image_2", "grid_image_2_alt"],
         ],
         [
@@ -321,14 +324,14 @@ if (($schema["template_key"] ?? "") === "about") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
     $buttonFieldGroups = [
         "primary_cta" => [
-            "title" => "Bot�n principal",
+            "title" => "Botón principal",
             "text_key" => "primary_cta_text",
             "link_type_key" => "primary_cta_link_type",
             "page_id_key" => "primary_cta_page_id",
             "url_key" => "primary_cta_url",
         ],
         "secondary_cta" => [
-            "title" => "Bot�n secundario",
+            "title" => "Botón secundario",
             "text_key" => "secondary_cta_text",
             "link_type_key" => "secondary_cta_link_type",
             "page_id_key" => "secondary_cta_page_id",
@@ -346,7 +349,7 @@ if (($schema["template_key"] ?? "") === "about") {
             ],
         ],
         [
-            "title" => "Im�genes secundarias",
+            "title" => "Imágenes secundarias",
             "items" => [
                 [
                     "item_title" => "Imagen secundaria 1",
@@ -544,7 +547,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                             <?php endif; ?>
 
                                             <?php $isButtonsGroup = ((string) ($groupConfig["title"] ?? "")) === "Botones"; ?>
-                                            <?php $isImagesGroup = ((string) ($groupConfig["title"] ?? "")) === "Im�genes"; ?>
+                                            <?php $isImagesGroup = ((string) ($groupConfig["title"] ?? "")) === "Imágenes"; ?>
                                             <?php if ($isButtonsGroup): ?>
                                                 <div class="button-groups">
                                                     <?php foreach ($buttonFieldGroups as $buttonConfig): ?>
@@ -591,7 +594,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         }
                                                         ?>
                                                         <div class="button-link-card">
-                                                            <h5><?php echo escapeAdminFieldLabel((string) ($buttonConfig["title"] ?? "Bot�n")); ?></h5>
+                                                            <h5><?php echo escapeAdminFieldLabel((string) ($buttonConfig["title"] ?? "Botón")); ?></h5>
 
                                                             <div class="field-group">
                                                                 <div class="field-header">
@@ -667,7 +670,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 $altVisible = (int) ($altFieldData["is_visible"] ?? 1) === 1;
                                                                 ?>
                                                                 <div class="image-section-head">
-                                                                    <h5><?php echo escapeAdminFieldLabel((string) ($imageGroupConfig["title"] ?? "Im�genes")); ?></h5>
+                                                                    <h5><?php echo escapeAdminFieldLabel((string) ($imageGroupConfig["title"] ?? "Imágenes")); ?></h5>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $imageVisible ? " checked" : ""; ?>>
                                                                         <span>Mostrar</span>
@@ -687,7 +690,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                     </div>
                                                                 </div>
                                                             <?php else: ?>
-                                                                <h5><?php echo escapeAdminFieldLabel((string) ($imageGroupConfig["title"] ?? "Im�genes")); ?></h5>
+                                                                <h5><?php echo escapeAdminFieldLabel((string) ($imageGroupConfig["title"] ?? "Imágenes")); ?></h5>
                                                                 <div class="image-items">
                                                                     <?php foreach (($imageGroupConfig["items"] ?? []) as $imageItemConfig): ?>
                                                                         <?php
@@ -914,6 +917,12 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
