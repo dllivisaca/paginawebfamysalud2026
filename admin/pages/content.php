@@ -124,7 +124,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
             ?>
             <div class="card">
                 <div class="item-title">
-                    <h3><?php echo htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8"); ?></h3>
+                    <h3><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
                     <label class="toggle-row">
                         <input type="checkbox" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][is_visible]" value="1"<?php echo $itemVisible ? " checked" : ""; ?>>
                         <span>Mostrar este bloque</span>
