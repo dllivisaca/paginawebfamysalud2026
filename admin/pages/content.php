@@ -104,6 +104,52 @@ function storeSimpleFieldImageUpload(array $file, string $fieldKey, string $temp
         "error" => "",
     ];
 }
+function renderAdminRepeaterSection(array $repeaterConfig, array $contentData): void
+{
+    $repeaterKey = (string) ($repeaterConfig["repeater_key"] ?? "");
+    $repeaterItems = $contentData["repeaters"][$repeaterKey] ?? [];
+    ?>
+    <div class="section-block">
+        <h3><?php echo htmlspecialchars((string) ($repeaterConfig["label"] ?? $repeaterKey), ENT_QUOTES, "UTF-8"); ?></h3>
+
+        <?php foreach ($repeaterConfig["items"] as $itemConfig): ?>
+            <?php
+            $itemIndex = (int) $itemConfig["item_index"];
+            $itemLabel = (string) ($itemConfig["item_label"] ?? ("Item " . ($itemIndex + 1)));
+            $itemData = $repeaterItems[$itemIndex] ?? ["fields" => [], "is_visible" => 1];
+            $itemVisible = (int) ($itemData["is_visible"] ?? 1) === 1;
+            ?>
+            <div class="card">
+                <div class="item-title">
+                    <h3><?php echo htmlspecialchars($itemLabel, ENT_QUOTES, "UTF-8"); ?></h3>
+                    <label class="toggle-row">
+                        <input type="checkbox" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][is_visible]" value="1"<?php echo $itemVisible ? " checked" : ""; ?>>
+                        <span>Mostrar este bloque</span>
+                    </label>
+                </div>
+
+                <div class="field-grid">
+                    <?php foreach ($repeaterConfig["fields"] as $fieldConfig): ?>
+                        <?php
+                        $fieldKey = (string) ($fieldConfig["field_key"] ?? "");
+                        $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
+                        $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
+                        ?>
+                        <div class="field-group">
+                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $fieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                            <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+
+                            <?php if ($fieldType === "image" && $fieldValue !== ""): ?>
+                                <img src="../../<?php echo htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+}
 
 if (empty($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
@@ -242,6 +288,7 @@ $contentData = ($page && $schema)
     ? getPageContentData($conn, (int) $page["id"], $schema)
     : ["simple_fields" => [], "repeaters" => []];
 
+$aboutStatsRepeaterConfig = null;
 $linkableSitePages = [];
 $linkableSitePagesById = [];
 $buttonFieldGroups = [];
@@ -314,6 +361,7 @@ if (($schema["template_key"] ?? "") === "about") {
             ],
         ],
     ];
+    $aboutStatsRepeaterConfig = $schema["repeaters"][0] ?? null;
 }
 ?>
 <!DOCTYPE html>
@@ -755,6 +803,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 </div>
                                             <?php endif; ?>
                                         </div>
+                                            <?php if ($isIntroGroup && is_array($aboutStatsRepeaterConfig)): ?>
+                                                <?php renderAdminRepeaterSection($aboutStatsRepeaterConfig, $contentData); ?>
+                                            <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
                             <?php else: ?>
@@ -798,50 +849,11 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php endif; ?>
                         </div>
 
-                        <?php foreach ($schema["repeaters"] as $repeaterConfig): ?>
-                            <?php
-                            $repeaterKey = (string) $repeaterConfig["repeater_key"];
-                            $repeaterItems = $contentData["repeaters"][$repeaterKey] ?? [];
-                            ?>
-                            <div class="section-block">
-                                <h3><?php echo htmlspecialchars((string) ($repeaterConfig["label"] ?? $repeaterKey), ENT_QUOTES, "UTF-8"); ?></h3>
-
-                                <?php foreach ($repeaterConfig["items"] as $itemConfig): ?>
-                                    <?php
-                                    $itemIndex = (int) $itemConfig["item_index"];
-                                    $itemLabel = (string) ($itemConfig["item_label"] ?? ("Item " . ($itemIndex + 1)));
-                                    $itemData = $repeaterItems[$itemIndex] ?? ["fields" => [], "is_visible" => 1];
-                                    $itemVisible = (int) ($itemData["is_visible"] ?? 1) === 1;
-                                    ?>
-                                    <div class="card">
-                                        <div class="item-title">
-                                            <h3><?php echo htmlspecialchars($itemLabel, ENT_QUOTES, "UTF-8"); ?></h3>
-                                            <label class="toggle-row">
-                                                <input type="checkbox" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][is_visible]" value="1"<?php echo $itemVisible ? " checked" : ""; ?>>
-                                                <span>Mostrar este bloque</span>
-                                            </label>
-                                        </div>
-
-                                        <div class="field-grid">
-                                            <?php foreach ($repeaterConfig["fields"] as $fieldConfig): ?>
-                                                <?php
-                                                $fieldKey = (string) $fieldConfig["field_key"];
-                                                $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
-                                                $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
-                                                ?>
-                                                <div class="field-group">
-                                                    <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $fieldKey), ENT_QUOTES, "UTF-8"); ?></label>
-                                                    <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
-
-                                                    <?php if ($fieldType === "image" && $fieldValue !== ""): ?>
-                                                        <img src="../../<?php echo htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8"); ?>" alt="" class="preview-image">
-                                                    <?php endif; ?>
-                                                </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
+                        <?php foreach ($schema["repeaters"] as $repeaterIndex => $repeaterConfig): ?>
+                            <?php if (is_array($aboutStatsRepeaterConfig) && $repeaterIndex === 0): ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <?php renderAdminRepeaterSection($repeaterConfig, $contentData); ?>
                         <?php endforeach; ?>
 
                         <div class="actions">
