@@ -237,3 +237,32 @@
 
 ### Como retomar en una nueva sesion
 - Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-17".
+
+## Sesion 2026-03-18
+
+### Cambios realizados hoy
+- Se corrigieron textos visibles con codificacion rota en `admin/pages/content.php`, reemplazando literales mojibake del editor admin en mensajes, titulos, descripciones y labels visibles sin tocar keys internas ni persistencia.
+- Se normalizaron textos visibles del editor para Home en `admin/pages/content.php`, incluyendo `Boton`, `Imagenes`, `Titulo principal`, descripciones de bloques y mensajes de validacion asociados a imagenes.
+- Se renombro visualmente el bloque `Home About` a `Sobre nosotros` en el editor admin, manteniendo intactas las keys `home_about_*` y el frontend publico.
+- Se actualizaron labels visibles del schema `home` para el bloque `Sobre nosotros`: `A?os de experiencia`, `Texto de experiencia`, `Titulo principal`, `Texto introductorio` y `Texto complementario`, sin alterar estructura ni guardado.
+- Se reordeno visualmente el bloque `Sobre nosotros` en `admin/pages/content.php` para que el admin muestre primero `Titulo principal`, `Texto introductorio` y `Texto complementario`, y despues los campos de experiencia, alineandolo mejor con la percepcion del frontend.
+- Se mantuvo sin cambios el resto de bloques, la persistencia, el flujo de guardado, los nombres de campos y la logica del editor.
+
+### Archivos modificados
+- `admin/pages/content.php`
+- `templates/page-schemas/home.php`
+- `SECURITY-NOTES.md`
+
+### Verificacion realizada
+- Se ejecuto `php -l` sobre `admin/pages/content.php`.
+- Se ejecuto `php -l` sobre `templates/page-schemas/home.php`.
+- Ambas validaciones terminaron sin errores de sintaxis.
+- Se confirmo por busqueda que `admin/pages/content.php` ya no devolvia coincidencias para `?` despues de la correccion puntual aplicada en esa pantalla.
+
+### Pendientes recomendados
+- Revisar el resto de labels heredados con codificacion rota en `templates/page-schemas/home.php` que no pertenecen al bloque `Sobre nosotros`.
+- Probar visualmente en navegador el editor de Home para validar que el bloque `Sobre nosotros` ahora siga el orden esperado y que los labels amigables se vean correctamente.
+- Evaluar si conviene hacer una pasada controlada de normalizacion UTF-8 en otras pantallas del admin para evitar nuevos restos de mojibake.
+
+### Como retomar en una nueva sesion
+- Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-18".
