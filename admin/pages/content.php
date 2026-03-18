@@ -57,7 +57,7 @@ function storeSimpleFieldImageUpload(array $file, string $fieldKey, string $temp
     $tmpName = (string) ($file["tmp_name"] ?? "");
 
     if ($tmpName === "" || !is_uploaded_file($tmpName)) {
-        return ["ok" => false, "path" => null, "error" => "No se encontró un archivo válido para la subida."];
+        return ["ok" => false, "path" => null, "error" => "No se encontrÃ³ un archivo vÃ¡lido para la subida."];
     }
 
     $originalName = (string) ($file["name"] ?? "");
@@ -78,13 +78,13 @@ function storeSimpleFieldImageUpload(array $file, string $fieldKey, string $temp
     $allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
 
     if ($mimeType !== "" && !in_array($mimeType, $allowedMimeTypes, true)) {
-        return ["ok" => false, "path" => null, "error" => "El archivo seleccionado no es una imagen válida."];
+        return ["ok" => false, "path" => null, "error" => "El archivo seleccionado no es una imagen vÃ¡lida."];
     }
 
     $uploadDirectory = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "img" . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_SEPARATOR . "pages";
 
     if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0775, true) && !is_dir($uploadDirectory)) {
-        return ["ok" => false, "path" => null, "error" => "No fue posible preparar la carpeta de imágenes."];
+        return ["ok" => false, "path" => null, "error" => "No fue posible preparar la carpeta de imÃ¡genes."];
     }
 
     $safeTemplateKey = preg_replace('/[^a-z0-9]+/i', '-', strtolower($templateKey));
@@ -117,7 +117,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
             $itemIndex = (int) $itemConfig["item_index"];
             $itemTitle = trim((string) ($itemConfig["item_label"] ?? ""));
             if ($itemTitle === "") {
-                $itemTitle = "Estadística " . ($itemIndex + 1);
+                $itemTitle = "EstadÃ­stica " . ($itemIndex + 1);
             }
             $itemData = $repeaterItems[$itemIndex] ?? ["fields" => [], "is_visible" => 1];
             $itemVisible = (int) ($itemData["is_visible"] ?? 1) === 1;
@@ -310,17 +310,17 @@ if (($schema["template_key"] ?? "") === "about") {
     $simpleFieldGroups = [
         [
             "title" => "Texto introductorio",
-            "description" => "Contenido principal que acompaña el inicio de la sección.",
+            "description" => "Contenido principal que acompaÃ±a el inicio de la secciÃ³n.",
             "field_keys" => ["intro_title", "intro_text_1", "intro_text_2"],
         ],
         [
             "title" => "Botones",
-            "description" => "Textos y enlaces de los llamados a la acción.",
+            "description" => "Textos y enlaces de los llamados a la acciÃ³n.",
             "field_keys" => ["primary_cta_text", "primary_cta_link_type", "primary_cta_page_id", "primary_cta_url", "secondary_cta_text", "secondary_cta_link_type", "secondary_cta_page_id", "secondary_cta_url"],
         ],
         [
-            "title" => "Imágenes",
-            "description" => "Imagen principal y las dos imágenes secundarias de apoyo.",
+            "title" => "ImÃ¡genes",
+            "description" => "Imagen principal y las dos imÃ¡genes secundarias de apoyo.",
             "field_keys" => ["main_image", "main_image_alt", "grid_image_1", "grid_image_1_alt", "grid_image_2", "grid_image_2_alt"],
         ],
         [
@@ -333,14 +333,14 @@ if (($schema["template_key"] ?? "") === "about") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
     $buttonFieldGroups = [
         "primary_cta" => [
-            "title" => "Botón principal",
+            "title" => "BotÃ³n principal",
             "text_key" => "primary_cta_text",
             "link_type_key" => "primary_cta_link_type",
             "page_id_key" => "primary_cta_page_id",
             "url_key" => "primary_cta_url",
         ],
         "secondary_cta" => [
-            "title" => "Botón secundario",
+            "title" => "BotÃ³n secundario",
             "text_key" => "secondary_cta_text",
             "link_type_key" => "secondary_cta_link_type",
             "page_id_key" => "secondary_cta_page_id",
@@ -358,7 +358,7 @@ if (($schema["template_key"] ?? "") === "about") {
             ],
         ],
         [
-            "title" => "Imágenes secundarias",
+            "title" => "ImÃ¡genes secundarias",
             "items" => [
                 [
                     "item_title" => "Imagen secundaria 1",
@@ -379,23 +379,23 @@ if (($schema["template_key"] ?? "") === "about") {
     $simpleFieldGroups = [
         [
             "title" => "Portada",
-            "description" => "Contenido principal que aparece al inicio de la página.",
-            "field_keys" => ["hero_badge", "hero_title", "hero_text", "hero_emergency_label", "hero_emergency_value", "hero_hours_label", "hero_hours_value"],
+            "description" => "Contenido principal que aparece al inicio de la pÃ¡gina.",
+            "field_keys" => ["hero_badge", "hero_title", "hero_text"],
         ],
         [
             "title" => "Portada - Botones",
-            "description" => "Llamados a la acción de la portada.",
+            "description" => "Llamados a la acciÃ³n de la portada.",
             "render_mode" => "buttons",
             "button_groups" => [
                 "hero_primary_cta" => [
-                    "title" => "Botón principal",
+                    "title" => "BotÃ³n principal",
                     "text_key" => "hero_primary_cta_text",
                     "link_type_key" => "hero_primary_cta_link_type",
                     "page_id_key" => "hero_primary_cta_page_id",
                     "url_key" => "hero_primary_cta_url",
                 ],
                 "hero_secondary_cta" => [
-                    "title" => "Botón secundario",
+                    "title" => "BotÃ³n secundario",
                     "text_key" => "hero_secondary_cta_text",
                     "link_type_key" => "hero_secondary_cta_link_type",
                     "page_id_key" => "hero_secondary_cta_page_id",
@@ -403,6 +403,11 @@ if (($schema["template_key"] ?? "") === "about") {
                 ],
             ],
             "field_keys" => ["hero_primary_cta_text", "hero_primary_cta_link_type", "hero_primary_cta_page_id", "hero_primary_cta_url", "hero_secondary_cta_text", "hero_secondary_cta_link_type", "hero_secondary_cta_page_id", "hero_secondary_cta_url"],
+        ],
+        [
+            "title" => "Portada - Datos informativos",
+            "description" => "Textos y datos informativos que se muestran debajo de los botones de la portada.",
+            "field_keys" => ["hero_emergency_label", "hero_emergency_value", "hero_hours_label", "hero_hours_value"],
         ],
         [
             "title" => "Portada - Imagen",
@@ -432,14 +437,14 @@ if (($schema["template_key"] ?? "") === "about") {
             "render_mode" => "buttons",
             "button_groups" => [
                 "home_about_primary_cta" => [
-                    "title" => "Botón principal",
+                    "title" => "BotÃ³n principal",
                     "text_key" => "home_about_primary_cta_text",
                     "link_type_key" => "home_about_primary_cta_link_type",
                     "page_id_key" => "home_about_primary_cta_page_id",
                     "url_key" => "home_about_primary_cta_url",
                 ],
                 "home_about_secondary_cta" => [
-                    "title" => "Botón secundario",
+                    "title" => "BotÃ³n secundario",
                     "text_key" => "home_about_secondary_cta_text",
                     "link_type_key" => "home_about_secondary_cta_link_type",
                     "page_id_key" => "home_about_secondary_cta_page_id",
@@ -487,23 +492,23 @@ if (($schema["template_key"] ?? "") === "about") {
         ],
         [
             "title" => "Call To Action",
-            "description" => "Contenido principal del llamado a la acción.",
+            "description" => "Contenido principal del llamado a la acciÃ³n.",
             "field_keys" => ["cta_title", "cta_text"],
         ],
         [
             "title" => "Call To Action - Botones",
-            "description" => "Botones principales del llamado a la acción.",
+            "description" => "Botones principales del llamado a la acciÃ³n.",
             "render_mode" => "buttons",
             "button_groups" => [
                 "cta_primary" => [
-                    "title" => "Botón principal",
+                    "title" => "BotÃ³n principal",
                     "text_key" => "cta_primary_text",
                     "link_type_key" => "cta_primary_link_type",
                     "page_id_key" => "cta_primary_page_id",
                     "url_key" => "cta_primary_url",
                 ],
                 "cta_secondary" => [
-                    "title" => "Botón secundario",
+                    "title" => "BotÃ³n secundario",
                     "text_key" => "cta_secondary_text",
                     "link_type_key" => "cta_secondary_link_type",
                     "page_id_key" => "cta_secondary_page_id",
@@ -514,12 +519,12 @@ if (($schema["template_key"] ?? "") === "about") {
         ],
         [
             "title" => "Call To Action - Emergencia",
-            "description" => "Bloque secundario de emergencia del llamado a la acción.",
+            "description" => "Bloque secundario de emergencia del llamado a la acciÃ³n.",
             "field_keys" => ["cta_emergency_title", "cta_emergency_text", "cta_emergency_button_text", "cta_emergency_button_url"],
         ],
         [
             "title" => "Emergency Info",
-            "description" => "Encabezados del bloque de información de emergencia.",
+            "description" => "Encabezados del bloque de informaciÃ³n de emergencia.",
             "field_keys" => ["emergency_info_title", "emergency_info_text", "quick_actions_title", "emergency_tips_title"],
         ],
         [
@@ -717,7 +722,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                             $groupButtonFieldGroups = isset($groupConfig["button_groups"]) && is_array($groupConfig["button_groups"]) ? $groupConfig["button_groups"] : $buttonFieldGroups;
                                             $groupImageFieldGroups = isset($groupConfig["image_groups"]) && is_array($groupConfig["image_groups"]) ? $groupConfig["image_groups"] : $imageFieldGroups;
                                             $isButtonsGroup = $groupRenderMode === "buttons" || ((string) ($groupConfig["title"] ?? "")) === "Botones";
-                                            $isImagesGroup = $groupRenderMode === "images" || ((string) ($groupConfig["title"] ?? "")) === "Imágenes";
+                                            $isImagesGroup = $groupRenderMode === "images" || ((string) ($groupConfig["title"] ?? "")) === "ImÃ¡genes";
                                             ?>
                                             <?php if ($isButtonsGroup): ?>
                                                 <div class="button-groups">
@@ -765,12 +770,12 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         }
                                                         ?>
                                                         <div class="button-link-card">
-                                                            <h5><?php echo escapeAdminFieldLabel((string) ($buttonConfig["title"] ?? "Botón")); ?></h5>
+                                                            <h5><?php echo escapeAdminFieldLabel((string) ($buttonConfig["title"] ?? "BotÃ³n")); ?></h5>
 
                                                             <div class="field-group">
                                                                 <div class="field-header">
                                                                     <?php $buttonTextLabel = escapeAdminFieldLabel((string) ($textConfig["label"] ?? $textKey)); ?>
-                                                                    <?php if ($templateKey === "home" && $textKey === "hero_primary_cta_text") { $buttonTextLabel = "Texto del botón principal"; } elseif ($templateKey === "home" && $textKey === "hero_secondary_cta_text") { $buttonTextLabel = "Texto del botón secundario"; } ?>
+                                                                    <?php if ($templateKey === "home" && $textKey === "hero_primary_cta_text") { $buttonTextLabel = "Texto del botÃ³n principal"; } elseif ($templateKey === "home" && $textKey === "hero_secondary_cta_text") { $buttonTextLabel = "Texto del botÃ³n secundario"; } ?>
                                                                     <label class="field-label" for="simple_<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $buttonTextLabel; ?></label>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $textVisible ? " checked" : ""; ?>>
@@ -843,7 +848,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 $altVisible = (int) ($altFieldData["is_visible"] ?? 1) === 1;
                                                                 ?>
                                                                 <div class="image-section-head">
-                                                                    <h5><?php echo escapeAdminFieldLabel((string) ($imageGroupConfig["title"] ?? "Imágenes")); ?></h5>
+                                                                    <h5><?php echo escapeAdminFieldLabel((string) ($imageGroupConfig["title"] ?? "ImÃ¡genes")); ?></h5>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($imageKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $imageVisible ? " checked" : ""; ?>>
                                                                         <span>Mostrar</span>
@@ -865,7 +870,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                     </div>
                                                                 </div>
                                                             <?php else: ?>
-                                                                <h5><?php echo escapeAdminFieldLabel((string) ($imageGroupConfig["title"] ?? "Imágenes")); ?></h5>
+                                                                <h5><?php echo escapeAdminFieldLabel((string) ($imageGroupConfig["title"] ?? "ImÃ¡genes")); ?></h5>
                                                                 <div class="image-items">
                                                                     <?php foreach (($imageGroupConfig["items"] ?? []) as $imageItemConfig): ?>
                                                                         <?php
@@ -951,7 +956,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         if ($templateKey === "home" && $groupFieldKey === "hero_badge") {
                                                             $displayLabelHtml = "Etiqueta destacada";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "hero_title") {
-                                                            $displayLabelHtml = "Título principal";
+                                                            $displayLabelHtml = "TÃ­tulo principal";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "hero_text") {
                                                             $displayLabelHtml = "Texto principal";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "hero_emergency_label") {
