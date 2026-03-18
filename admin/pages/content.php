@@ -429,7 +429,7 @@ if (($schema["template_key"] ?? "") === "about") {
         [
             "title" => "Sobre nosotros",
             "description" => "Contenido principal de la sección Sobre nosotros.",
-            "field_keys" => ["home_about_experience_years", "home_about_experience_text", "home_about_title", "home_about_lead", "home_about_text"],
+            "field_keys" => ["home_about_title", "home_about_lead", "home_about_text", "home_about_experience_years", "home_about_experience_text"],
         ],
         [
             "title" => "Home About - Botones",
