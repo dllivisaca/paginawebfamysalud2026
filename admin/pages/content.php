@@ -109,8 +109,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
     $repeaterKey = (string) ($repeaterConfig["repeater_key"] ?? "");
     $repeaterItems = $contentData["repeaters"][$repeaterKey] ?? [];
     ?>
-    <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?>">
-        <h3><?php echo htmlspecialchars((string) ($repeaterConfig["label"] ?? $repeaterKey), ENT_QUOTES, "UTF-8"); ?></h3>
+    <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?>">
+        <h3><?php echo htmlspecialchars($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : (string) ($repeaterConfig["label"] ?? $repeaterKey), ENT_QUOTES, "UTF-8"); ?></h3>
 
         <?php foreach ($repeaterConfig["items"] as $itemConfig): ?>
             <?php
@@ -599,6 +599,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .hero-features-admin-section .card { background: #f9fafb; }
         .section-block.hero-features-admin-section > h3 { font-size: 17px; }
         .hero-features-admin-section .item-title h3 { font-size: 17px; }
+        .section-block.home-about-features-admin-section > h3 { font-size: 17px; }
+        .home-about-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block h3 { margin: 0 0 8px; font-size: 18px; }
         .section-groups { display: grid; gap: 16px; }
         .content-subgroup { background: #fff; border: 1px solid #dbe4dc; border-radius: 14px; padding: 18px; }
@@ -725,7 +727,7 @@ if (($schema["template_key"] ?? "") === "about") {
                     <form id="content-form" action="content.php?id=<?php echo (int) $page["id"]; ?>" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
 
-                        <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?>">
+                        <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?>">
                             <h3>Contenido b&aacute;sico</h3>
                             <?php if ($simpleFieldGroups !== []): ?>
                                 <div class="section-groups">
@@ -1151,6 +1153,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
