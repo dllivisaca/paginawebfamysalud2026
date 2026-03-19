@@ -1004,6 +1004,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                             <?php if ($isIntroGroup && is_array($aboutStatsRepeaterConfig)): ?>
                                                 <?php renderAdminRepeaterSection($aboutStatsRepeaterConfig, $contentData, "about-stats-section"); ?>
                                             <?php endif; ?>
+                                            <?php if ($templateKey === "home" && ((string) ($groupConfig["title"] ?? "")) === "Portada - Datos informativos"): ?>
+                                                <?php foreach ($schema["repeaters"] as $repeaterConfig): ?>
+                                                    <?php if (((string) ($repeaterConfig["repeater_key"] ?? "")) === "hero_features"): ?>
+                                                        <?php renderAdminRepeaterSection($repeaterConfig, $contentData); ?>
+                                                        <?php break; ?>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
                             <?php else: ?>
@@ -1049,6 +1057,9 @@ if (($schema["template_key"] ?? "") === "about") {
 
                         <?php foreach ($schema["repeaters"] as $repeaterIndex => $repeaterConfig): ?>
                             <?php if (is_array($aboutStatsRepeaterConfig) && $repeaterIndex === 0): ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <?php if ($templateKey === "home" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "hero_features"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : ""); ?>
