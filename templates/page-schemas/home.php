@@ -72,16 +72,16 @@ return [
     "repeaters" => [
         [
             "repeater_key" => "hero_features",
-            "label" => "Hero features",
+            "label" => "Portada - Características destacadas",
             "fields" => [
                 ["field_key" => "icon_class", "label" => "Icono", "field_type" => "text", "default" => ""],
                 ["field_key" => "title", "label" => "Título", "field_type" => "text", "default" => ""],
                 ["field_key" => "text", "label" => "Texto", "field_type" => "text", "default" => ""],
             ],
             "items" => [
-                ["item_index" => 0, "item_label" => "Feature 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse-fill", "title" => "Cardiology", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
-                ["item_index" => 1, "item_label" => "Feature 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-lungs-fill", "title" => "Pulmonology", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
-                ["item_index" => 2, "item_label" => "Feature 3", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-capsule", "title" => "Diagnostics", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
+                ["item_index" => 0, "item_label" => "Característica 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse-fill", "title" => "Cardiology", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
+                ["item_index" => 1, "item_label" => "Característica 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-lungs-fill", "title" => "Pulmonology", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
+                ["item_index" => 2, "item_label" => "Característica 3", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-capsule", "title" => "Diagnostics", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
             ],
         ],
         [
@@ -93,8 +93,8 @@ return [
                 ["field_key" => "text", "label" => "Texto", "field_type" => "text", "default" => ""],
             ],
             "items" => [
-                ["item_index" => 0, "item_label" => "Feature 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse", "title" => "Compassionate Care", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
-                ["item_index" => 1, "item_label" => "Feature 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-star", "title" => "Medical Excellence", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
+                ["item_index" => 0, "item_label" => "Característica 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse", "title" => "Compassionate Care", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
+                ["item_index" => 1, "item_label" => "Característica 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-star", "title" => "Medical Excellence", "text" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit."]],
             ],
         ],
         [
@@ -189,9 +189,9 @@ return [
                 ["field_key" => "link_url", "label" => "URL del enlace", "field_type" => "url", "default" => ""],
             ],
             "items" => [
-                ["item_index" => 0, "item_label" => "Feature 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse", "title" => "24/7 Emergency Care", "text" => "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.", "link_text" => "Learn More", "link_url" => "#"]],
-                ["item_index" => 1, "item_label" => "Feature 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-calendar-check", "title" => "Easy Online Booking", "text" => "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.", "link_text" => "Book Now", "link_url" => "#"]],
-                ["item_index" => 2, "item_label" => "Feature 3", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-people", "title" => "Expert Medical Team", "text" => "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.", "link_text" => "Meet Our Doctors", "link_url" => "#"]],
+                ["item_index" => 0, "item_label" => "Característica 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse", "title" => "24/7 Emergency Care", "text" => "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.", "link_text" => "Learn More", "link_url" => "#"]],
+                ["item_index" => 1, "item_label" => "Característica 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-calendar-check", "title" => "Easy Online Booking", "text" => "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.", "link_text" => "Book Now", "link_url" => "#"]],
+                ["item_index" => 2, "item_label" => "Característica 3", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-people", "title" => "Expert Medical Team", "text" => "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.", "link_text" => "Meet Our Doctors", "link_url" => "#"]],
             ],
         ],
         [
