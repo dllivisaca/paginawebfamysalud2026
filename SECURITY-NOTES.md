@@ -266,3 +266,41 @@
 
 ### Como retomar en una nueva sesion
 - Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-18".
+
+## Sesion 2026-03-19
+
+### Cambios realizados hoy
+- Se conecto la Home publica al mismo flujo dinamico de contenido editable que ya usaba `about`, dejando `index.php` como bootstrap de la portada y creando `templates/pages/home.php` para consumir `$pageContent` desde BD.
+- Se confirmo y corrigio un problema de salida accidental en Home causado por BOM UTF-8 al inicio de `index.php` y `templates/pages/home.php`, que podia empujar nodos como `meta`, `title` y `&#xFEFF;` dentro del `body`.
+- Se ajusto el frontend publico de Home para leer campos simples y repeaters reales del schema `home`, incluyendo `hero_*`, `hero_features`, bloques de `Sobre nosotros`, `featured_*`, `find_doctor`, `cta_*` y `emergency_*`, sin cambiar la estructura de BD existente.
+- Se realizaron varios ajustes puntuales en `admin/pages/content.php` para mejorar la edicion de Home: reubicacion visual de `hero_features` y `home_about_features`, separacion del bloque `Años de experiencia`, y mejoras de labels visibles solo en el admin.
+- Se agregaron ajustes visuales acotados al admin para repeaters especificos, incluyendo clases dedicadas para `hero_features` y `home_about_features`, tamaños de titulo homogéneos y mejoras de usabilidad del editor con boton superior de guardado y barra sticky.
+- Se actualizaron labels visibles del editor para `hero_features` en `templates/page-schemas/home.php`, pasandolos a español sin tocar keys ni logica de guardado.
+- Se realizaron ajustes visuales controlados en `assets/css/main.css` para Home, incluyendo margen base del `body`, encapsulado del header para `.home-page` y reduccion del padding superior del hero, sin afectar otras plantillas.
+
+### Archivos creados
+- `templates/pages/home.php`
+
+### Archivos modificados
+- `SECURITY-NOTES.md`
+- `index.php`
+- `templates/pages/home.php`
+- `includes/header.php`
+- `assets/css/main.css`
+- `admin/pages/content.php`
+- `templates/page-schemas/home.php`
+
+### Verificacion realizada
+- Se ejecuto `php -l` sobre `index.php`, `templates/pages/home.php`, `admin/pages/content.php` y `templates/page-schemas/home.php` en los cambios principales del dia.
+- Las validaciones ejecutadas terminaron sin errores de sintaxis.
+- Se verifico por lectura binaria que `index.php` y `templates/pages/home.php` ya no conservan BOM UTF-8 al inicio despues de la correccion.
+- Se confirmo por inspeccion del flujo que Home ya usa el mismo sistema de contenido editable dinamico que `about`.
+
+### Pendientes recomendados
+- Probar en navegador la Home publica completa para validar cada bloque dinamico y descartar restos visuales del header fijo o del espaciado superior.
+- Revisar con cuidado los literales del admin que aun muestran mojibake heredado antes de hacer nuevas pasadas de texto en `admin/pages/content.php` o schemas.
+- Hacer una validacion manual del editor de Home para confirmar que los bloques reubicados del admin aparecen en el orden esperado y sin duplicaciones.
+- Evaluar si conviene mover el patron de bootstrap dinamico de `index.php` a un helper compartido cuando se estabilice la portada, sin refactorizar mientras siga habiendo cambios funcionales.
+
+### Como retomar en una nueva sesion
+- Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-19".
