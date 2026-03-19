@@ -569,7 +569,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .nav a.active { background: #e9f7ef; color: #198754; font-weight: bold; }
         .nav-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; }
         .main { flex: 1; padding: 32px; min-width: 0; }
-        .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 24px; position: sticky; top: 0; z-index: 40; background: #f4f6f9; }
+        .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 24px; padding: 12px 0; position: sticky; top: 0; z-index: 40; background: #f4f6f9; border-bottom: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,.04); }
         .page-title { margin: 0; font-size: 34px; line-height: 1.1; }
         .page-subtitle { margin: 10px 0 0; font-size: 16px; color: #6b7280; max-width: 760px; }
         .topbar-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
