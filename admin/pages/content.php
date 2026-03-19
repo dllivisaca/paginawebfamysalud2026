@@ -1029,6 +1029,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
+                                            <?php if ($templateKey === "home" && ((string) ($groupConfig["title"] ?? "")) === "Sobre nosotros"): ?>
+                                                <?php foreach ($schema["repeaters"] as $repeaterConfig): ?>
+                                                    <?php if (((string) ($repeaterConfig["repeater_key"] ?? "")) === "home_about_features"): ?>
+                                                        <?php renderAdminRepeaterSection($repeaterConfig, $contentData); ?>
+                                                        <?php break; ?>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
                             <?php else: ?>
@@ -1076,7 +1084,7 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php if (is_array($aboutStatsRepeaterConfig) && $repeaterIndex === 0): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
-                            <?php if ($templateKey === "home" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "hero_features"): ?>
+                            <?php if ($templateKey === "home" && in_array((string) ($repeaterConfig["repeater_key"] ?? ""), ["hero_features", "home_about_features"], true)): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : ""); ?>
@@ -1138,6 +1146,9 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
+
+
 
 
 
