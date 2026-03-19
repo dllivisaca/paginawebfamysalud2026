@@ -569,7 +569,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .nav a.active { background: #e9f7ef; color: #198754; font-weight: bold; }
         .nav-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; }
         .main { flex: 1; padding: 32px; min-width: 0; }
-        .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 24px; }
+        .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 24px; position: sticky; top: 0; z-index: 40; background: #f4f6f9; }
         .page-title { margin: 0; font-size: 34px; line-height: 1.1; }
         .page-subtitle { margin: 10px 0 0; font-size: 16px; color: #6b7280; max-width: 760px; }
         .topbar-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -689,6 +689,7 @@ if (($schema["template_key"] ?? "") === "about") {
 
                 <div class="topbar-actions">
                     <?php if ($page): ?>
+                        <button type="submit" form="content-form" class="btn btn-primary">Guardar contenido</button>
                         <a href="edit.php?id=<?php echo (int) $page["id"]; ?>" class="btn btn-outline">Configuraci&oacute;n base</a>
                     <?php endif; ?>
                     <a href="index.php" class="btn btn-outline">Volver a p&aacute;ginas</a>
@@ -716,7 +717,7 @@ if (($schema["template_key"] ?? "") === "about") {
                     <h2>Contenido de la plantilla <?php echo htmlspecialchars((string) ($schema["template_name"] ?? $templateKey), ENT_QUOTES, "UTF-8"); ?></h2>
                     <p>Los bloques repetibles tienen cantidad fija definida por la plantilla. Aqu&iacute; solo puedes editar valores y mostrar u ocultar cada elemento.</p>
 
-                    <form action="content.php?id=<?php echo (int) $page["id"]; ?>" method="post" enctype="multipart/form-data">
+                    <form id="content-form" action="content.php?id=<?php echo (int) $page["id"]; ?>" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
 
                         <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?>">
@@ -1082,7 +1083,6 @@ if (($schema["template_key"] ?? "") === "about") {
                         <?php endforeach; ?>
 
                         <div class="actions">
-                            <button type="submit" class="btn btn-primary">Guardar contenido</button>
                             <a href="edit.php?id=<?php echo (int) $page["id"]; ?>" class="btn btn-outline">Volver a configuraci&oacute;n base</a>
                         </div>
                     </form>
