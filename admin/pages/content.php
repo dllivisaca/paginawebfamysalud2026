@@ -592,6 +592,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .repeater-after-certifications .card { background: #f9fafb; }
         .hero-features-admin-section { background: #fff; }
         .hero-features-admin-section .card { background: #f9fafb; }
+        .section-block.hero-features-admin-section > h3 { font-size: 17px; }
+        .hero-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block h3 { margin: 0 0 8px; font-size: 18px; }
         .section-groups { display: grid; gap: 16px; }
         .content-subgroup { background: #fff; border: 1px solid #dbe4dc; border-radius: 14px; padding: 18px; }
