@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $homeContent = is_array($pageContent ?? null) ? $pageContent : ["simple_fields" => [], "repeaters" => []];
 $homeFields = $homeContent["simple_fields"] ?? [];
 $homeRepeaters = $homeContent["repeaters"] ?? [];
