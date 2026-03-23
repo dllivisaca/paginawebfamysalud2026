@@ -1,4 +1,4 @@
-﻿<?php
+﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -239,7 +239,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $page && $schema) {
 
             $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
             $fieldValue = trim((string) ($_POST["simple_fields"][$fieldKey]["value"] ?? ""));
-            $isVisible = isset($_POST["simple_fields"][$fieldKey]["is_visible"]) ? 1 : 0;
+            $isVisible = (int) ($_POST["simple_fields"][$fieldKey]["is_visible"] ?? 0) === 1 ? 1 : 0;
 
             if ($fieldType === "image") {
                 $uploadedFile = getSimpleFieldUpload($_FILES, $fieldKey);
@@ -1008,6 +1008,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             <div class="field-header">
                                                                 <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $displayLabelHtml; ?></label>
                                                                 <label class="toggle-row">
+                                                                    <?php if (in_array($groupFieldKey, ["home_about_experience_years", "home_about_experience_text"], true)): ?>
+                                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="0">
+                                                                    <?php endif; ?>
                                                                     <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
                                                                     <span>Mostrar</span>
                                                                 </label>

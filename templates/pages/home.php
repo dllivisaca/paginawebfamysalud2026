@@ -149,7 +149,7 @@ require __DIR__ . "/../../includes/header.php";
         <div class="col-lg-6" data-aos="fade-right" data-aos-delay="200">
           <div class="about-image">
             <?php if (homeFieldVisible($homeFields, "home_about_image") && $homeAboutImage !== ""): ?><img src="<?php echo htmlspecialchars($homeAboutImage, ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars($homeAboutImageAlt, ENT_QUOTES, "UTF-8"); ?>" class="img-fluid rounded-3 mb-4"><?php endif; ?>
-            <div class="experience-badge"><span class="years"><?php echo htmlspecialchars($homeAboutExperienceYears, ENT_QUOTES, "UTF-8"); ?></span><span class="text"><?php echo htmlspecialchars($homeAboutExperienceText, ENT_QUOTES, "UTF-8"); ?></span></div>
+            <?php if ((homeFieldVisible($homeFields, "home_about_experience_years") && $homeAboutExperienceYears !== "") || (homeFieldVisible($homeFields, "home_about_experience_text") && $homeAboutExperienceText !== "")): ?><div class="experience-badge"><?php if (homeFieldVisible($homeFields, "home_about_experience_years") && $homeAboutExperienceYears !== ""): ?><span class="years"><?php echo htmlspecialchars($homeAboutExperienceYears, ENT_QUOTES, "UTF-8"); ?></span><?php endif; ?><?php if (homeFieldVisible($homeFields, "home_about_experience_text") && $homeAboutExperienceText !== ""): ?><span class="text"><?php echo htmlspecialchars($homeAboutExperienceText, ENT_QUOTES, "UTF-8"); ?></span><?php endif; ?></div><?php endif; ?>
           </div>
         </div>
         <div class="col-lg-6" data-aos="fade-left" data-aos-delay="300">
