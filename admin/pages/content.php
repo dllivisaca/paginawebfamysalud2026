@@ -1,4 +1,4 @@
-﻿﻿﻿<?php
+﻿﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -454,8 +454,8 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["home_about_experience_years", "home_about_experience_text"],
         ],
         [
-            "title" => "Home About - Botones",
-            "description" => "Botones del bloque Home About.",
+            "title" => "Sobre nosotros - Botones",
+            "description" => "Botones del bloque Sobre nosotros.",
             "render_mode" => "buttons",
             "button_groups" => [
                 "home_about_primary_cta" => [
@@ -806,7 +806,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             <div class="field-group">
                                                                 <div class="field-header">
                                                                     <?php $buttonTextLabel = escapeAdminFieldLabel((string) ($textConfig["label"] ?? $textKey)); ?>
-                                                                    <?php if ($templateKey === "home" && $textKey === "hero_primary_cta_text") { $buttonTextLabel = "Texto del botón principal"; } elseif ($templateKey === "home" && $textKey === "hero_secondary_cta_text") { $buttonTextLabel = "Texto del botón secundario"; } ?>
+                                                                    <?php if ($templateKey === "home" && $textKey === "hero_primary_cta_text") { $buttonTextLabel = "Texto del botón principal"; } elseif ($templateKey === "home" && $textKey === "hero_secondary_cta_text") { $buttonTextLabel = "Texto del botón secundario"; } elseif ($templateKey === "home" && $textKey === "home_about_primary_cta_text") { $buttonTextLabel = "Texto del botón principal de Sobre nosotros"; } elseif ($templateKey === "home" && $textKey === "home_about_secondary_cta_text") { $buttonTextLabel = "Texto del botón secundario de Sobre nosotros"; } ?>
                                                                     <label class="field-label" for="simple_<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $buttonTextLabel; ?></label>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($textKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $textVisible ? " checked" : ""; ?>>
