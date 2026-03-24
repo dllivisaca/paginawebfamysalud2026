@@ -493,8 +493,8 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["home_about_image", "home_about_image_alt"],
         ],
         [
-            "title" => "Certificaciones Home",
-            "description" => "Encabezado del bloque de certificaciones de Home.",
+            "title" => "Certificaciones",
+            "description" => "Encabezado del bloque de certificaciones.",
             "field_keys" => ["home_about_certifications_title"],
         ],
         [
@@ -998,6 +998,8 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Texto informativo 2";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "hero_hours_value") {
                                                             $displayLabelHtml = "Dato informativo 2";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "home_about_certifications_title") {
+                                                            $displayLabelHtml = "Título de certificaciones";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
