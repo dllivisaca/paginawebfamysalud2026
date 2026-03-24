@@ -508,7 +508,7 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["featured_services_title", "featured_services_text"],
         ],
         [
-            "title" => "Find A Doctor",
+            "title" => "Encuentra a tu especialista",
             "description" => "Textos y controles del buscador de doctores.",
             "field_keys" => ["find_doctor_title", "find_doctor_text", "doctor_search_placeholder", "doctor_specialty_placeholder", "doctor_search_button_text"],
         ],
@@ -1012,6 +1012,16 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Título de servicios destacados";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "featured_services_text") {
                                                             $displayLabelHtml = "Texto introductorio de servicios destacados";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "find_doctor_title") {
+                                                            $displayLabelHtml = "Título de búsqueda de especialistas";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "find_doctor_text") {
+                                                            $displayLabelHtml = "Texto introductorio de búsqueda de especialistas";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "doctor_search_placeholder") {
+                                                            $displayLabelHtml = "Placeholder del buscador de especialista";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "doctor_specialty_placeholder") {
+                                                            $displayLabelHtml = "Placeholder del selector de especialidad";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "doctor_search_button_text") {
+                                                            $displayLabelHtml = "Texto del botón de búsqueda";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
