@@ -476,8 +476,8 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["home_about_primary_cta_text", "home_about_primary_cta_link_type", "home_about_primary_cta_page_id", "home_about_primary_cta_url", "home_about_secondary_cta_text", "home_about_secondary_cta_link_type", "home_about_secondary_cta_page_id", "home_about_secondary_cta_url"],
         ],
         [
-            "title" => "Home About - Imagen",
-            "description" => "Imagen del bloque Home About.",
+            "title" => "Sobre nosotros - Imagen",
+            "description" => "Imagen del bloque Sobre nosotros.",
             "render_mode" => "images",
             "image_groups" => [
                 [
@@ -895,7 +895,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                     </div>
                                                                     <div class="field-group">
                                                                         <?php $altLabelHtml = escapeAdminFieldLabel((string) ($altFieldConfig["label"] ?? $altKey)); ?>
-                                                                        <?php if ($templateKey === "home" && $altKey === "hero_image_alt") { $altLabelHtml = "Texto alternativo imagen principal"; } ?>
+                                                                        <?php if ($templateKey === "home" && $altKey === "hero_image_alt") { $altLabelHtml = "Texto alternativo imagen principal"; } elseif ($templateKey === "home" && $altKey === "home_about_image_alt") { $altLabelHtml = "Texto alternativo imagen de Sobre nosotros"; } ?>
                                                                         <label class="field-label" for="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $altLabelHtml; ?></label>
                                                                         <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($altKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($altValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                     </div>
