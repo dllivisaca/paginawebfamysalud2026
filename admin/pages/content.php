@@ -503,7 +503,7 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["featured_departments_title", "featured_departments_text"],
         ],
         [
-            "title" => "Featured Services",
+            "title" => "Servicios destacados",
             "description" => "Encabezado del bloque de servicios destacados.",
             "field_keys" => ["featured_services_title", "featured_services_text"],
         ],
@@ -1008,6 +1008,10 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Título de especialidades destacadas";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "featured_departments_text") {
                                                             $displayLabelHtml = "Texto introductorio de especialidades destacadas";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "featured_services_title") {
+                                                            $displayLabelHtml = "Título de servicios destacados";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "featured_services_text") {
+                                                            $displayLabelHtml = "Texto introductorio de servicios destacados";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
