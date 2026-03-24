@@ -51,6 +51,7 @@ $homeAboutPrimaryUrl = resolvePageContentLinkHref($conn, $homeFields, "home_abou
 $homeAboutSecondaryText = homeFieldValue($homeFields, "home_about_secondary_cta_text", "Meet Our Team");
 $homeAboutSecondaryUrl = resolvePageContentLinkHref($conn, $homeFields, "home_about_secondary_cta", "#");
 $homeAboutCertificationsTitle = homeFieldValue($homeFields, "home_about_certifications_title", "Our Accreditations");
+$homeAboutCertificationsTitleVisible = homeFieldVisible($homeFields, "home_about_certifications_title");
 $homeAboutFeatures = homeVisibleRepeaterItems($homeRepeaters["home_about_features"] ?? []);
 $homeCertifications = homeVisibleRepeaterItems($homeRepeaters["home_certifications"] ?? []);
 
@@ -165,7 +166,7 @@ require __DIR__ . "/../../includes/header.php";
           </div>
         </div>
       </div>
-      <?php if ($homeAboutCertificationsTitle !== "" || $homeCertifications !== []): ?><div class="row mt-5 pt-4 certifications-row" data-aos="fade-up" data-aos-delay="600"><div class="col-12 text-center mb-4"><?php if ($homeAboutCertificationsTitle !== ""): ?><h4 class="certification-title"><?php echo htmlspecialchars($homeAboutCertificationsTitle, ENT_QUOTES, "UTF-8"); ?></h4><?php endif; ?></div><div class="col-12"><div class="certifications"><?php foreach ($homeCertifications as $index => $certificationItem): $certFields = $certificationItem["fields"] ?? []; ?><div class="certification-item" data-aos="zoom-in" data-aos-delay="<?php echo 700 + ($index * 100); ?>"><img src="<?php echo htmlspecialchars((string) ($certFields["image"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars((string) ($certFields["alt"] ?? ""), ENT_QUOTES, "UTF-8"); ?>"></div><?php endforeach; ?></div></div></div><?php endif; ?>
+      <?php if (($homeAboutCertificationsTitleVisible && $homeAboutCertificationsTitle !== "") || $homeCertifications !== []): ?><div class="row mt-5 pt-4 certifications-row" data-aos="fade-up" data-aos-delay="600"><div class="col-12 text-center mb-4"><?php if ($homeAboutCertificationsTitleVisible && $homeAboutCertificationsTitle !== ""): ?><h4 class="certification-title"><?php echo htmlspecialchars($homeAboutCertificationsTitle, ENT_QUOTES, "UTF-8"); ?></h4><?php endif; ?></div><div class="col-12"><div class="certifications"><?php foreach ($homeCertifications as $index => $certificationItem): $certFields = $certificationItem["fields"] ?? []; ?><div class="certification-item" data-aos="zoom-in" data-aos-delay="<?php echo 700 + ($index * 100); ?>"><img src="<?php echo htmlspecialchars((string) ($certFields["image"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars((string) ($certFields["alt"] ?? ""), ENT_QUOTES, "UTF-8"); ?>"></div><?php endforeach; ?></div></div></div><?php endif; ?>
     </div>
   </section>
 
