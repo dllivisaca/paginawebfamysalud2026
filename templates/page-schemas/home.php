@@ -99,7 +99,7 @@ return [
         ],
         [
             "repeater_key" => "home_certifications",
-            "label" => "Logos de certificaciones Home",
+            "label" => "Certificaciones - Logos",
             "fields" => [
                 ["field_key" => "image", "label" => "Imagen", "field_type" => "image", "default" => ""],
                 ["field_key" => "alt", "label" => "Texto alternativo", "field_type" => "text", "default" => ""],

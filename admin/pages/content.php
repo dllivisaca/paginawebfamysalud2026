@@ -608,6 +608,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .home-about-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block.home-about-features-admin-section { background: #ffffff; }
         .home-about-features-admin-section .card { background: #f9fafb; }
+        .section-block.home-certifications-admin-section { background: #fff; }
+        .home-certifications-admin-section .card { background: #f9fafb; }
         .section-block.home-certifications-admin-section > h3 { font-size: 17px; }
         .home-certifications-admin-section .item-title h3 { font-size: 17px; }
         .section-block h3 { margin: 0 0 8px; font-size: 18px; }
