@@ -513,7 +513,7 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["find_doctor_title", "find_doctor_text", "doctor_search_placeholder", "doctor_specialty_placeholder", "doctor_search_button_text"],
         ],
         [
-            "title" => "Call To Action",
+            "title" => "Llamado a la acción",
             "description" => "Contenido principal del llamado a la acción.",
             "field_keys" => ["cta_title", "cta_text"],
         ],
@@ -1022,6 +1022,10 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Placeholder del selector de especialidad";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "doctor_search_button_text") {
                                                             $displayLabelHtml = "Texto del botón de búsqueda";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "cta_title") {
+                                                            $displayLabelHtml = "Título del llamado a la acción";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "cta_text") {
+                                                            $displayLabelHtml = "Texto descriptivo del llamado a la acción";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
