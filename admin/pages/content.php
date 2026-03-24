@@ -140,6 +140,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $fieldLabel = (string) ($fieldConfig["label"] ?? $fieldKey);
                         $isHeroFeatureIconField = $repeaterKey === "hero_features" && $fieldKey === "icon_class";
                         $isHomeAboutFeatureIconField = $repeaterKey === "home_about_features" && $fieldKey === "icon_class";
+                        $isCtaFeatureIconField = $repeaterKey === "cta_features" && $fieldKey === "icon_class";
                         $heroFeatureIconOptions = [
                             "bi bi-heart-pulse-fill" => "Corazón",
                             "bi bi-lungs-fill" => "Pulmones",
@@ -148,6 +149,11 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $homeAboutFeatureIconOptions = [
                             "bi bi-heart-pulse" => "Corazón",
                             "bi bi-star" => "Estrella",
+                        ];
+                        $ctaFeatureIconOptions = [
+                            "bi bi-heart-pulse" => "Corazón",
+                            "bi bi-calendar-check" => "Calendario",
+                            "bi bi-people" => "Personas",
                         ];
                         if ($repeaterKey === "about_stats" && $fieldKey === "value") {
                             $fieldLabel = "Valor";
@@ -161,9 +167,9 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                 <label class="file-input-label" for="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
                                 <input class="form-file js-image-upload" type="file" id="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">
                                 <img id="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
-                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField): ?>
+                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField): ?>
                                 <select class="form-input" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]">
-                                    <?php foreach (($isHeroFeatureIconField ? $heroFeatureIconOptions : $homeAboutFeatureIconOptions) as $iconValue => $iconLabel): ?>
+                                    <?php foreach (($isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : $ctaFeatureIconOptions)) as $iconValue => $iconLabel): ?>
                                         <option value="<?php echo htmlspecialchars($iconValue, ENT_QUOTES, "UTF-8"); ?>"<?php echo $fieldValue === $iconValue ? " selected" : ""; ?>><?php echo htmlspecialchars($iconLabel, ENT_QUOTES, "UTF-8"); ?></option>
                                     <?php endforeach; ?>
                                 </select>
