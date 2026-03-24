@@ -518,7 +518,7 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["cta_title", "cta_text"],
         ],
         [
-            "title" => "Call To Action - Botones",
+            "title" => "Llamado a la acción - Botones",
             "description" => "Botones principales del llamado a la acción.",
             "render_mode" => "buttons",
             "button_groups" => [
@@ -540,7 +540,7 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["cta_primary_text", "cta_primary_link_type", "cta_primary_page_id", "cta_primary_url", "cta_secondary_text", "cta_secondary_link_type", "cta_secondary_page_id", "cta_secondary_url"],
         ],
         [
-            "title" => "Call To Action - Emergencia",
+            "title" => "Llamado a la acción - Emergencia",
             "description" => "Bloque secundario de emergencia del llamado a la acción.",
             "field_keys" => ["cta_emergency_title", "cta_emergency_text", "cta_emergency_button_text", "cta_emergency_button_url"],
         ],
