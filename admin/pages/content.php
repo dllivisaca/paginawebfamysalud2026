@@ -498,8 +498,8 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["home_about_certifications_title"],
         ],
         [
-            "title" => "Featured Departments",
-            "description" => "Encabezado del bloque de departamentos destacados.",
+            "title" => "Especialidades destacadas",
+            "description" => "Encabezado del bloque de especialidades destacadas.",
             "field_keys" => ["featured_departments_title", "featured_departments_text"],
         ],
         [
@@ -1004,6 +1004,10 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Dato informativo 2";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "home_about_certifications_title") {
                                                             $displayLabelHtml = "Título de certificaciones";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "featured_departments_title") {
+                                                            $displayLabelHtml = "Título de especialidades destacadas";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "featured_departments_text") {
+                                                            $displayLabelHtml = "Texto introductorio de especialidades destacadas";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
