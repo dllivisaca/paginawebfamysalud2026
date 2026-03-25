@@ -1,4 +1,4 @@
-﻿﻿<?php
+﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -201,8 +201,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             continue;
                         }
                         ?>
-                        <div class="field-group<?php echo $isFeaturedDepartmentLinkTextField ? " field-group-full" : ""; ?>">
-                            <?php if (!$isFeaturedDepartmentLinkTextField): ?>
+                        <div class="field-group<?php echo ($isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField) ? " field-group-full" : ""; ?>">
+                            <?php if (!$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField): ?>
                                 <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
                             <?php endif; ?>
                             <?php if ($fieldType === "image"): ?>
