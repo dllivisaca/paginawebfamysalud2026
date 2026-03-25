@@ -24,6 +24,34 @@ function homeVisibleRepeaterItems(array $items): array
     }));
 }
 
+function homeRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl = ""): string
+{
+    $linkType = trim((string) ($fields["link_type"] ?? ""));
+    $pageId = (int) trim((string) ($fields["page_id"] ?? "0"));
+    $customUrl = trim((string) ($fields["link_url"] ?? ""));
+    static $pagesById = null;
+
+    if ($linkType !== "internal" && $linkType !== "custom") {
+        $linkType = $customUrl !== "" ? "custom" : ($pageId > 0 ? "internal" : "");
+    }
+
+    if ($linkType === "internal" && $pageId > 0) {
+        if ($pagesById === null) {
+            [, $pagesById] = getPageContentLinkablePages($conn, true);
+        }
+
+        if (isset($pagesById[$pageId])) {
+            return (string) ($pagesById[$pageId]["public_url"] ?? "");
+        }
+    }
+
+    if ($customUrl !== "") {
+        return $customUrl;
+    }
+
+    return $fallbackUrl;
+}
+
 $heroBadge = homeFieldValue($homeFields, "hero_badge", "Leading Healthcare Specialists");
 $heroTitle = homeFieldValue($homeFields, "hero_title", "Advanced Medical Care for Your Family's Health");
 $heroText = homeFieldValue($homeFields, "hero_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.");
@@ -172,7 +200,7 @@ require __DIR__ . "/../../includes/header.php";
 
   <section id="featured-departments" class="featured-departments section">
     <div class="container section-title" data-aos="fade-up"><?php if ($featuredDepartmentsTitle !== ""): ?><h2><?php echo htmlspecialchars($featuredDepartmentsTitle, ENT_QUOTES, "UTF-8"); ?></h2><?php endif; ?><?php if ($featuredDepartmentsText !== ""): ?><p><?php echo nl2br(htmlspecialchars($featuredDepartmentsText, ENT_QUOTES, "UTF-8")); ?></p><?php endif; ?></div>
-    <div class="container" data-aos="fade-up" data-aos-delay="100"><div class="row gy-4"><?php foreach ($featuredDepartments as $index => $departmentItem): $departmentFields = $departmentItem["fields"] ?? []; ?><div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?php echo 100 + (($index % 3) * 100); ?>"><div class="department-card"><div class="department-image"><img src="<?php echo htmlspecialchars((string) ($departmentFields["image"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars((string) ($departmentFields["alt"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" class="img-fluid"></div><div class="department-content"><div class="department-icon"><i class="<?php echo htmlspecialchars((string) ($departmentFields["icon_class"] ?? ""), ENT_QUOTES, "UTF-8"); ?>"></i></div><h3><?php echo htmlspecialchars((string) ($departmentFields["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h3><p><?php echo htmlspecialchars((string) ($departmentFields["text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></p><a href="<?php echo htmlspecialchars((string) ($departmentFields["link_url"] ?? "#"), ENT_QUOTES, "UTF-8"); ?>" class="btn-learn-more"><span><?php echo htmlspecialchars((string) ($departmentFields["link_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></span><i class="fas fa-arrow-right"></i></a></div></div></div><?php endforeach; ?></div></div>
+    <div class="container" data-aos="fade-up" data-aos-delay="100"><div class="row gy-4"><?php foreach ($featuredDepartments as $index => $departmentItem): $departmentFields = $departmentItem["fields"] ?? []; $departmentLinkUrl = homeRepeaterLinkHref($conn, $departmentFields, "#"); ?><div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?php echo 100 + (($index % 3) * 100); ?>"><div class="department-card"><div class="department-image"><img src="<?php echo htmlspecialchars((string) ($departmentFields["image"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars((string) ($departmentFields["alt"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" class="img-fluid"></div><div class="department-content"><div class="department-icon"><i class="<?php echo htmlspecialchars((string) ($departmentFields["icon_class"] ?? ""), ENT_QUOTES, "UTF-8"); ?>"></i></div><h3><?php echo htmlspecialchars((string) ($departmentFields["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h3><p><?php echo htmlspecialchars((string) ($departmentFields["text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></p><a href="<?php echo htmlspecialchars($departmentLinkUrl, ENT_QUOTES, "UTF-8"); ?>" class="btn-learn-more"><span><?php echo htmlspecialchars((string) ($departmentFields["link_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></span><i class="fas fa-arrow-right"></i></a></div></div></div><?php endforeach; ?></div></div>
   </section>
 
   <section id="featured-services" class="featured-services section light-background">

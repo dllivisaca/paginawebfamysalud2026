@@ -108,6 +108,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
 {
     $repeaterKey = (string) ($repeaterConfig["repeater_key"] ?? "");
     $repeaterItems = $contentData["repeaters"][$repeaterKey] ?? [];
+    global $linkableSitePages;
     ?>
     <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?>">
         <h3><?php echo htmlspecialchars($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : (string) ($repeaterConfig["label"] ?? $repeaterKey), ENT_QUOTES, "UTF-8"); ?></h3>
@@ -142,6 +143,17 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isHomeAboutFeatureIconField = $repeaterKey === "home_about_features" && $fieldKey === "icon_class";
                         $isCtaFeatureIconField = $repeaterKey === "cta_features" && $fieldKey === "icon_class";
                         $isFeaturedDepartmentIconField = $repeaterKey === "featured_departments" && $fieldKey === "icon_class";
+                        $isFeaturedDepartmentLinkTextField = $repeaterKey === "featured_departments" && $fieldKey === "link_text";
+                        $isFeaturedDepartmentLinkTypeField = $repeaterKey === "featured_departments" && $fieldKey === "link_type";
+                        $isFeaturedDepartmentPageIdField = $repeaterKey === "featured_departments" && $fieldKey === "page_id";
+                        $isFeaturedDepartmentLinkUrlField = $repeaterKey === "featured_departments" && $fieldKey === "link_url";
+                        $featuredDepartmentLinkTypeValue = trim((string) (($itemData["fields"]["link_type"]["field_value"] ?? "")));
+                        $featuredDepartmentPageIdValue = trim((string) (($itemData["fields"]["page_id"]["field_value"] ?? "")));
+                        $featuredDepartmentLinkUrlValue = (string) (($itemData["fields"]["link_url"]["field_value"] ?? ""));
+                        $featuredDepartmentLinkScope = $repeaterKey . "_" . $itemIndex . "_link";
+                        if ($featuredDepartmentLinkTypeValue !== "internal" && $featuredDepartmentLinkTypeValue !== "custom") {
+                            $featuredDepartmentLinkTypeValue = $featuredDepartmentLinkUrlValue !== "" ? "custom" : ($featuredDepartmentPageIdValue !== "" ? "internal" : "custom");
+                        }
                         $heroFeatureIconOptions = [
                             "bi bi-heart-pulse-fill" => "Corazón",
                             "bi bi-lungs-fill" => "Pulmones",
@@ -167,9 +179,14 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         if ($repeaterKey === "about_stats" && $fieldKey === "value") {
                             $fieldLabel = "Valor";
                         }
+                        if ($isFeaturedDepartmentLinkTypeField || $isFeaturedDepartmentPageIdField || $isFeaturedDepartmentLinkUrlField) {
+                            continue;
+                        }
                         ?>
-                        <div class="field-group">
-                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
+                        <div class="field-group<?php echo $isFeaturedDepartmentLinkTextField ? " field-group-full" : ""; ?>">
+                            <?php if (!$isFeaturedDepartmentLinkTextField): ?>
+                                <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
+                            <?php endif; ?>
                             <?php if ($fieldType === "image"): ?>
                                 <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                 <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($fieldValue !== "" ? basename($fieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
@@ -182,6 +199,36 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                         <option value="<?php echo htmlspecialchars($iconValue, ENT_QUOTES, "UTF-8"); ?>"<?php echo $fieldValue === $iconValue ? " selected" : ""; ?>><?php echo htmlspecialchars($iconLabel, ENT_QUOTES, "UTF-8"); ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                            <?php elseif ($isFeaturedDepartmentLinkTextField): ?>
+                                <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_text", ENT_QUOTES, "UTF-8"); ?>">Texto del enlace</label>
+                                <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_text", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_text]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+
+                                <div class="button-destination-box">
+                                    <div class="field-group field-group-full">
+                                        <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_type", ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
+                                        <select class="form-select js-link-type" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_type", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_type]" data-link-scope="<?php echo htmlspecialchars($featuredDepartmentLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <option value="internal"<?php echo $featuredDepartmentLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                            <option value="custom"<?php echo $featuredDepartmentLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="button-destination-grid">
+                                        <div class="field-group field-group-full js-link-panel <?php echo $featuredDepartmentLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($featuredDepartmentLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_page_id", ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
+                                            <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_page_id", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][page_id]">
+                                                <option value="">Selecciona una p&aacute;gina</option>
+                                                <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                    <option value="<?php echo (int) ($sitePageOption["id"] ?? 0); ?>"<?php echo (string) ($sitePageOption["id"] ?? "") === $featuredDepartmentPageIdValue ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="field-group field-group-full js-link-panel <?php echo $featuredDepartmentLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($featuredDepartmentLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                            <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_url]" value="<?php echo htmlspecialchars($featuredDepartmentLinkUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                        </div>
+                                    </div>
+                                </div>
                             <?php else: ?>
                                 <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                             <?php endif; ?>
