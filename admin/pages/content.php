@@ -110,7 +110,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
     $repeaterItems = $contentData["repeaters"][$repeaterKey] ?? [];
     global $linkableSitePages;
     ?>
-    <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?>">
+    <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?>">
         <h3><?php echo htmlspecialchars($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : (string) ($repeaterConfig["label"] ?? $repeaterKey), ENT_QUOTES, "UTF-8"); ?></h3>
 
         <?php foreach ($repeaterConfig["items"] as $itemConfig): ?>
@@ -674,6 +674,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .home-certifications-admin-section .card { background: #f9fafb; }
         .section-block.home-certifications-admin-section > h3 { font-size: 17px; }
         .home-certifications-admin-section .item-title h3 { font-size: 17px; }
+        .section-block.featured-departments-admin-section { background: #fff; }
+        .featured-departments-admin-section .card { background: #f9fafb; }
         .section-block h3 { margin: 0 0 8px; font-size: 18px; }
         .section-groups { display: grid; gap: 16px; }
         .content-subgroup { background: #fff; border: 1px solid #dbe4dc; border-radius: 14px; padding: 18px; }
@@ -800,7 +802,7 @@ if (($schema["template_key"] ?? "") === "about") {
                     <form id="content-form" action="content.php?id=<?php echo (int) $page["id"]; ?>" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION["csrf_token"], ENT_QUOTES, "UTF-8"); ?>">
 
-                        <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?>">
+                        <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?>">
                             <h3>Contenido b&aacute;sico</h3>
                             <?php if ($simpleFieldGroups !== []): ?>
                                 <div class="section-groups">
