@@ -145,6 +145,8 @@ return [
                 ["field_key" => "feature_2", "label" => "Característica 2", "field_type" => "text", "default" => ""],
                 ["field_key" => "feature_3", "label" => "Característica 3", "field_type" => "text", "default" => ""],
                 ["field_key" => "link_text", "label" => "Texto del enlace", "field_type" => "text", "default" => ""],
+                ["field_key" => "link_type", "label" => "Tipo de enlace", "field_type" => "text", "default" => ""],
+                ["field_key" => "page_id", "label" => "Página interna", "field_type" => "text", "default" => ""],
                 ["field_key" => "link_url", "label" => "URL del enlace", "field_type" => "url", "default" => ""],
             ],
             "items" => [
