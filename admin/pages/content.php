@@ -1164,6 +1164,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
+                                            <?php if ($templateKey === "home" && ((string) ($groupConfig["title"] ?? "")) === "Servicios destacados"): ?>
+                                                <?php foreach ($schema["repeaters"] as $repeaterConfig): ?>
+                                                    <?php if (((string) ($repeaterConfig["repeater_key"] ?? "")) === "featured_services"): ?>
+                                                        <?php renderAdminRepeaterSection($repeaterConfig, $contentData); ?>
+                                                        <?php break; ?>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                             <?php if ($templateKey === "home" && ((string) ($groupConfig["title"] ?? "")) === "Certificaciones"): ?>
                                                 <?php foreach ($schema["repeaters"] as $repeaterConfig): ?>
                                                     <?php if (((string) ($repeaterConfig["repeater_key"] ?? "")) === "home_certifications"): ?>
@@ -1219,7 +1227,7 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php if (is_array($aboutStatsRepeaterConfig) && $repeaterIndex === 0): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
-                            <?php if ($templateKey === "home" && in_array((string) ($repeaterConfig["repeater_key"] ?? ""), ["hero_features", "home_about_features", "home_certifications", "cta_features", "featured_departments"], true)): ?>
+                            <?php if ($templateKey === "home" && in_array((string) ($repeaterConfig["repeater_key"] ?? ""), ["hero_features", "home_about_features", "home_certifications", "cta_features", "featured_departments", "featured_services"], true)): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : ""); ?>
