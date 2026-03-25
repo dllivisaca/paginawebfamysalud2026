@@ -379,3 +379,36 @@
 
 ### Como retomar en una nueva sesion
 - Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-24".
+
+## Sesion 2026-03-25
+
+### Cambios realizados hoy
+- Se diagnostico el problema de mojibake en archivos PHP del proyecto y se confirmo por lectura binaria que los textos correctos en UTF-8 podian verse como `TÃ­tulo`, `CaracterÃ­stica` o `PÃ¡gina` cuando eran interpretados como Windows-1252 en lectura o salida.
+- Se saneo `admin/pages/content.php` a nivel de bytes, eliminando BOM UTF-8 repetidos al inicio y dejando un unico BOM para minimizar riesgo sin alterar el contenido funcional del archivo.
+- Se verifico que `templates/page-schemas/home.php` estaba sano en UTF-8 sin BOM y que `templates/pages/home.php` tambien estaba sano, sin mojibake real en bytes.
+- Se inspecciono `escapeAdminFieldLabel()` en `admin/pages/content.php` y se confirmo que funciona como proteccion defensiva: deja intacto UTF-8 valido, intenta convertir Windows-1252 a UTF-8 y puede ocultar problemas de origen sin corregir mojibake que ya sea UTF-8 valido.
+- Se adapto en `admin/pages/content.php` el repeater `featured_services` para que la parte del enlace use una rama exclusiva con el mismo patron visual y funcional de `featured_departments`, agregando flags propias, exclusion por `continue` para `link_type`, `page_id` y `link_url`, y un bloque propio con `Texto del enlace`, `Tipo de enlace`, `Página interna` y `URL personalizada`.
+- Se corrigio en `admin/pages/content.php` el label duplicado `Texto del enlace` de `featured_services`, ajustando solo la condicion compartida que imprime labels genericos para que tambien excluya el caso `isFeaturedServiceLinkTextField`.
+- Se diagnostico la persistencia de `featured_services` y se confirmo que el problema no estaba en el render admin sino en el schema: `templates/page-schemas/home.php` no definia `link_type` ni `page_id` para ese repeater, mientras el backend guarda y carga solo fields presentes en schema.
+- Se agregaron en `templates/page-schemas/home.php` los fields faltantes `link_type` y `page_id` dentro de `featured_services`, insertandolos entre `link_text` y `link_url` sin tocar `icon_class`, `title`, `text`, `feature_1`, `feature_2`, `feature_3`, `link_text` ni `link_url`.
+- Se confirmo que el backend real de guardado parte desde `admin/pages/content.php`, apoyandose en `includes/page-content.php`, y que el filtrado por schema explica por que antes `featured_services.link_type` y `featured_services.page_id` se descartaban al guardar.
+
+### Archivos modificados
+- `SECURITY-NOTES.md`
+- `admin/pages/content.php`
+- `templates/page-schemas/home.php`
+
+### Verificacion realizada
+- Se hicieron inspecciones binarias y validaciones de encoding sobre `admin/pages/content.php`, `templates/page-schemas/home.php` y `templates/pages/home.php` para confirmar BOM, ausencia de mojibake real y estado UTF-8 de cada archivo.
+- Se ejecuto `php -l` sobre `admin/pages/content.php` despues del saneamiento de BOM y despues de los cambios puntuales del render de `featured_services`, sin errores de sintaxis.
+- Se ejecuto `php -l` sobre `templates/page-schemas/home.php` despues de agregar `link_type` y `page_id`, sin errores de sintaxis.
+- Se verifico por inspeccion del flujo de guardado que `admin/pages/content.php` recorre `repeaters` usando `$schema["repeaters"]` y que `includes/page-content.php` construye y carga fields repetibles solo desde los definidos en schema.
+
+### Pendientes recomendados
+- Probar manualmente en el admin de `home` el flujo completo de `Servicios destacados - tarjetas`: cambiar `Tipo de enlace`, elegir `Página interna`, guardar y recargar para confirmar que ahora persiste correctamente.
+- Verificar en frontend que `featured_services` resuelva correctamente enlaces internos una vez se aplique, si hace falta, la adaptacion correspondiente en `templates/pages/home.php`.
+- Hacer una pasada controlada adicional de saneamiento de BOM y encoding en `admin/pages/content.php` si reaparecen escrituras con BOM duplicado al inicio del archivo.
+- Revisar visualmente el editor de contenido para confirmar que no queden labels duplicados ni casos similares en otros repeaters con bloques especiales de enlace.
+
+### Como retomar en una nueva sesion
+- Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-25".
