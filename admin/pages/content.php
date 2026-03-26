@@ -171,6 +171,14 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isFeaturedServiceLinkTypeField = $repeaterKey === "featured_services" && $fieldKey === "link_type";
                         $isFeaturedServicePageIdField = $repeaterKey === "featured_services" && $fieldKey === "page_id";
                         $isFeaturedServiceLinkUrlField = $repeaterKey === "featured_services" && $fieldKey === "link_url";
+                        $isFeaturedDoctorProfileButtonTextField = $repeaterKey === "featured_doctors" && $fieldKey === "profile_button_text";
+                        $isFeaturedDoctorProfileButtonLinkTypeField = $repeaterKey === "featured_doctors" && $fieldKey === "profile_button_link_type";
+                        $isFeaturedDoctorProfileButtonPageIdField = $repeaterKey === "featured_doctors" && $fieldKey === "profile_button_page_id";
+                        $isFeaturedDoctorProfileButtonUrlField = $repeaterKey === "featured_doctors" && $fieldKey === "profile_button_url";
+                        $isFeaturedDoctorAppointmentButtonTextField = $repeaterKey === "featured_doctors" && $fieldKey === "appointment_button_text";
+                        $isFeaturedDoctorAppointmentButtonLinkTypeField = $repeaterKey === "featured_doctors" && $fieldKey === "appointment_button_link_type";
+                        $isFeaturedDoctorAppointmentButtonPageIdField = $repeaterKey === "featured_doctors" && $fieldKey === "appointment_button_page_id";
+                        $isFeaturedDoctorAppointmentButtonUrlField = $repeaterKey === "featured_doctors" && $fieldKey === "appointment_button_url";
                         $featuredDepartmentLinkTypeValue = trim((string) (($itemData["fields"]["link_type"]["field_value"] ?? "")));
                         $featuredDepartmentPageIdValue = trim((string) (($itemData["fields"]["page_id"]["field_value"] ?? "")));
                         $featuredDepartmentLinkUrlValue = (string) (($itemData["fields"]["link_url"]["field_value"] ?? ""));
@@ -184,6 +192,20 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $featuredServiceLinkScope = $repeaterKey . "_" . $itemIndex . "_link";
                         if ($featuredServiceLinkTypeValue !== "internal" && $featuredServiceLinkTypeValue !== "custom") {
                             $featuredServiceLinkTypeValue = $featuredServiceLinkUrlValue !== "" ? "custom" : ($featuredServicePageIdValue !== "" ? "internal" : "custom");
+                        }
+                        $featuredDoctorProfileButtonLinkTypeValue = trim((string) (($itemData["fields"]["profile_button_link_type"]["field_value"] ?? "")));
+                        $featuredDoctorProfileButtonPageIdValue = trim((string) (($itemData["fields"]["profile_button_page_id"]["field_value"] ?? "")));
+                        $featuredDoctorProfileButtonUrlValue = (string) (($itemData["fields"]["profile_button_url"]["field_value"] ?? ""));
+                        $featuredDoctorProfileButtonLinkScope = $repeaterKey . "_" . $itemIndex . "_profile_button_link";
+                        if ($featuredDoctorProfileButtonLinkTypeValue !== "internal" && $featuredDoctorProfileButtonLinkTypeValue !== "custom") {
+                            $featuredDoctorProfileButtonLinkTypeValue = $featuredDoctorProfileButtonUrlValue !== "" ? "custom" : ($featuredDoctorProfileButtonPageIdValue !== "" ? "internal" : "custom");
+                        }
+                        $featuredDoctorAppointmentButtonLinkTypeValue = trim((string) (($itemData["fields"]["appointment_button_link_type"]["field_value"] ?? "")));
+                        $featuredDoctorAppointmentButtonPageIdValue = trim((string) (($itemData["fields"]["appointment_button_page_id"]["field_value"] ?? "")));
+                        $featuredDoctorAppointmentButtonUrlValue = (string) (($itemData["fields"]["appointment_button_url"]["field_value"] ?? ""));
+                        $featuredDoctorAppointmentButtonLinkScope = $repeaterKey . "_" . $itemIndex . "_appointment_button_link";
+                        if ($featuredDoctorAppointmentButtonLinkTypeValue !== "internal" && $featuredDoctorAppointmentButtonLinkTypeValue !== "custom") {
+                            $featuredDoctorAppointmentButtonLinkTypeValue = $featuredDoctorAppointmentButtonUrlValue !== "" ? "custom" : ($featuredDoctorAppointmentButtonPageIdValue !== "" ? "internal" : "custom");
                         }
                         $heroFeatureIconOptions = [
                             "bi bi-heart-pulse-fill" => "Corazón",
@@ -216,12 +238,12 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         if ($repeaterKey === "about_stats" && $fieldKey === "value") {
                             $fieldLabel = "Valor";
                         }
-                        if ($isFeaturedDepartmentLinkTypeField || $isFeaturedDepartmentPageIdField || $isFeaturedDepartmentLinkUrlField || $isFeaturedServiceLinkTypeField || $isFeaturedServicePageIdField || $isFeaturedServiceLinkUrlField) {
+                        if ($isFeaturedDepartmentLinkTypeField || $isFeaturedDepartmentPageIdField || $isFeaturedDepartmentLinkUrlField || $isFeaturedServiceLinkTypeField || $isFeaturedServicePageIdField || $isFeaturedServiceLinkUrlField || $isFeaturedDoctorProfileButtonLinkTypeField || $isFeaturedDoctorProfileButtonPageIdField || $isFeaturedDoctorProfileButtonUrlField || $isFeaturedDoctorAppointmentButtonLinkTypeField || $isFeaturedDoctorAppointmentButtonPageIdField || $isFeaturedDoctorAppointmentButtonUrlField) {
                             continue;
                         }
                         ?>
-                        <div class="field-group<?php echo ($isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField) ? " field-group-full" : ""; ?>">
-                            <?php if (!$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField): ?>
+                        <div class="field-group<?php echo ($isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField) ? " field-group-full" : ""; ?>">
+                            <?php if (!$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField): ?>
                                 <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
                             <?php endif; ?>
                             <?php if ($fieldType === "image"): ?>
@@ -293,6 +315,66 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                         <div class="field-group field-group-full js-link-panel <?php echo $featuredServiceLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($featuredServiceLinkScope, ENT_QUOTES, "UTF-8"); ?>">
                                             <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
                                             <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_url]" value="<?php echo htmlspecialchars($featuredServiceLinkUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php elseif ($isFeaturedDoctorProfileButtonTextField): ?>
+                                <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_profile_button_text", ENT_QUOTES, "UTF-8"); ?>">Texto del botón de perfil</label>
+                                <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_profile_button_text", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][profile_button_text]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+
+                                <div class="button-destination-box">
+                                    <div class="field-group field-group-full">
+                                        <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_profile_button_link_type", ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
+                                        <select class="form-select js-link-type" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_profile_button_link_type", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][profile_button_link_type]" data-link-scope="<?php echo htmlspecialchars($featuredDoctorProfileButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <option value="internal"<?php echo $featuredDoctorProfileButtonLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                            <option value="custom"<?php echo $featuredDoctorProfileButtonLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="button-destination-grid">
+                                        <div class="field-group field-group-full js-link-panel <?php echo $featuredDoctorProfileButtonLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($featuredDoctorProfileButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_profile_button_page_id", ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
+                                            <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_profile_button_page_id", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][profile_button_page_id]">
+                                                <option value="">Selecciona una p&aacute;gina</option>
+                                                <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                    <option value="<?php echo (int) ($sitePageOption["id"] ?? 0); ?>"<?php echo (string) ($sitePageOption["id"] ?? "") === $featuredDoctorProfileButtonPageIdValue ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="field-group field-group-full js-link-panel <?php echo $featuredDoctorProfileButtonLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($featuredDoctorProfileButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_profile_button_url", ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                            <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_profile_button_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][profile_button_url]" value="<?php echo htmlspecialchars($featuredDoctorProfileButtonUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php elseif ($isFeaturedDoctorAppointmentButtonTextField): ?>
+                                <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_appointment_button_text", ENT_QUOTES, "UTF-8"); ?>">Texto del botón de cita</label>
+                                <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_appointment_button_text", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][appointment_button_text]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+
+                                <div class="button-destination-box">
+                                    <div class="field-group field-group-full">
+                                        <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_appointment_button_link_type", ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
+                                        <select class="form-select js-link-type" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_appointment_button_link_type", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][appointment_button_link_type]" data-link-scope="<?php echo htmlspecialchars($featuredDoctorAppointmentButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <option value="internal"<?php echo $featuredDoctorAppointmentButtonLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                            <option value="custom"<?php echo $featuredDoctorAppointmentButtonLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="button-destination-grid">
+                                        <div class="field-group field-group-full js-link-panel <?php echo $featuredDoctorAppointmentButtonLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($featuredDoctorAppointmentButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_appointment_button_page_id", ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
+                                            <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_appointment_button_page_id", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][appointment_button_page_id]">
+                                                <option value="">Selecciona una p&aacute;gina</option>
+                                                <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                    <option value="<?php echo (int) ($sitePageOption["id"] ?? 0); ?>"<?php echo (string) ($sitePageOption["id"] ?? "") === $featuredDoctorAppointmentButtonPageIdValue ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="field-group field-group-full js-link-panel <?php echo $featuredDoctorAppointmentButtonLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($featuredDoctorAppointmentButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_appointment_button_url", ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                            <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_appointment_button_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][appointment_button_url]" value="<?php echo htmlspecialchars($featuredDoctorAppointmentButtonUrlValue, ENT_QUOTES, "UTF-8"); ?>">
                                         </div>
                                     </div>
                                 </div>
