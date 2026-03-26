@@ -188,7 +188,7 @@ return [
         ],
         [
             "repeater_key" => "cta_features",
-            "label" => "Call To Action features",
+            "label" => "Llamado a la acción - características",
             "fields" => [
                 ["field_key" => "icon_class", "label" => "Icono", "field_type" => "text", "default" => ""],
                 ["field_key" => "title", "label" => "Título", "field_type" => "text", "default" => ""],
