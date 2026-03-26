@@ -1304,6 +1304,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Título del llamado a la acción";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "cta_text") {
                                                             $displayLabelHtml = "Texto descriptivo del llamado a la acción";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "cta_emergency_title") {
+                                                            $displayLabelHtml = "Título";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "cta_emergency_text") {
+                                                            $displayLabelHtml = "Texto";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "cta_emergency_button_text") {
+                                                            $displayLabelHtml = "Texto del botón";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "cta_emergency_button_url") {
+                                                            $displayLabelHtml = "URL del botón";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
@@ -1537,7 +1545,6 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
-
 
 
 
