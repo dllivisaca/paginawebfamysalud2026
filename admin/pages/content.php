@@ -296,6 +296,18 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                         </div>
                                     </div>
                                 </div>
+                            <?php elseif ($repeaterKey === "featured_doctors" && $fieldKey === "availability_status"): ?>
+                                <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" data-doctor-availability-item="<?php echo $itemIndex; ?>" data-doctor-availability-role="status">
+                                    <option value="online"<?php echo $fieldValue === "online" ? " selected" : ""; ?>>Disponible</option>
+                                    <option value="offline"<?php echo $fieldValue === "offline" ? " selected" : ""; ?>>No disponible</option>
+                                    <option value="busy"<?php echo $fieldValue === "busy" ? " selected" : ""; ?>>En consulta</option>
+                                </select>
+                            <?php elseif ($repeaterKey === "featured_doctors" && $fieldKey === "availability_text"): ?>
+                                <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" data-doctor-availability-item="<?php echo $itemIndex; ?>" data-doctor-availability-role="text">
+                                    <option value="Disponible"<?php echo $fieldValue === "Disponible" ? " selected" : ""; ?>>Disponible</option>
+                                    <option value="No disponible"<?php echo $fieldValue === "No disponible" ? " selected" : ""; ?>>No disponible</option>
+                                    <option value="En consulta"<?php echo $fieldValue === "En consulta" ? " selected" : ""; ?>>En consulta</option>
+                                </select>
                             <?php else: ?>
                                 <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                             <?php endif; ?>
@@ -1338,6 +1350,34 @@ if (($schema["template_key"] ?? "") === "about") {
 
                 selector.addEventListener("change", syncPanels);
                 syncPanels();
+            });
+
+            var doctorAvailabilityMap = {
+                online: "Disponible",
+                offline: "No disponible",
+                busy: "En consulta"
+            };
+            var doctorStatusSelectors = document.querySelectorAll('[data-doctor-availability-role="status"]');
+            var syncDoctorAvailabilityText = function (itemIndex) {
+                var statusSelector = document.querySelector('[data-doctor-availability-role="status"][data-doctor-availability-item="' + itemIndex + '"]');
+                var textSelector = document.querySelector('[data-doctor-availability-role="text"][data-doctor-availability-item="' + itemIndex + '"]');
+
+                if (!statusSelector || !textSelector) {
+                    return;
+                }
+
+                var mappedText = doctorAvailabilityMap[statusSelector.value] || doctorAvailabilityMap.online;
+                textSelector.value = mappedText;
+            };
+
+            doctorStatusSelectors.forEach(function (selector) {
+                var itemIndex = selector.getAttribute("data-doctor-availability-item");
+
+                selector.addEventListener("change", function () {
+                    syncDoctorAvailabilityText(itemIndex);
+                });
+
+                syncDoctorAvailabilityText(itemIndex);
             });
 
             var imageInputs = document.querySelectorAll(".js-image-upload");
