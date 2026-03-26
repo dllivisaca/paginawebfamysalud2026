@@ -843,6 +843,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .featured-services-admin-section .card { background: #f9fafb; }
         .section-block.cta-features-admin-section { background: #fff; }
         .cta-features-admin-section .card { background: #f9fafb; }
+        .section-block.cta-features-admin-section > h3 { font-size: 17px; }
+        .cta-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-doctors-admin-section { background: #fff; }
         .featured-doctors-admin-section .card { background: #f9fafb; }
         .section-block.featured-doctors-admin-section > h3 { font-size: 17px; }
