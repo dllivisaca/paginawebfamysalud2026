@@ -24,11 +24,38 @@ function homeVisibleRepeaterItems(array $items): array
     }));
 }
 
+function homeNormalizeCustomHref(string $url): string
+{
+    $url = trim($url);
+
+    if ($url === "") {
+        return "";
+    }
+
+    if ($url[0] === "#" || $url[0] === "/") {
+        return $url;
+    }
+
+    if (preg_match('~^(?:https?:)?//~i', $url) === 1) {
+        return $url;
+    }
+
+    if (preg_match('~^[a-z][a-z0-9+.-]*:~i', $url) === 1) {
+        return $url;
+    }
+
+    if (preg_match('~^www\.~i', $url) === 1) {
+        return 'https://' . $url;
+    }
+
+    return $url;
+}
+
 function homeRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl = ""): string
 {
     $linkType = trim((string) ($fields["link_type"] ?? ""));
     $pageId = (int) trim((string) ($fields["page_id"] ?? "0"));
-    $customUrl = trim((string) ($fields["link_url"] ?? ""));
+    $customUrl = homeNormalizeCustomHref((string) ($fields["link_url"] ?? ""));
     static $pagesById = null;
 
     if ($linkType !== "internal" && $linkType !== "custom") {
@@ -56,7 +83,7 @@ function homeRepeaterCustomLinkHref(mysqli $conn, array $fields, string $linkTyp
 {
     $linkType = trim((string) ($fields[$linkTypeKey] ?? ""));
     $pageId = (int) trim((string) ($fields[$pageIdKey] ?? "0"));
-    $customUrl = trim((string) ($fields[$urlKey] ?? ""));
+    $customUrl = homeNormalizeCustomHref((string) ($fields[$urlKey] ?? ""));
     static $pagesById = null;
 
     if ($linkType !== "internal" && $linkType !== "custom") {
@@ -247,7 +274,7 @@ require __DIR__ . "/../../includes/header.php";
   <section id="call-to-action" class="call-to-action section">
     <div class="container" data-aos="fade-up" data-aos-delay="100">
       <div class="row justify-content-center"><div class="col-lg-8 text-center"><?php if ($ctaTitle !== ""): ?><h2 data-aos="fade-up" data-aos-delay="200"><?php echo htmlspecialchars($ctaTitle, ENT_QUOTES, "UTF-8"); ?></h2><?php endif; ?><?php if ($ctaText !== ""): ?><p data-aos="fade-up" data-aos-delay="250"><?php echo nl2br(htmlspecialchars($ctaText, ENT_QUOTES, "UTF-8")); ?></p><?php endif; ?><div class="cta-buttons" data-aos="fade-up" data-aos-delay="300"><?php if ($ctaPrimaryText !== ""): ?><a href="<?php echo htmlspecialchars($ctaPrimaryUrl, ENT_QUOTES, "UTF-8"); ?>" class="btn-primary"><?php echo htmlspecialchars($ctaPrimaryText, ENT_QUOTES, "UTF-8"); ?></a><?php endif; ?><?php if ($ctaSecondaryText !== ""): ?><a href="<?php echo htmlspecialchars($ctaSecondaryUrl, ENT_QUOTES, "UTF-8"); ?>" class="btn-secondary"><?php echo htmlspecialchars($ctaSecondaryText, ENT_QUOTES, "UTF-8"); ?></a><?php endif; ?></div></div></div>
-      <?php if ($ctaFeatures !== []): ?><div class="row features-row" data-aos="fade-up" data-aos-delay="400"><?php foreach ($ctaFeatures as $featureItem): $featureFields = $featureItem["fields"] ?? []; ?><div class="col-lg-4 col-md-6 mb-4"><div class="feature-card"><div class="icon-wrapper"><i class="<?php echo htmlspecialchars((string) ($featureFields["icon_class"] ?? ""), ENT_QUOTES, "UTF-8"); ?>"></i></div><h5><?php echo htmlspecialchars((string) ($featureFields["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h5><p><?php echo htmlspecialchars((string) ($featureFields["text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></p><a href="<?php echo htmlspecialchars((string) ($featureFields["link_url"] ?? "#"), ENT_QUOTES, "UTF-8"); ?>" class="feature-link"><span><?php echo htmlspecialchars((string) ($featureFields["link_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></span><i class="bi bi-arrow-right"></i></a></div></div><?php endforeach; ?></div><?php endif; ?>
+      <?php if ($ctaFeatures !== []): ?><div class="row features-row" data-aos="fade-up" data-aos-delay="400"><?php foreach ($ctaFeatures as $featureItem): $featureFields = $featureItem["fields"] ?? []; $ctaFeatureLinkUrl = homeRepeaterLinkHref($conn, $featureFields, "#"); ?><div class="col-lg-4 col-md-6 mb-4"><div class="feature-card"><div class="icon-wrapper"><i class="<?php echo htmlspecialchars((string) ($featureFields["icon_class"] ?? ""), ENT_QUOTES, "UTF-8"); ?>"></i></div><h5><?php echo htmlspecialchars((string) ($featureFields["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h5><p><?php echo htmlspecialchars((string) ($featureFields["text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></p><a href="<?php echo htmlspecialchars($ctaFeatureLinkUrl, ENT_QUOTES, "UTF-8"); ?>" class="feature-link"><span><?php echo htmlspecialchars((string) ($featureFields["link_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></span><i class="bi bi-arrow-right"></i></a></div></div><?php endforeach; ?></div><?php endif; ?>
       <div class="emergency-alert" data-aos="zoom-in" data-aos-delay="500"><div class="row align-items-center"><div class="col-lg-8"><div class="emergency-content"><div class="emergency-icon"><i class="bi bi-telephone-fill"></i></div><div class="emergency-text"><h4><?php echo htmlspecialchars($ctaEmergencyTitle, ENT_QUOTES, "UTF-8"); ?></h4><p><?php echo htmlspecialchars($ctaEmergencyText, ENT_QUOTES, "UTF-8"); ?></p></div></div></div><div class="col-lg-4 text-end"><a href="<?php echo htmlspecialchars($ctaEmergencyButtonUrl, ENT_QUOTES, "UTF-8"); ?>" class="emergency-btn"><i class="bi bi-telephone-fill"></i><?php echo htmlspecialchars($ctaEmergencyButtonText, ENT_QUOTES, "UTF-8"); ?></a></div></div></div>
     </div>
   </section>
