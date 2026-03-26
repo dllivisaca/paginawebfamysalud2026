@@ -1,4 +1,4 @@
-# Security Notes
+﻿# Security Notes
 
 ## Sesion 2026-03-10
 
@@ -412,3 +412,41 @@
 
 ### Como retomar en una nueva sesion
 - Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-25".
+
+## Sesion 2026-03-26
+
+### Cambios realizados hoy
+- Se corrigio el frontend de `featured_services` en `templates/pages/home.php` para que deje de usar solo `link_url` y pase a resolver correctamente `link_type`, `page_id` y `link_url` mediante el helper existente del mismo archivo.
+- Se reordeno en `admin/pages/content.php` el bloque `featured_doctors` para que quede debajo de `Encuentra a tu especialista` y encima de `Llamado a la accion`, excluyendolo del render general final para evitar duplicados.
+- Se ajustaron estilos inline del admin para `featured_doctors`: intercambio controlado de fondos entre el contenedor principal y las cards internas, e igualacion de tamanos de fuente del titulo del repeater y de los items `Doctor X` con la referencia visual del editor.
+- Se tradujo y simplifico visualmente en `admin/pages/content.php` el bloque `featured_doctors`, renombrando el titulo visible a `Doctores destacados - tarjetas` y ajustando labels internos como `Texto alternativo de la imagen`, `Nombre del doctor`, `Texto de experiencia`, `Calificacion`, `Texto del boton de perfil`, `URL del boton de perfil`, `Texto del boton de cita` y `URL del boton de cita`.
+- Se transformaron en `admin/pages/content.php` los campos `availability_status` y `availability_text` de `featured_doctors` de inputs libres a `select`, con sincronizacion automatica al cargar y al cambiar el estado, manteniendo compatibilidad con el guardado actual.
+- Se extendio `featured_doctors` en `templates/page-schemas/home.php` y `admin/pages/content.php` para que los botones de perfil y cita usen la misma logica expandida de destino de enlace que `featured_services`, agregando los fields complementarios `*_link_type` y `*_page_id` y reutilizando `.js-link-type` y `.js-link-panel`.
+- Se adapto el frontend de `featured_doctors` en `templates/pages/home.php` para resolver correctamente `Pagina interna` y `URL personalizada` en los botones `profile_button` y `appointment_button`, mediante un helper reutilizable con keys parametrizadas.
+- Se hicieron ajustes puntuales en `cta_features` dentro de la Home: intercambio de fondos e igualacion de tamanos de fuente en el admin, y extension del repeater para usar la misma logica expandida de enlaces que `featured_services`, agregando `link_type` y `page_id` al schema y al render admin.
+- Se corrigio el frontend de `cta_features` en `templates/pages/home.php` para que use `homeRepeaterLinkHref(...)` y respete `Pagina interna` y `URL personalizada`, dejando de imprimir solo `link_url`.
+- Se introdujo en `templates/pages/home.php` una normalizacion de URLs personalizadas para repeaters, de forma que valores como `www.google.com` pasen a `https://www.google.com` sin convertirse en rutas relativas locales.
+- Se simplificaron labels visibles del bloque `Llamado a la accion - Emergencia` en `admin/pages/content.php`, dejandolos como `Titulo`, `Texto`, `Texto del boton` y `Telefono o enlace del boton`.
+- Se agrego en `templates/pages/home.php` una normalizacion localizada para `cta_emergency_button_url`, detectando telefonos como `911`, `0987654321`, `+593987654321`, `tel:911`, `(555) 123-4567`, `555 123 4567` y `555-123-4567`, y convirtiendolos a `tel:` sin romper URLs normales, anchors ni rutas internas.
+
+### Archivos modificados
+- `SECURITY-NOTES.md`
+- `admin/pages/content.php`
+- `templates/page-schemas/home.php`
+- `templates/pages/home.php`
+
+### Verificacion realizada
+- Se ejecuto `php -l` repetidamente sobre `admin/pages/content.php` despues de cada bloque relevante de cambios en el editor de Home, sin errores de sintaxis.
+- Se ejecuto `php -l` sobre `templates/page-schemas/home.php` despues de ampliar `featured_doctors` y `cta_features`, sin errores de sintaxis.
+- Se ejecuto `php -l` sobre `templates/pages/home.php` despues de corregir los helpers de enlaces, `featured_services`, `featured_doctors`, `cta_features` y el boton de emergencia, sin errores de sintaxis.
+- Se verifico por inspeccion de codigo que `featured_doctors` y `cta_features` quedaron reutilizando la misma base visual y de comportamiento de enlaces ya presente en `featured_services` dentro del admin.
+- Se confirmo por lectura del frontend que `cta_features` y los botones de `featured_doctors` ya no imprimen directamente solo `link_url`, sino que usan helpers que resuelven `link_type`, `page_id` y normalizacion segura de URLs.
+
+### Pendientes recomendados
+- Probar manualmente en el admin de `home` los nuevos flujos de enlace de `featured_doctors` y `cta_features`, incluyendo `Pagina interna` y `URL personalizada`, guardando y recargando para confirmar persistencia visual y funcional.
+- Validar en navegador la Home publica completa, especialmente `featured_services`, `featured_doctors`, `cta_features` y `Llamado a la accion - Emergencia`, para confirmar que todos los botones apunten a la URL esperada en casos internos, externos, anchors y telefonos.
+- Revisar visualmente si quedan labels del editor de Home con mojibake o textos largos residuales, manteniendo el mismo criterio de no tocar keys internas ni schema si no hace falta.
+- Confirmar que los valores telefonicos del bloque de emergencia siguen siendo adecuados para analytics, SEO o integraciones externas antes de reutilizar la misma normalizacion en otros botones del sitio.
+
+### Como retomar en una nueva sesion
+- Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-26".
