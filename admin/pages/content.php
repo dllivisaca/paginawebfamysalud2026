@@ -161,6 +161,10 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isHeroFeatureIconField = $repeaterKey === "hero_features" && $fieldKey === "icon_class";
                         $isHomeAboutFeatureIconField = $repeaterKey === "home_about_features" && $fieldKey === "icon_class";
                         $isCtaFeatureIconField = $repeaterKey === "cta_features" && $fieldKey === "icon_class";
+                        $isCtaFeatureLinkTextField = $repeaterKey === "cta_features" && $fieldKey === "link_text";
+                        $isCtaFeatureLinkTypeField = $repeaterKey === "cta_features" && $fieldKey === "link_type";
+                        $isCtaFeaturePageIdField = $repeaterKey === "cta_features" && $fieldKey === "page_id";
+                        $isCtaFeatureLinkUrlField = $repeaterKey === "cta_features" && $fieldKey === "link_url";
                         $isFeaturedDepartmentIconField = $repeaterKey === "featured_departments" && $fieldKey === "icon_class";
                         $isFeaturedServiceIconField = $repeaterKey === "featured_services" && $fieldKey === "icon_class";
                         $isFeaturedDepartmentLinkTextField = $repeaterKey === "featured_departments" && $fieldKey === "link_text";
@@ -192,6 +196,13 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $featuredServiceLinkScope = $repeaterKey . "_" . $itemIndex . "_link";
                         if ($featuredServiceLinkTypeValue !== "internal" && $featuredServiceLinkTypeValue !== "custom") {
                             $featuredServiceLinkTypeValue = $featuredServiceLinkUrlValue !== "" ? "custom" : ($featuredServicePageIdValue !== "" ? "internal" : "custom");
+                        }
+                        $ctaFeatureLinkTypeValue = trim((string) (($itemData["fields"]["link_type"]["field_value"] ?? "")));
+                        $ctaFeaturePageIdValue = trim((string) (($itemData["fields"]["page_id"]["field_value"] ?? "")));
+                        $ctaFeatureLinkUrlValue = (string) (($itemData["fields"]["link_url"]["field_value"] ?? ""));
+                        $ctaFeatureLinkScope = $repeaterKey . "_" . $itemIndex . "_link";
+                        if ($ctaFeatureLinkTypeValue !== "internal" && $ctaFeatureLinkTypeValue !== "custom") {
+                            $ctaFeatureLinkTypeValue = $ctaFeatureLinkUrlValue !== "" ? "custom" : ($ctaFeaturePageIdValue !== "" ? "internal" : "custom");
                         }
                         $featuredDoctorProfileButtonLinkTypeValue = trim((string) (($itemData["fields"]["profile_button_link_type"]["field_value"] ?? "")));
                         $featuredDoctorProfileButtonPageIdValue = trim((string) (($itemData["fields"]["profile_button_page_id"]["field_value"] ?? "")));
@@ -238,12 +249,12 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         if ($repeaterKey === "about_stats" && $fieldKey === "value") {
                             $fieldLabel = "Valor";
                         }
-                        if ($isFeaturedDepartmentLinkTypeField || $isFeaturedDepartmentPageIdField || $isFeaturedDepartmentLinkUrlField || $isFeaturedServiceLinkTypeField || $isFeaturedServicePageIdField || $isFeaturedServiceLinkUrlField || $isFeaturedDoctorProfileButtonLinkTypeField || $isFeaturedDoctorProfileButtonPageIdField || $isFeaturedDoctorProfileButtonUrlField || $isFeaturedDoctorAppointmentButtonLinkTypeField || $isFeaturedDoctorAppointmentButtonPageIdField || $isFeaturedDoctorAppointmentButtonUrlField) {
+                        if ($isCtaFeatureLinkTypeField || $isCtaFeaturePageIdField || $isCtaFeatureLinkUrlField || $isFeaturedDepartmentLinkTypeField || $isFeaturedDepartmentPageIdField || $isFeaturedDepartmentLinkUrlField || $isFeaturedServiceLinkTypeField || $isFeaturedServicePageIdField || $isFeaturedServiceLinkUrlField || $isFeaturedDoctorProfileButtonLinkTypeField || $isFeaturedDoctorProfileButtonPageIdField || $isFeaturedDoctorProfileButtonUrlField || $isFeaturedDoctorAppointmentButtonLinkTypeField || $isFeaturedDoctorAppointmentButtonPageIdField || $isFeaturedDoctorAppointmentButtonUrlField) {
                             continue;
                         }
                         ?>
-                        <div class="field-group<?php echo ($isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField) ? " field-group-full" : ""; ?>">
-                            <?php if (!$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField): ?>
+                        <div class="field-group<?php echo ($isCtaFeatureLinkTextField || $isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField) ? " field-group-full" : ""; ?>">
+                            <?php if (!$isCtaFeatureLinkTextField && !$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField): ?>
                                 <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
                             <?php endif; ?>
                             <?php if ($fieldType === "image"): ?>
@@ -258,6 +269,36 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                         <option value="<?php echo htmlspecialchars($iconValue, ENT_QUOTES, "UTF-8"); ?>"<?php echo $fieldValue === $iconValue ? " selected" : ""; ?>><?php echo htmlspecialchars($iconLabel, ENT_QUOTES, "UTF-8"); ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                            <?php elseif ($isCtaFeatureLinkTextField): ?>
+                                <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_text", ENT_QUOTES, "UTF-8"); ?>">Texto del enlace</label>
+                                <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_text", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_text]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+
+                                <div class="button-destination-box">
+                                    <div class="field-group field-group-full">
+                                        <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_type", ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
+                                        <select class="form-select js-link-type" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_type", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_type]" data-link-scope="<?php echo htmlspecialchars($ctaFeatureLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <option value="internal"<?php echo $ctaFeatureLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                            <option value="custom"<?php echo $ctaFeatureLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="button-destination-grid">
+                                        <div class="field-group field-group-full js-link-panel <?php echo $ctaFeatureLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($ctaFeatureLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_page_id", ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
+                                            <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_page_id", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][page_id]">
+                                                <option value="">Selecciona una p&aacute;gina</option>
+                                                <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                    <option value="<?php echo (int) ($sitePageOption["id"] ?? 0); ?>"<?php echo (string) ($sitePageOption["id"] ?? "") === $ctaFeaturePageIdValue ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="field-group field-group-full js-link-panel <?php echo $ctaFeatureLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($ctaFeatureLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                            <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_url]" value="<?php echo htmlspecialchars($ctaFeatureLinkUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                        </div>
+                                    </div>
+                                </div>
                             <?php elseif ($isFeaturedDepartmentLinkTextField): ?>
                                 <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_text", ENT_QUOTES, "UTF-8"); ?>">Texto del enlace</label>
                                 <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_text", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_text]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
@@ -1496,7 +1537,6 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
-
 
 
 

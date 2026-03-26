@@ -194,12 +194,14 @@ return [
                 ["field_key" => "title", "label" => "Título", "field_type" => "text", "default" => ""],
                 ["field_key" => "text", "label" => "Texto", "field_type" => "text", "default" => ""],
                 ["field_key" => "link_text", "label" => "Texto del enlace", "field_type" => "text", "default" => ""],
+                ["field_key" => "link_type", "label" => "Tipo de enlace", "field_type" => "text", "default" => ""],
+                ["field_key" => "page_id", "label" => "Página interna", "field_type" => "text", "default" => ""],
                 ["field_key" => "link_url", "label" => "URL del enlace", "field_type" => "url", "default" => ""],
             ],
             "items" => [
-                ["item_index" => 0, "item_label" => "Característica 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse", "title" => "24/7 Emergency Care", "text" => "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.", "link_text" => "Learn More", "link_url" => "#"]],
-                ["item_index" => 1, "item_label" => "Característica 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-calendar-check", "title" => "Easy Online Booking", "text" => "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.", "link_text" => "Book Now", "link_url" => "#"]],
-                ["item_index" => 2, "item_label" => "Característica 3", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-people", "title" => "Expert Medical Team", "text" => "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.", "link_text" => "Meet Our Doctors", "link_url" => "#"]],
+                ["item_index" => 0, "item_label" => "Característica 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse", "title" => "24/7 Emergency Care", "text" => "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.", "link_text" => "Learn More", "link_type" => "custom", "page_id" => "", "link_url" => "#"]],
+                ["item_index" => 1, "item_label" => "Característica 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-calendar-check", "title" => "Easy Online Booking", "text" => "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.", "link_text" => "Book Now", "link_type" => "custom", "page_id" => "", "link_url" => "#"]],
+                ["item_index" => 2, "item_label" => "Característica 3", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-people", "title" => "Expert Medical Team", "text" => "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.", "link_text" => "Meet Our Doctors", "link_type" => "custom", "page_id" => "", "link_url" => "#"]],
             ],
         ],
         [
