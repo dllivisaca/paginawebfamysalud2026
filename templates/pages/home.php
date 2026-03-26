@@ -52,6 +52,34 @@ function homeRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl =
     return $fallbackUrl;
 }
 
+function homeRepeaterCustomLinkHref(mysqli $conn, array $fields, string $linkTypeKey, string $pageIdKey, string $urlKey, string $fallbackUrl = ""): string
+{
+    $linkType = trim((string) ($fields[$linkTypeKey] ?? ""));
+    $pageId = (int) trim((string) ($fields[$pageIdKey] ?? "0"));
+    $customUrl = trim((string) ($fields[$urlKey] ?? ""));
+    static $pagesById = null;
+
+    if ($linkType !== "internal" && $linkType !== "custom") {
+        $linkType = $customUrl !== "" ? "custom" : ($pageId > 0 ? "internal" : "");
+    }
+
+    if ($linkType === "internal" && $pageId > 0) {
+        if ($pagesById === null) {
+            [, $pagesById] = getPageContentLinkablePages($conn, true);
+        }
+
+        if (isset($pagesById[$pageId])) {
+            return (string) ($pagesById[$pageId]["public_url"] ?? "");
+        }
+    }
+
+    if ($customUrl !== "") {
+        return $customUrl;
+    }
+
+    return $fallbackUrl;
+}
+
 $heroBadge = homeFieldValue($homeFields, "hero_badge", "Leading Healthcare Specialists");
 $heroTitle = homeFieldValue($homeFields, "hero_title", "Advanced Medical Care for Your Family's Health");
 $heroText = homeFieldValue($homeFields, "hero_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.");
@@ -212,7 +240,7 @@ require __DIR__ . "/../../includes/header.php";
     <div class="container section-title" data-aos="fade-up"><?php if ($findDoctorTitle !== ""): ?><h2><?php echo htmlspecialchars($findDoctorTitle, ENT_QUOTES, "UTF-8"); ?></h2><?php endif; ?><?php if ($findDoctorText !== ""): ?><p><?php echo nl2br(htmlspecialchars($findDoctorText, ENT_QUOTES, "UTF-8")); ?></p><?php endif; ?></div>
     <div class="container" data-aos="fade-up" data-aos-delay="100">
       <div class="row justify-content-center" data-aos="fade-up" data-aos-delay="200"><div class="col-lg-12"><div class="search-container"><form class="search-form" action="forms/doctor-search.php" method="get"><div class="row g-3"><div class="col-md-4"><input type="text" class="form-control" name="doctor_name" placeholder="<?php echo htmlspecialchars($doctorSearchPlaceholder, ENT_QUOTES, "UTF-8"); ?>"></div><div class="col-md-4"><select class="form-select" name="specialty" id="specialty-select"><option value=""><?php echo htmlspecialchars($doctorSpecialtyPlaceholder, ENT_QUOTES, "UTF-8"); ?></option><option value="cardiology">Cardiology</option><option value="neurology">Neurology</option><option value="orthopedics">Orthopedics</option><option value="pediatrics">Pediatrics</option><option value="dermatology">Dermatology</option><option value="oncology">Oncology</option><option value="surgery">Surgery</option><option value="emergency">Emergency Medicine</option></select></div><div class="col-md-4"><button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-2"></i><?php echo htmlspecialchars($doctorSearchButtonText, ENT_QUOTES, "UTF-8"); ?></button></div></div></form></div></div></div>
-      <div class="row" data-aos="fade-up" data-aos-delay="400"><?php foreach ($featuredDoctors as $doctorItem): $doctorFields = $doctorItem["fields"] ?? []; $availabilityClass = trim((string) ($doctorFields["availability_status"] ?? "")); ?><div class="col-lg-4 col-md-6 mb-4"><div class="doctor-card"><div class="doctor-image"><img src="<?php echo htmlspecialchars((string) ($doctorFields["image"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars((string) ($doctorFields["alt"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" class="img-fluid"><div class="availability-badge <?php echo htmlspecialchars($availabilityClass, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($doctorFields["availability_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></div></div><div class="doctor-info"><h5><?php echo htmlspecialchars((string) ($doctorFields["name"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h5><p class="specialty"><?php echo htmlspecialchars((string) ($doctorFields["specialty"] ?? ""), ENT_QUOTES, "UTF-8"); ?></p><p class="experience"><?php echo htmlspecialchars((string) ($doctorFields["experience"] ?? ""), ENT_QUOTES, "UTF-8"); ?></p><div class="rating"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><span class="rating-text"><?php echo htmlspecialchars((string) ($doctorFields["rating"] ?? ""), ENT_QUOTES, "UTF-8"); ?></span></div><div class="appointment-actions"><a href="<?php echo htmlspecialchars((string) ($doctorFields["profile_button_url"] ?? "#"), ENT_QUOTES, "UTF-8"); ?>" class="btn btn-outline-primary btn-sm"><?php echo htmlspecialchars((string) ($doctorFields["profile_button_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></a><a href="<?php echo htmlspecialchars((string) ($doctorFields["appointment_button_url"] ?? "#"), ENT_QUOTES, "UTF-8"); ?>" class="btn btn-primary btn-sm"><?php echo htmlspecialchars((string) ($doctorFields["appointment_button_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></a></div></div></div></div><?php endforeach; ?></div>
+      <div class="row" data-aos="fade-up" data-aos-delay="400"><?php foreach ($featuredDoctors as $doctorItem): $doctorFields = $doctorItem["fields"] ?? []; $availabilityClass = trim((string) ($doctorFields["availability_status"] ?? "")); $profileButtonUrl = homeRepeaterCustomLinkHref($conn, $doctorFields, "profile_button_link_type", "profile_button_page_id", "profile_button_url", "#"); $appointmentButtonUrl = homeRepeaterCustomLinkHref($conn, $doctorFields, "appointment_button_link_type", "appointment_button_page_id", "appointment_button_url", "#"); ?><div class="col-lg-4 col-md-6 mb-4"><div class="doctor-card"><div class="doctor-image"><img src="<?php echo htmlspecialchars((string) ($doctorFields["image"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars((string) ($doctorFields["alt"] ?? ""), ENT_QUOTES, "UTF-8"); ?>" class="img-fluid"><div class="availability-badge <?php echo htmlspecialchars($availabilityClass, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($doctorFields["availability_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></div></div><div class="doctor-info"><h5><?php echo htmlspecialchars((string) ($doctorFields["name"] ?? ""), ENT_QUOTES, "UTF-8"); ?></h5><p class="specialty"><?php echo htmlspecialchars((string) ($doctorFields["specialty"] ?? ""), ENT_QUOTES, "UTF-8"); ?></p><p class="experience"><?php echo htmlspecialchars((string) ($doctorFields["experience"] ?? ""), ENT_QUOTES, "UTF-8"); ?></p><div class="rating"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><span class="rating-text"><?php echo htmlspecialchars((string) ($doctorFields["rating"] ?? ""), ENT_QUOTES, "UTF-8"); ?></span></div><div class="appointment-actions"><a href="<?php echo htmlspecialchars($profileButtonUrl, ENT_QUOTES, "UTF-8"); ?>" class="btn btn-outline-primary btn-sm"><?php echo htmlspecialchars((string) ($doctorFields["profile_button_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></a><a href="<?php echo htmlspecialchars($appointmentButtonUrl, ENT_QUOTES, "UTF-8"); ?>" class="btn btn-primary btn-sm"><?php echo htmlspecialchars((string) ($doctorFields["appointment_button_text"] ?? ""), ENT_QUOTES, "UTF-8"); ?></a></div></div></div></div><?php endforeach; ?></div>
     </div>
   </section>
 
