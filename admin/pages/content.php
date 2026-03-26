@@ -111,7 +111,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
     global $linkableSitePages;
     ?>
     <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?>">
-        <h3><?php echo htmlspecialchars($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : (string) ($repeaterConfig["label"] ?? $repeaterKey), ENT_QUOTES, "UTF-8"); ?></h3>
+        <h3><?php echo htmlspecialchars($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : ($repeaterKey === "featured_doctors" ? "Doctores destacados - tarjetas" : (string) ($repeaterConfig["label"] ?? $repeaterKey)), ENT_QUOTES, "UTF-8"); ?></h3>
 
         <?php foreach ($repeaterConfig["items"] as $itemConfig): ?>
             <?php
@@ -139,6 +139,25 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                         $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
                         $fieldLabel = (string) ($fieldConfig["label"] ?? $fieldKey);
+                        if ($repeaterKey === "featured_doctors") {
+                            if ($fieldKey === "alt") {
+                                $fieldLabel = "Texto alternativo de la imagen";
+                            } elseif ($fieldKey === "name") {
+                                $fieldLabel = "Nombre del doctor";
+                            } elseif ($fieldKey === "experience") {
+                                $fieldLabel = "Texto de experiencia";
+                            } elseif ($fieldKey === "rating") {
+                                $fieldLabel = "Calificación";
+                            } elseif ($fieldKey === "profile_button_text") {
+                                $fieldLabel = "Texto del botón de perfil";
+                            } elseif ($fieldKey === "profile_button_url") {
+                                $fieldLabel = "URL del botón de perfil";
+                            } elseif ($fieldKey === "appointment_button_text") {
+                                $fieldLabel = "Texto del botón de cita";
+                            } elseif ($fieldKey === "appointment_button_url") {
+                                $fieldLabel = "URL del botón de cita";
+                            }
+                        }
                         $isHeroFeatureIconField = $repeaterKey === "hero_features" && $fieldKey === "icon_class";
                         $isHomeAboutFeatureIconField = $repeaterKey === "home_about_features" && $fieldKey === "icon_class";
                         $isCtaFeatureIconField = $repeaterKey === "cta_features" && $fieldKey === "icon_class";
