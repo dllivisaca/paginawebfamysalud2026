@@ -1311,7 +1311,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "cta_emergency_button_text") {
                                                             $displayLabelHtml = "Texto del botón";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "cta_emergency_button_url") {
-                                                            $displayLabelHtml = "URL del botón";
+                                                            $displayLabelHtml = "Teléfono o enlace del botón";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {

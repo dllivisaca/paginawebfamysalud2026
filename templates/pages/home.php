@@ -51,6 +51,28 @@ function homeNormalizeCustomHref(string $url): string
     return $url;
 }
 
+function homeNormalizePhoneOrHref(string $value, string $fallbackUrl = ""): string
+{
+    $value = trim($value);
+
+    if ($value === "") {
+        return $fallbackUrl;
+    }
+
+    if (preg_match('~^tel:\s*(.+)$~i', $value, $matches) === 1) {
+        $phone = preg_replace('~[^\d+]~', "", trim((string) $matches[1]));
+        return $phone !== "" ? 'tel:' . $phone : 'tel:' . trim((string) $matches[1]);
+    }
+
+    $compactPhone = preg_replace('~[\s\-\(\)]~', "", $value);
+    if ($compactPhone !== "" && preg_match('~^\+?\d+$~', $compactPhone) === 1) {
+        return 'tel:' . $compactPhone;
+    }
+
+    $normalizedHref = homeNormalizeCustomHref($value);
+    return $normalizedHref !== "" ? $normalizedHref : $fallbackUrl;
+}
+
 function homeRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl = ""): string
 {
     $linkType = trim((string) ($fields["link_type"] ?? ""));
@@ -162,7 +184,7 @@ $ctaSecondaryUrl = resolvePageContentLinkHref($conn, $homeFields, "cta_secondary
 $ctaEmergencyTitle = homeFieldValue($homeFields, "cta_emergency_title", "Medical Emergency?");
 $ctaEmergencyText = homeFieldValue($homeFields, "cta_emergency_text", "Call our 24/7 emergency hotline for immediate assistance");
 $ctaEmergencyButtonText = homeFieldValue($homeFields, "cta_emergency_button_text", "Call (555) 123-4567");
-$ctaEmergencyButtonUrl = homeFieldValue($homeFields, "cta_emergency_button_url", "tel:911");
+$ctaEmergencyButtonUrl = homeNormalizePhoneOrHref(homeFieldValue($homeFields, "cta_emergency_button_url", "tel:911"), "tel:911");
 $ctaFeatures = homeVisibleRepeaterItems($homeRepeaters["cta_features"] ?? []);
 
 $emergencyInfoTitle = homeFieldValue($homeFields, "emergency_info_title", "Emergency Info");
