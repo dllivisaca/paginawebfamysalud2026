@@ -813,8 +813,8 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["emergency_info_title", "emergency_info_text"],
         ],
         [
-            "title" => "Emergency Banner",
-            "description" => "Banner principal del bloque de emergencia.",
+            "title" => "Banner de emergencia",
+            "description" => "Banner principal de la sección de emergencia.",
             "field_keys" => ["emergency_banner_title", "emergency_banner_text", "emergency_banner_button_text", "emergency_banner_button_url"],
         ],
         [
@@ -1322,6 +1322,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Texto del botón";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "cta_emergency_button_url") {
                                                             $displayLabelHtml = "Teléfono o enlace del botón";
+                                                        } elseif ($groupFieldKey === "emergency_banner_title") {
+                                                            $displayLabelHtml = "Título del banner";
+                                                        } elseif ($groupFieldKey === "emergency_banner_text") {
+                                                            $displayLabelHtml = "Texto del banner";
+                                                        } elseif ($groupFieldKey === "emergency_banner_button_text") {
+                                                            $displayLabelHtml = "Texto del botón";
+                                                        } elseif ($groupFieldKey === "emergency_banner_button_url") {
+                                                            $displayLabelHtml = "Teléfono o enlace del botón";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
@@ -1559,6 +1567,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
