@@ -431,6 +431,11 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                     <option value="No disponible"<?php echo $fieldValue === "No disponible" ? " selected" : ""; ?>>No disponible</option>
                                     <option value="En consulta"<?php echo $fieldValue === "En consulta" ? " selected" : ""; ?>>En consulta</option>
                                 </select>
+                            <?php elseif ($repeaterKey === "emergency_contacts" && $fieldKey === "variant"): ?>
+                                <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]">
+                                    <option value=""<?php echo $fieldValue === "" ? " selected" : ""; ?>>Sin variante</option>
+                                    <option value="urgent"<?php echo $fieldValue === "urgent" ? " selected" : ""; ?>>Urgente</option>
+                                </select>
                             <?php else: ?>
                                 <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                             <?php endif; ?>
@@ -1579,6 +1584,8 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
+
 
 
 
