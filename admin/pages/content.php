@@ -157,6 +157,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             } elseif ($fieldKey === "appointment_button_url") {
                                 $fieldLabel = "URL del botón de cita";
                             }
+                        } elseif ($repeaterKey === "emergency_contacts" && $fieldKey === "variant") {
+                            $fieldLabel = "Prioridad del contacto";
                         }
                         $isHeroFeatureIconField = $repeaterKey === "hero_features" && $fieldKey === "icon_class";
                         $isHomeAboutFeatureIconField = $repeaterKey === "home_about_features" && $fieldKey === "icon_class";
@@ -433,7 +435,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                 </select>
                             <?php elseif ($repeaterKey === "emergency_contacts" && $fieldKey === "variant"): ?>
                                 <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]">
-                                    <option value=""<?php echo $fieldValue === "" ? " selected" : ""; ?>>Sin variante</option>
+                                    <option value=""<?php echo $fieldValue === "" ? " selected" : ""; ?>>No urgente</option>
                                     <option value="urgent"<?php echo $fieldValue === "urgent" ? " selected" : ""; ?>>Urgente</option>
                                 </select>
                             <?php else: ?>
@@ -1584,6 +1586,8 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
+
 
 
 
