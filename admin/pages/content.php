@@ -811,7 +811,17 @@ if (($schema["template_key"] ?? "") === "about") {
         [
             "title" => "Emergency Info",
             "description" => "Encabezados del bloque de información de emergencia.",
-            "field_keys" => ["emergency_info_title", "emergency_info_text", "quick_actions_title", "emergency_tips_title"],
+            "field_keys" => ["emergency_info_title", "emergency_info_text"],
+        ],
+        [
+            "title" => "Quick Actions",
+            "description" => "Encabezado del bloque de acciones rápidas.",
+            "field_keys" => ["quick_actions_title"],
+        ],
+        [
+            "title" => "Emergency Tips",
+            "description" => "Encabezado del bloque de consejos de emergencia.",
+            "field_keys" => ["emergency_tips_title"],
         ],
         [
             "title" => "Emergency Banner",
@@ -1550,6 +1560,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
