@@ -229,17 +229,17 @@ return [
         ],
         [
             "repeater_key" => "quick_actions",
-            "label" => "Quick Actions",
+            "label" => "Acciones rápidas - enlaces",
             "fields" => [
                 ["field_key" => "icon_class", "label" => "Icono", "field_type" => "text", "default" => ""],
                 ["field_key" => "label", "label" => "Etiqueta", "field_type" => "text", "default" => ""],
                 ["field_key" => "url", "label" => "URL", "field_type" => "url", "default" => ""],
             ],
             "items" => [
-                ["item_index" => 0, "item_label" => "Action 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-geo-alt-fill", "label" => "Get Directions", "url" => "#"]],
-                ["item_index" => 1, "item_label" => "Action 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-calendar-check", "label" => "Book Appointment", "url" => "#"]],
-                ["item_index" => 2, "item_label" => "Action 3", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-person-badge", "label" => "Find a Doctor", "url" => "#"]],
-                ["item_index" => 3, "item_label" => "Action 4", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-chat-dots", "label" => "Live Chat", "url" => "#"]],
+                ["item_index" => 0, "item_label" => "Enlace 1", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-geo-alt-fill", "label" => "Get Directions", "url" => "#"]],
+                ["item_index" => 1, "item_label" => "Enlace 2", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-calendar-check", "label" => "Book Appointment", "url" => "#"]],
+                ["item_index" => 2, "item_label" => "Enlace 3", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-person-badge", "label" => "Find a Doctor", "url" => "#"]],
+                ["item_index" => 3, "item_label" => "Enlace 4", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-chat-dots", "label" => "Live Chat", "url" => "#"]],
             ],
         ],
         [
