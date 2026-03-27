@@ -874,8 +874,8 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["emergency_banner_title", "emergency_banner_text", "emergency_banner_button_text", "emergency_banner_button_url"],
         ],
         [
-            "title" => "Quick Actions",
-            "description" => "Encabezado del bloque de acciones rápidas.",
+            "title" => "Acciones rápidas",
+            "description" => "Encabezado de la sección de accesos rápidos.",
             "field_keys" => ["quick_actions_title"],
         ],
         [
@@ -1498,7 +1498,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
-                                            <?php if ($templateKey === "home" && ((string) ($groupConfig["title"] ?? "")) === "Quick Actions"): ?>
+                                            <?php if ($templateKey === "home" && ((string) ($groupConfig["title"] ?? "")) === "Acciones rápidas"): ?>
                                                 <?php foreach ($schema["repeaters"] as $repeaterConfig): ?>
                                                     <?php if (((string) ($repeaterConfig["repeater_key"] ?? "")) === "quick_actions"): ?>
                                                         <?php renderAdminRepeaterSection($repeaterConfig, $contentData); ?>

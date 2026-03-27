@@ -66,7 +66,7 @@ return [
         ["field_key" => "emergency_banner_text", "label" => "Emergency banner texto", "field_type" => "textarea", "default" => "If you are experiencing a life-threatening emergency, call 911 immediately or go to your nearest emergency room.", "default_visible" => 1],
         ["field_key" => "emergency_banner_button_text", "label" => "Emergency banner botón texto", "field_type" => "text", "default" => "Call 911", "default_visible" => 1],
         ["field_key" => "emergency_banner_button_url", "label" => "Emergency banner botón URL", "field_type" => "url", "default" => "tel:911", "default_visible" => 1],
-        ["field_key" => "quick_actions_title", "label" => "Quick Actions título", "field_type" => "text", "default" => "Quick Actions", "default_visible" => 1],
+        ["field_key" => "quick_actions_title", "label" => "Título de la sección", "field_type" => "text", "default" => "Quick Actions", "default_visible" => 1],
         ["field_key" => "emergency_tips_title", "label" => "Emergency Tips título", "field_type" => "text", "default" => "When to Seek Emergency Care", "default_visible" => 1],
     ],
     "repeaters" => [
