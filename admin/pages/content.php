@@ -468,7 +468,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                             <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_button_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][button_url]" value="<?php echo htmlspecialchars($emergencyContactButtonUrlValue, ENT_QUOTES, "UTF-8"); ?>">
                                         </div>
                                     </div>
-                                </div>
+                                </div>
+
                             <?php elseif ($repeaterKey === "featured_doctors" && $fieldKey === "availability_status"): ?>
                                 <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" data-doctor-availability-item="<?php echo $itemIndex; ?>" data-doctor-availability-role="status">
                                     <option value="online"<?php echo $fieldValue === "online" ? " selected" : ""; ?>>Disponible</option>
@@ -1497,6 +1498,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
+                                            <?php if ($templateKey === "home" && ((string) ($groupConfig["title"] ?? "")) === "Quick Actions"): ?>
+                                                <?php foreach ($schema["repeaters"] as $repeaterConfig): ?>
+                                                    <?php if (((string) ($repeaterConfig["repeater_key"] ?? "")) === "quick_actions"): ?>
+                                                        <?php renderAdminRepeaterSection($repeaterConfig, $contentData); ?>
+                                                        <?php break; ?>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
                             <?php else: ?>
@@ -1544,7 +1553,7 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php if (is_array($aboutStatsRepeaterConfig) && $repeaterIndex === 0): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
-                            <?php if ($templateKey === "home" && in_array((string) ($repeaterConfig["repeater_key"] ?? ""), ["hero_features", "home_about_features", "home_certifications", "cta_features", "featured_departments", "featured_services", "featured_doctors", "emergency_contacts"], true)): ?>
+                            <?php if ($templateKey === "home" && in_array((string) ($repeaterConfig["repeater_key"] ?? ""), ["hero_features", "home_about_features", "home_certifications", "cta_features", "featured_departments", "featured_services", "featured_doctors", "emergency_contacts", "quick_actions"], true)): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : ""); ?>
