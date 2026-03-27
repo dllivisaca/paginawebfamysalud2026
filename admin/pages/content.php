@@ -807,11 +807,15 @@ if (($schema["template_key"] ?? "") === "about") {
             "title" => "Llamado a la acción - Emergencia",
             "description" => "Bloque secundario de emergencia del llamado a la acción.",
             "field_keys" => ["cta_emergency_title", "cta_emergency_text", "cta_emergency_button_text", "cta_emergency_button_url"],
-        ],
-        [
+        ],        [
             "title" => "Emergency Info",
             "description" => "Encabezados del bloque de información de emergencia.",
             "field_keys" => ["emergency_info_title", "emergency_info_text"],
+        ],
+        [
+            "title" => "Emergency Banner",
+            "description" => "Banner principal del bloque de emergencia.",
+            "field_keys" => ["emergency_banner_title", "emergency_banner_text", "emergency_banner_button_text", "emergency_banner_button_url"],
         ],
         [
             "title" => "Quick Actions",
@@ -822,11 +826,6 @@ if (($schema["template_key"] ?? "") === "about") {
             "title" => "Emergency Tips",
             "description" => "Encabezado del bloque de consejos de emergencia.",
             "field_keys" => ["emergency_tips_title"],
-        ],
-        [
-            "title" => "Emergency Banner",
-            "description" => "Banner principal del bloque de emergencia.",
-            "field_keys" => ["emergency_banner_title", "emergency_banner_text", "emergency_banner_button_text", "emergency_banner_button_url"],
         ],
     ];
 }
@@ -1560,6 +1559,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
