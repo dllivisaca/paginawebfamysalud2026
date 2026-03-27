@@ -899,6 +899,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .featured-doctors-admin-section .card { background: #f9fafb; }
         .section-block.emergency-contacts-admin-section { background: #fff; }
         .emergency-contacts-admin-section .card { background: #f9fafb; }
+        .section-block.emergency-contacts-admin-section > h3 { font-size: 17px; }
+        .emergency-contacts-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-doctors-admin-section > h3 { font-size: 17px; }
         .featured-doctors-admin-section .item-title h3 { font-size: 17px; }
         .section-block h3 { margin: 0 0 8px; font-size: 18px; }
@@ -1577,6 +1579,8 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
+
 
 
 
