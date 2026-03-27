@@ -1263,6 +1263,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         $fieldVisible = (int) ($fieldData["is_visible"] ?? 1) === 1;
                                                         $isTextarea = $fieldType === "textarea";
                                                         $isImage = $fieldType === "image";
+                                                        $hideVisibilityToggle = $templateKey === "home" && $groupFieldKey === "cta_emergency_button_url";
                                                         $displayLabel = (string) ($fieldConfig["label"] ?? $groupFieldKey);
                                                         $displayLabelHtml = escapeAdminFieldLabel($displayLabel);
 
@@ -1321,13 +1322,17 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
                                                             <div class="field-header">
                                                                 <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $displayLabelHtml; ?></label>
-                                                                <label class="toggle-row">
-                                                                    <?php if (in_array($groupFieldKey, ["home_about_experience_years", "home_about_experience_text"], true)): ?>
-                                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="0">
-                                                                    <?php endif; ?>
-                                                                    <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
-                                                                    <span>Mostrar</span>
-                                                                </label>
+                                                                <?php if ($hideVisibilityToggle): ?>
+                                                                    <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="<?php echo $fieldVisible ? "1" : "0"; ?>">
+                                                                <?php else: ?>
+                                                                    <label class="toggle-row">
+                                                                        <?php if (in_array($groupFieldKey, ["home_about_experience_years", "home_about_experience_text"], true)): ?>
+                                                                            <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="0">
+                                                                        <?php endif; ?>
+                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                                                        <span>Mostrar</span>
+                                                                    </label>
+                                                                <?php endif; ?>
                                                             </div>
 
                                                             <?php if ($isTextarea): ?>
@@ -1545,6 +1550,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
