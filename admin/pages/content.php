@@ -1430,6 +1430,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
+                                            <?php if ($templateKey === "home" && ((string) ($groupConfig["title"] ?? "")) === "Banner de emergencia"): ?>
+                                                <?php foreach ($schema["repeaters"] as $repeaterConfig): ?>
+                                                    <?php if (((string) ($repeaterConfig["repeater_key"] ?? "")) === "emergency_contacts"): ?>
+                                                        <?php renderAdminRepeaterSection($repeaterConfig, $contentData); ?>
+                                                        <?php break; ?>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
                             <?php else: ?>
@@ -1477,7 +1485,7 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php if (is_array($aboutStatsRepeaterConfig) && $repeaterIndex === 0): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
-                            <?php if ($templateKey === "home" && in_array((string) ($repeaterConfig["repeater_key"] ?? ""), ["hero_features", "home_about_features", "home_certifications", "cta_features", "featured_departments", "featured_services", "featured_doctors"], true)): ?>
+                            <?php if ($templateKey === "home" && in_array((string) ($repeaterConfig["repeater_key"] ?? ""), ["hero_features", "home_about_features", "home_certifications", "cta_features", "featured_departments", "featured_services", "featured_doctors", "emergency_contacts"], true)): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : ""); ?>
@@ -1567,6 +1575,7 @@ if (($schema["template_key"] ?? "") === "about") {
     </script>
 </body>
 </html>
+
 
 
 
