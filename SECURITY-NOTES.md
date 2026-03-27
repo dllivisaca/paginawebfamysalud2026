@@ -450,3 +450,47 @@
 
 ### Como retomar en una nueva sesion
 - Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-26".
+
+## Sesion 2026-03-27
+
+### Cambios realizados hoy
+- Se continuo afinando el editor de contenido de `home` en `admin/pages/content.php`, aplicando ajustes puntuales de orden visual, labels visibles y widgets de seleccion sin alterar keys internas, schema base ni flujos generales de guardado fuera de los casos extendidos.
+- Se oculto visualmente el toggle `Mostrar` del campo simple `cta_emergency_button_url` en el bloque `Llamado a la accion - Emergencia`, manteniendo intacto el input y la persistencia de `is_visible`.
+- Se separaron en el admin los encabezados simples de `Emergency Info`, `Quick Actions` y `Emergency Tips` para que cada contenedor muestre solo sus fields correctos, sin mezclar `quick_actions_title` ni `emergency_tips_title` dentro de `Emergency Info`.
+- Se reordeno visualmente el bloque simple `Emergency Banner` para ubicarlo debajo de `Emergency Info`, y luego se ajustaron sus textos visibles en el admin a `Banner de emergencia`, `Banner principal de la seccion de emergencia.`, `Titulo del banner`, `Texto del banner`, `Texto del boton` y `Telefono o enlace del boton`, sin tocar keys internas.
+- Se corrigio en `templates/pages/home.php` la resolucion del enlace del boton de `Emergency Banner` para que use la misma normalizacion inteligente de telefono/URL ya aplicada en `cta_emergency_button_url`.
+- Se reubico visualmente el repeater `emergency_contacts` dentro del admin para que aparezca debajo de `Banner de emergencia`, mediante render manual en `admin/pages/content.php` y exclusion del foreach general, evitando duplicados.
+- Se ajustaron estilos puntuales del repeater `emergency_contacts` en el admin: intercambio controlado de fondos entre contenedor padre e items internos, e igualacion del tamano de fuente de su titulo y de `Contacto N` contra la referencia visual de `Banner de emergencia`.
+- Se convirtio `emergency_contacts.variant` de input libre a `select`, con textos visibles en espanol (`No urgente`, `Urgente`) y label visible `Prioridad del contacto`, manteniendo los valores tecnicos reales `""` y `urgent`.
+- Se convirtio `emergency_contacts.icon_class` de input libre a `select`, reutilizando el patron ya existente de iconos amigables y conservando valores tecnicos usados por el frontend.
+- Se extendio `emergency_contacts` con la misma logica expandida de enlaces que `cta_features`: se agregaron en schema los fields `button_link_type` y `button_page_id`, el admin paso a mostrar `button_text` en ancho completo con bloque `Tipo de enlace / Pagina interna / URL personalizada`, y el frontend paso a resolver el destino final con el helper parametrico ya existente.
+- Se reubico visualmente el repeater `quick_actions` para que aparezca debajo del bloque simple `Quick Actions` y antes de `Emergency Tips`, usando el mismo patron de render manual y exclusion del loop general ya usado por otros repeaters.
+- Se ajustaron textos visibles del bloque simple `Quick Actions`: `Acciones rapidas`, `Encabezado de la seccion de accesos rapidos.` y `Titulo de la seccion`, sin tocar el repeater `quick_actions`.
+- Se ajustaron textos visibles del repeater `quick_actions` en schema: el contenedor paso a `Acciones rapidas - enlaces` y los items a `Accion 1`, `Accion 2`, `Accion 3` y `Accion 4`.
+- Se hizo una ronda de diagnosticos sobre la franja blanca superior del hero en la Home, revisando `index.php`, `includes/header.php`, `templates/pages/home.php` y `assets/css/main.css`, identificando sucesivamente el offset del hero, el `header-container` y finalmente la capa completa del `header` como origen visual del problema.
+- Se probaron ajustes CSS puntuales en `assets/css/main.css` para mover compensacion del hero y para actuar sobre `header`, `header-container` y `home-page .header`, pero el usuario indico restauraciones posteriores del archivo; por tanto, esos experimentos quedaron documentados como diagnostico/trabajo de sesion y no deben asumirse como estado persistente actual.
+
+### Archivos modificados
+- `admin/pages/content.php`
+- `templates/page-schemas/home.php`
+- `templates/pages/home.php`
+- `assets/css/main.css`
+- `SECURITY-NOTES.md`
+
+### Verificacion realizada
+- Se ejecuto `php -l` repetidamente sobre `admin/pages/content.php` durante los ajustes del editor admin y las comprobaciones terminaron sin errores de sintaxis.
+- Se ejecuto `php -l` sobre `templates/page-schemas/home.php` despues de extender `emergency_contacts` y de ajustar textos visibles del repeater `quick_actions`, sin errores de sintaxis.
+- Se ejecuto `php -l` sobre `templates/pages/home.php` despues de adaptar los enlaces de `Emergency Banner` y `emergency_contacts`, sin errores de sintaxis.
+- En `assets/css/main.css` no aplicaba `php -l`; las verificaciones ahi fueron estructurales por lectura de bloques CSS y por contraste con el HTML real de `header` y `hero`.
+- Se confirmo por inspeccion de codigo que la Home publica usa `includes/header.php` y no `partials/header.php`.
+- Se confirmo por diagnostico que la franja superior del hero en Home involucra al `header` fijo y a su contenedor interno como capas separadas, aunque el archivo CSS fue restaurado por el usuario despues de los intentos de ajuste.
+
+### Pendientes recomendados
+- Hacer una pasada limpia y controlada sobre `assets/css/main.css` para resolver definitivamente la franja superior del hero en Home, partiendo del estado restaurado actual y validando el comportamiento real en navegador.
+- Probar manualmente en el admin de `home` los bloques `Emergency Info`, `Banner de emergencia`, `Emergency contacts`, `Quick Actions` y `Emergency Tips` para confirmar el orden visual final, los labels visibles y la ausencia de duplicados.
+- Verificar en navegador la logica expandida de enlaces de `emergency_contacts`, incluyendo `Pagina interna`, `URL personalizada`, URLs sin esquema y telefonos.
+- Revisar si conviene consolidar en helpers o configuracion declarativa los bloques especiales de enlace del editor de contenido para reducir repeticion futura en `admin/pages/content.php`.
+- Confirmar visualmente que los textos visibles recientemente traducidos en `Quick Actions` y `Emergency Banner` mantengan codificacion correcta en todos los entornos.
+
+### Como retomar en una nueva sesion
+- Indicar: "Revisa `SECURITY-NOTES.md` y continuemos desde la sesion 2026-03-27".
