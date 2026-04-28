@@ -164,6 +164,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isHomeAboutFeatureIconField = $repeaterKey === "home_about_features" && $fieldKey === "icon_class";
                         $isCtaFeatureIconField = $repeaterKey === "cta_features" && $fieldKey === "icon_class";
                         $isQuickActionIconField = $repeaterKey === "quick_actions" && $fieldKey === "icon_class";
+                        $isQuickActionLabelField = $repeaterKey === "quick_actions" && $fieldKey === "label";
+                        $isQuickActionUrlField = $repeaterKey === "quick_actions" && $fieldKey === "url";
                         $isEmergencyContactIconField = $repeaterKey === "emergency_contacts" && $fieldKey === "icon_class";
                         $isCtaFeatureLinkTextField = $repeaterKey === "cta_features" && $fieldKey === "link_text";
                         $isCtaFeatureLinkTypeField = $repeaterKey === "cta_features" && $fieldKey === "link_type";
@@ -212,6 +214,16 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         if ($ctaFeatureLinkTypeValue !== "internal" && $ctaFeatureLinkTypeValue !== "custom") {
                             $ctaFeatureLinkTypeValue = $ctaFeatureLinkUrlValue !== "" ? "custom" : ($ctaFeaturePageIdValue !== "" ? "internal" : "custom");
                         }
+                        $quickActionUrlValue = (string) (($itemData["fields"]["url"]["field_value"] ?? ""));
+                        $quickActionLinkScope = $repeaterKey . "_" . $itemIndex . "_link";
+                        $quickActionMatchedPageId = "";
+                        foreach ($linkableSitePages as $sitePageOption) {
+                            if ((string) ($sitePageOption["public_url"] ?? "") === $quickActionUrlValue) {
+                                $quickActionMatchedPageId = (string) ($sitePageOption["id"] ?? "");
+                                break;
+                            }
+                        }
+                        $quickActionLinkTypeValue = $quickActionMatchedPageId !== "" ? "internal" : "custom";
                         $featuredDoctorProfileButtonLinkTypeValue = trim((string) (($itemData["fields"]["profile_button_link_type"]["field_value"] ?? "")));
                         $featuredDoctorProfileButtonPageIdValue = trim((string) (($itemData["fields"]["profile_button_page_id"]["field_value"] ?? "")));
                         $featuredDoctorProfileButtonUrlValue = (string) (($itemData["fields"]["profile_button_url"]["field_value"] ?? ""));
@@ -280,8 +292,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             continue;
                         }
                         ?>
-                        <div class="field-group<?php echo ($isCtaFeatureLinkTextField || $isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField || $isEmergencyContactButtonTextField) ? " field-group-full" : ""; ?>">
-                            <?php if (!$isCtaFeatureLinkTextField && !$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField && !$isEmergencyContactButtonTextField): ?>
+                        <div class="field-group<?php echo ($isQuickActionIconField || $isQuickActionLabelField || $isQuickActionUrlField || $isCtaFeatureLinkTextField || $isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField || $isEmergencyContactButtonTextField) ? " field-group-full" : ""; ?>">
+                            <?php if (!$isQuickActionUrlField && !$isCtaFeatureLinkTextField && !$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField && !$isEmergencyContactButtonTextField): ?>
                                 <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
                             <?php endif; ?>
                             <?php if ($fieldType === "image"): ?>
@@ -498,6 +510,34 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                     <option value=""<?php echo $fieldValue === "" ? " selected" : ""; ?>>No urgente</option>
                                     <option value="urgent"<?php echo $fieldValue === "urgent" ? " selected" : ""; ?>>Urgente</option>
                                 </select>
+                            <?php elseif ($isQuickActionUrlField): ?>
+                                <div class="button-destination-box">
+                                    <div class="field-group field-group-full">
+                                        <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_type", ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
+                                        <select class="form-select js-link-type js-quick-action-link-type" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_type", ENT_QUOTES, "UTF-8"); ?>" data-link-scope="<?php echo htmlspecialchars($quickActionLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <option value="internal"<?php echo $quickActionLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                            <option value="custom"<?php echo $quickActionLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="button-destination-grid">
+                                        <div class="field-group field-group-full js-link-panel <?php echo $quickActionLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($quickActionLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_page_url", ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
+                                            <select class="form-select js-quick-action-page" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_page_url", ENT_QUOTES, "UTF-8"); ?>" data-link-scope="<?php echo htmlspecialchars($quickActionLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                <option value="">Selecciona una p&aacute;gina</option>
+                                                <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                    <?php $sitePagePublicUrl = (string) ($sitePageOption["public_url"] ?? ""); ?>
+                                                    <option value="<?php echo (int) ($sitePageOption["id"] ?? 0); ?>" data-public-url="<?php echo htmlspecialchars($sitePagePublicUrl, ENT_QUOTES, "UTF-8"); ?>"<?php echo (string) ($sitePageOption["id"] ?? "") === $quickActionMatchedPageId ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="field-group field-group-full js-link-panel <?php echo $quickActionLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($quickActionLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_url", ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                            <input class="form-input js-quick-action-url" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][url]" value="<?php echo htmlspecialchars($quickActionUrlValue, ENT_QUOTES, "UTF-8"); ?>" data-link-scope="<?php echo htmlspecialchars($quickActionLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                        </div>
+                                    </div>
+                                </div>
                             <?php else: ?>
                                 <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                             <?php endif; ?>
@@ -1598,7 +1638,22 @@ if (($schema["template_key"] ?? "") === "about") {
                     panels.forEach(function (panel) {
                         panel.classList.toggle("is-hidden", panel.getAttribute("data-link-panel") !== value);
                     });
+
+                    if (selector.classList.contains("js-quick-action-link-type")) {
+                        var quickActionUrlInput = document.querySelector('.js-quick-action-url[data-link-scope="' + scope + '"]');
+                        var quickActionPageSelect = document.querySelector('.js-quick-action-page[data-link-scope="' + scope + '"]');
+
+                        if (value === "internal" && quickActionUrlInput && quickActionPageSelect) {
+                            var selectedPage = quickActionPageSelect.options[quickActionPageSelect.selectedIndex];
+                            quickActionUrlInput.value = selectedPage ? (selectedPage.getAttribute("data-public-url") || "") : "";
+                        }
+                    }
                 };
+
+                var quickActionPageSelect = document.querySelector('.js-quick-action-page[data-link-scope="' + selector.getAttribute("data-link-scope") + '"]');
+                if (quickActionPageSelect) {
+                    quickActionPageSelect.addEventListener("change", syncPanels);
+                }
 
                 selector.addEventListener("change", syncPanels);
                 syncPanels();
