@@ -210,14 +210,7 @@ $pageDescriptionEscaped = $metaDescription !== ""
 
 $heroTitle = departmentsFieldValue($departmentsFields, "hero_title", (string) ($page["title"] ?? "Departamentos"));
 $heroSubtitle = departmentsFieldValue($departmentsFields, "hero_subtitle", "Conoce nuestras areas de atencion especializadas, disenadas para acompanar cada etapa del cuidado de tu salud.");
-$introTitle = departmentsFieldValue($departmentsFields, "intro_title", "Atencion integral por especialidad");
-$introText = departmentsFieldValue($departmentsFields, "intro_text", "Reunimos profesionales, tecnologia y procesos coordinados para brindar una experiencia clara, cercana y segura en cada servicio.");
-$sectionTitle = departmentsFieldValue($departmentsFields, "section_title", "Nuestros departamentos");
-$sectionSubtitle = departmentsFieldValue($departmentsFields, "section_subtitle", "Explora las principales areas de atencion disponibles para pacientes y familias.");
-$ctaTitle = departmentsFieldValue($departmentsFields, "cta_title", "Necesitas orientacion para elegir un servicio?");
-$ctaText = departmentsFieldValue($departmentsFields, "cta_text", "Nuestro equipo puede ayudarte a identificar el departamento adecuado segun tus necesidades de atencion.");
-$ctaButtonText = departmentsFieldValue($departmentsFields, "cta_button_text", "Solicitar informacion");
-$ctaButtonUrl = resolvePageContentLinkHref($conn, $departmentsFields, "cta_button", "contact.html");
+
 $departmentItems = departmentsVisibleRepeaterItems($departmentsRepeaters["departments"] ?? []);
 $featuredIndex = null;
 
@@ -267,30 +260,8 @@ require __DIR__ . "/../../includes/header.php";
       </div>
     </div>
 
-    <section id="departments-intro" class="section">
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-        <div class="row justify-content-center">
-          <div class="col-lg-9 text-center">
-            <?php if (departmentsFieldVisible($departmentsFields, "intro_title") && $introTitle !== ""): ?>
-              <h2><?php echo htmlspecialchars($introTitle, ENT_QUOTES, "UTF-8"); ?></h2>
-            <?php endif; ?>
-            <?php if (departmentsFieldVisible($departmentsFields, "intro_text") && $introText !== ""): ?>
-              <p><?php echo nl2br(htmlspecialchars($introText, ENT_QUOTES, "UTF-8")); ?></p>
-            <?php endif; ?>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <section id="departments" class="departments section">
-      <div class="container section-title" data-aos="fade-up">
-        <?php if (departmentsFieldVisible($departmentsFields, "section_title") && $sectionTitle !== ""): ?>
-          <h2><?php echo htmlspecialchars($sectionTitle, ENT_QUOTES, "UTF-8"); ?></h2>
-        <?php endif; ?>
-        <?php if (departmentsFieldVisible($departmentsFields, "section_subtitle") && $sectionSubtitle !== ""): ?>
-          <p><?php echo nl2br(htmlspecialchars($sectionSubtitle, ENT_QUOTES, "UTF-8")); ?></p>
-        <?php endif; ?>
-      </div>
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
         <div class="row gy-4">
@@ -315,27 +286,6 @@ require __DIR__ . "/../../includes/header.php";
       </div>
     </section>
 
-    <?php if ((departmentsFieldVisible($departmentsFields, "cta_title") && $ctaTitle !== "") || (departmentsFieldVisible($departmentsFields, "cta_text") && $ctaText !== "") || (departmentsFieldVisible($departmentsFields, "cta_button_text") && $ctaButtonText !== "")): ?>
-      <section id="departments-cta" class="call-to-action section">
-        <div class="container" data-aos="fade-up" data-aos-delay="100">
-          <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-              <?php if (departmentsFieldVisible($departmentsFields, "cta_title") && $ctaTitle !== ""): ?>
-                <h2><?php echo htmlspecialchars($ctaTitle, ENT_QUOTES, "UTF-8"); ?></h2>
-              <?php endif; ?>
-              <?php if (departmentsFieldVisible($departmentsFields, "cta_text") && $ctaText !== ""): ?>
-                <p><?php echo nl2br(htmlspecialchars($ctaText, ENT_QUOTES, "UTF-8")); ?></p>
-              <?php endif; ?>
-              <?php if (departmentsFieldVisible($departmentsFields, "cta_button_text") && $ctaButtonText !== ""): ?>
-                <div class="cta-buttons">
-                  <a href="<?php echo htmlspecialchars($ctaButtonUrl, ENT_QUOTES, "UTF-8"); ?>" class="btn-primary"><?php echo htmlspecialchars($ctaButtonText, ENT_QUOTES, "UTF-8"); ?></a>
-                </div>
-              <?php endif; ?>
-            </div>
-          </div>
-        </div>
-      </section>
-    <?php endif; ?>
   </main>
 
 <?php require __DIR__ . "/../../includes/footer.php"; ?>

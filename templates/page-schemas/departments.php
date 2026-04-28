@@ -6,16 +6,6 @@ return [
     "simple_fields" => [
         ["field_key" => "hero_title", "label" => "Titulo principal", "field_type" => "text", "default" => "Departamentos", "default_visible" => 1],
         ["field_key" => "hero_subtitle", "label" => "Subtitulo principal", "field_type" => "textarea", "default" => "Conoce nuestras areas de atencion especializadas, disenadas para acompanar cada etapa del cuidado de tu salud.", "default_visible" => 1],
-        ["field_key" => "intro_title", "label" => "Titulo introductorio", "field_type" => "text", "default" => "Atencion integral por especialidad", "default_visible" => 1],
-        ["field_key" => "intro_text", "label" => "Texto introductorio", "field_type" => "textarea", "default" => "Reunimos profesionales, tecnologia y procesos coordinados para brindar una experiencia clara, cercana y segura en cada servicio.", "default_visible" => 1],
-        ["field_key" => "section_title", "label" => "Titulo de seccion", "field_type" => "text", "default" => "Nuestros departamentos", "default_visible" => 1],
-        ["field_key" => "section_subtitle", "label" => "Subtitulo de seccion", "field_type" => "textarea", "default" => "Explora las principales areas de atencion disponibles para pacientes y familias.", "default_visible" => 1],
-        ["field_key" => "cta_title", "label" => "Titulo CTA", "field_type" => "text", "default" => "Necesitas orientacion para elegir un servicio?", "default_visible" => 1],
-        ["field_key" => "cta_text", "label" => "Texto CTA", "field_type" => "textarea", "default" => "Nuestro equipo puede ayudarte a identificar el departamento adecuado segun tus necesidades de atencion.", "default_visible" => 1],
-        ["field_key" => "cta_button_text", "label" => "Texto boton CTA", "field_type" => "text", "default" => "Solicitar informacion", "default_visible" => 1],
-        ["field_key" => "cta_button_link_type", "label" => "Tipo de enlace boton CTA", "field_type" => "text", "default" => "custom", "default_visible" => 1],
-        ["field_key" => "cta_button_page_id", "label" => "Pagina interna boton CTA", "field_type" => "text", "default" => "", "default_visible" => 1],
-        ["field_key" => "cta_button_url", "label" => "URL boton CTA", "field_type" => "url", "default" => "contact.html", "default_visible" => 1],
     ],
     "repeaters" => [
         [
