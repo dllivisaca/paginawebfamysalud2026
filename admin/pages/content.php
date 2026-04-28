@@ -1646,6 +1646,11 @@ if (($schema["template_key"] ?? "") === "about") {
                         if (value === "internal" && quickActionUrlInput && quickActionPageSelect) {
                             var selectedPage = quickActionPageSelect.options[quickActionPageSelect.selectedIndex];
                             quickActionUrlInput.value = selectedPage ? (selectedPage.getAttribute("data-public-url") || "") : "";
+                        } else if (value === "custom" && quickActionUrlInput) {
+                            var customUrl = quickActionUrlInput.value.trim();
+                            if (customUrl !== "" && !/^(?:https?:\/\/|mailto:|tel:|#)/i.test(customUrl)) {
+                                quickActionUrlInput.value = "https://" + customUrl;
+                            }
                         }
                     }
                 };
