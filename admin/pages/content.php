@@ -122,6 +122,19 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
             }
             $itemData = $repeaterItems[$itemIndex] ?? ["fields" => [], "is_visible" => 1];
             $itemVisible = (int) ($itemData["is_visible"] ?? 1) === 1;
+            $departmentsHiddenFields = [];
+            if ($repeaterKey === "departments") {
+                $departmentsLayoutVariant = strtolower(trim((string) ($itemData["fields"]["layout_variant"]["field_value"] ?? "")));
+                $departmentsTitleValue = trim((string) ($itemData["fields"]["title"]["field_value"] ?? ""));
+                if ($departmentsTitleValue !== "") {
+                    $itemTitle = $departmentsLayoutVariant === "featured" ? "Departamento destacado: " . $departmentsTitleValue : $departmentsTitleValue;
+                } elseif ($departmentsLayoutVariant === "featured") {
+                    $itemTitle = "Departamento destacado: " . $itemTitle;
+                }
+                $departmentsHiddenFields = $departmentsLayoutVariant === "featured"
+                    ? ["stats_number", "stats_label", "feature_1", "feature_2", "feature_3"]
+                    : ["featured_badge_text", "achievement_1_icon", "achievement_1_text", "achievement_2_icon", "achievement_2_text", "tag_1", "tag_2", "tag_3", "tag_4"];
+            }
             ?>
             <div class="card">
                 <div class="item-title">
@@ -138,6 +151,12 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $fieldKey = (string) ($fieldConfig["field_key"] ?? "");
                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                         $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
+                        if ($repeaterKey === "departments" && in_array($fieldKey, $departmentsHiddenFields, true)) {
+                            ?>
+                            <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                            <?php
+                            continue;
+                        }
                         $fieldLabel = (string) ($fieldConfig["label"] ?? $fieldKey);
                         if ($repeaterKey === "featured_doctors") {
                             if ($fieldKey === "alt") {
