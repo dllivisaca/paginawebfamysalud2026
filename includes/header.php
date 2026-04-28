@@ -97,7 +97,7 @@ $publicMenuItems = [];
 $publicMenuButton = null;
 
 if (isset($conn) && $conn instanceof mysqli) {
-    $menuSql = "SELECT id, item_key, label, url, target
+    $menuSql = "SELECT id, parent_id, item_key, label, url, target
                 FROM menu_items
                 WHERE is_button = 0 AND is_active = 1
                 ORDER BY display_order ASC, id ASC";
@@ -105,6 +105,8 @@ if (isset($conn) && $conn instanceof mysqli) {
 
     if ($menuResult) {
         while ($row = $menuResult->fetch_assoc()) {
+            $row["id"] = (int) ($row["id"] ?? 0);
+            $row["parent_id"] = isset($row["parent_id"]) ? (int) $row["parent_id"] : null;
             $publicMenuItems[] = $row;
         }
     }
@@ -124,18 +126,58 @@ if (isset($conn) && $conn instanceof mysqli) {
 if (count($publicMenuItems) === 0) {
     $publicMenuItems = [
         [
+            "id" => 1,
+            "parent_id" => null,
             "item_key" => "home",
             "label" => "Inicio",
             "url" => "index.php",
             "target" => "_self",
         ],
         [
+            "id" => 2,
+            "parent_id" => null,
             "item_key" => "about",
             "label" => "Nosotros",
             "url" => "nosotros",
             "target" => "_self",
         ],
     ];
+}
+
+$publicMenuItemsByParent = [];
+foreach ($publicMenuItems as $menuItem) {
+    $parentKey = isset($menuItem["parent_id"]) && (int) $menuItem["parent_id"] > 0 ? (string) ((int) $menuItem["parent_id"]) : "root";
+    $publicMenuItemsByParent[$parentKey][] = $menuItem;
+}
+
+if (!function_exists("renderPublicMenuItem")) {
+    function renderPublicMenuItem(array $menuItem, array $itemsByParent, string $currentPublicSlug): void
+    {
+        $menuItemId = (int) ($menuItem["id"] ?? 0);
+        $children = $itemsByParent[(string) $menuItemId] ?? [];
+        $hasChildren = $children !== [];
+        $menuItemLabel = htmlspecialchars((string) ($menuItem["label"] ?? ""), ENT_QUOTES, "UTF-8");
+        $menuItemUrl = resolveMenuItemHref((string) ($menuItem["url"] ?? ""));
+        $menuItemTarget = resolveMenuItemTarget((string) ($menuItem["target"] ?? "_self"));
+        $menuItemKey = (string) ($menuItem["item_key"] ?? "");
+        $menuItemSlug = resolveMenuItemSlug((string) ($menuItem["url"] ?? ""));
+        $menuIsHome = $menuItemUrl === "index.php" || $menuItemKey === "home" || in_array($menuItemSlug, ["", "inicio", "home"], true);
+        $menuIsActive = $menuIsHome
+            ? in_array($currentPublicSlug, ["", "inicio", "home"], true)
+            : $menuItemSlug !== "" && $menuItemSlug === $currentPublicSlug;
+        ?>
+            <li<?php echo $hasChildren ? ' class="dropdown"' : ""; ?>>
+              <a href="<?php echo htmlspecialchars($menuItemUrl, ENT_QUOTES, "UTF-8"); ?>" target="<?php echo htmlspecialchars($menuItemTarget, ENT_QUOTES, "UTF-8"); ?>"<?php echo $menuIsActive ? ' class="active"' : ""; ?>><?php if ($hasChildren): ?><span><?php echo $menuItemLabel; ?></span> <i class="bi bi-chevron-down toggle-dropdown"></i><?php else: ?><?php echo $menuItemLabel; ?><?php endif; ?></a>
+              <?php if ($hasChildren): ?>
+                <ul>
+                  <?php foreach ($children as $childItem): ?>
+                    <?php renderPublicMenuItem($childItem, $itemsByParent, $currentPublicSlug); ?>
+                  <?php endforeach; ?>
+                </ul>
+              <?php endif; ?>
+            </li>
+        <?php
+    }
 }
 
 $pageTitleEscaped = htmlspecialchars($pageTitle, ENT_QUOTES, "UTF-8");
@@ -213,23 +255,8 @@ $currentPublicSlug = (string) ($currentPublicSlug ?? "");
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <?php foreach ($publicMenuItems as $menuItem): ?>
-            <?php
-            $menuItemLabel = htmlspecialchars((string) ($menuItem["label"] ?? ""), ENT_QUOTES, "UTF-8");
-            $menuItemUrl = resolveMenuItemHref((string) ($menuItem["url"] ?? ""));
-            $menuItemTarget = resolveMenuItemTarget((string) ($menuItem["target"] ?? "_self"));
-            $menuItemKey = (string) ($menuItem["item_key"] ?? "");
-            $menuItemSlug = resolveMenuItemSlug((string) ($menuItem["url"] ?? ""));
-            $menuIsHome = $menuItemUrl === "index.php" || $menuItemKey === "home" || in_array($menuItemSlug, ["", "inicio", "home"], true);
-            $menuIsActive = $menuIsHome
-                ? in_array($currentPublicSlug, ["", "inicio", "home"], true)
-                : $menuItemSlug !== "" && $menuItemSlug === $currentPublicSlug;
-            ?>
-            <li>
-              <a href="<?php echo htmlspecialchars($menuItemUrl, ENT_QUOTES, "UTF-8"); ?>" target="<?php echo htmlspecialchars($menuItemTarget, ENT_QUOTES, "UTF-8"); ?>"<?php echo $menuIsActive ? ' class="active"' : ""; ?>>
-                <?php echo $menuItemLabel; ?>
-              </a>
-            </li>
+          <?php foreach ($publicMenuItemsByParent["root"] ?? [] as $menuItem): ?>
+            <?php renderPublicMenuItem($menuItem, $publicMenuItemsByParent, $currentPublicSlug); ?>
           <?php endforeach; ?>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
