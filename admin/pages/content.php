@@ -864,7 +864,7 @@ if (($schema["template_key"] ?? "") === "about") {
             "description" => "Bloque secundario de emergencia del llamado a la acción.",
             "field_keys" => ["cta_emergency_title", "cta_emergency_text", "cta_emergency_button_text", "cta_emergency_button_url"],
         ],        [
-            "title" => "Emergency Info",
+            "title" => "Información de emergencia",
             "description" => "Encabezados del bloque de información de emergencia.",
             "field_keys" => ["emergency_info_title", "emergency_info_text"],
         ],
@@ -1350,6 +1350,10 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Texto informativo 2";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "hero_hours_value") {
                                                             $displayLabelHtml = "Dato informativo 2";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "emergency_info_title") {
+                                                            $displayLabelHtml = "Título de la sección";
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "emergency_info_text") {
+                                                            $displayLabelHtml = "Descripción de la sección";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "home_about_certifications_title") {
                                                             $displayLabelHtml = "Título de certificaciones";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "featured_departments_title") {

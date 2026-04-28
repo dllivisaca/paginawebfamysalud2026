@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return [
     "template_key" => "home",
@@ -206,7 +206,7 @@ return [
         ],
         [
             "repeater_key" => "emergency_contacts",
-            "label" => "Emergency contacts",
+            "label" => "Contactos de emergencia",
             "fields" => [
                 ["field_key" => "variant", "label" => "Variante", "field_type" => "text", "default" => ""],
                 ["field_key" => "icon_class", "label" => "Icono", "field_type" => "text", "default" => ""],
