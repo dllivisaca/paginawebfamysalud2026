@@ -142,10 +142,10 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
             if ($repeaterKey === "departments") {
                 $departmentsLayoutVariant = strtolower(trim((string) ($itemData["fields"]["layout_variant"]["field_value"] ?? "")));
                 $departmentsTitleValue = trim((string) ($itemData["fields"]["title"]["field_value"] ?? ""));
-                if ($departmentsTitleValue !== "") {
-                    $itemTitle = $departmentsLayoutVariant === "featured" ? "Departamento destacado: " . $departmentsTitleValue : $departmentsTitleValue;
-                } elseif ($departmentsLayoutVariant === "featured") {
-                    $itemTitle = "Departamento destacado: " . $itemTitle;
+                if ($departmentsLayoutVariant === "featured") {
+                    $itemTitle = $departmentsTitleValue !== "" ? "Departamento destacado: " . $departmentsTitleValue : "Departamento destacado";
+                } else {
+                    $itemTitle = $departmentsTitleValue !== "" ? "Departamento estándar: " . $departmentsTitleValue : "Departamento estándar";
                 }
                 $departmentsHiddenFields = $departmentsLayoutVariant === "featured"
                     ? ["stats_number", "stats_label", "feature_1", "feature_2", "feature_3"]
@@ -169,13 +169,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
                         if ($repeaterKey === "departments" && $fieldKey === "layout_variant") {
                             $layoutVariantValue = $fieldValue === "featured" ? "featured" : "card";
-                            $layoutVariantLabel = $layoutVariantValue === "featured" ? "Destacado" : "Tarjeta estándar";
                             ?>
-                            <div class="field-group">
-                                <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>_readonly">Tipo de tarjeta</label>
-                                <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($layoutVariantValue, ENT_QUOTES, "UTF-8"); ?>">
-                                <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>_readonly" value="<?php echo htmlspecialchars($layoutVariantLabel, ENT_QUOTES, "UTF-8"); ?>" readonly>
-                            </div>
+                            <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($layoutVariantValue, ENT_QUOTES, "UTF-8"); ?>">
                             <?php
                             continue;
                         }
