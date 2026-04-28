@@ -149,6 +149,56 @@ function countByType(mysqli $conn, int $isButton): int
     return (int) ($row["total"] ?? 0);
 }
 
+function getAvailableMainMenuPositions(mysqli $conn, int $excludeItemId = 0, ?int $currentPosition = null): array
+{
+    $occupiedPositions = [];
+    $sql = "SELECT display_order FROM menu_items WHERE is_button = 0 AND parent_id IS NULL AND (item_key IS NULL OR item_key <> 'home') AND id <> ?";
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        $stmt->bind_param("i", $excludeItemId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $occupiedPositions[(int) ($row["display_order"] ?? 0)] = true;
+            }
+        }
+
+        $stmt->close();
+    }
+
+    $positions = [];
+    for ($position = 2; $position <= 8; $position++) {
+        if (!isset($occupiedPositions[$position]) || $currentPosition === $position) {
+            $positions[] = $position;
+        }
+    }
+
+    return $positions;
+}
+
+function isMainMenuPositionAvailable(mysqli $conn, int $position, int $excludeItemId = 0): bool
+{
+    if ($position < 2 || $position > 8) {
+        return false;
+    }
+
+    $stmt = $conn->prepare("SELECT id FROM menu_items WHERE is_button = 0 AND parent_id IS NULL AND (item_key IS NULL OR item_key <> 'home') AND display_order = ? AND id <> ? LIMIT 1");
+    if (!$stmt) {
+        return false;
+    }
+
+    $stmt->bind_param("ii", $position, $excludeItemId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $exists = $result && $result->fetch_assoc();
+    $stmt->close();
+
+    return !$exists;
+}
+
 function ensureHomeMenuItem(mysqli $conn): void
 {
     $sql = "INSERT INTO menu_items (parent_id, item_key, label, url, display_order, is_active, is_button, target, created_at, updated_at)

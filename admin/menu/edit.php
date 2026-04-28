@@ -74,6 +74,12 @@ if ($isCreateMode && $_SERVER["REQUEST_METHOD"] !== "POST" && ($sitePages === []
 }
 
 $parentOptions = getMenuParentOptions($conn, $isCreateMode ? 0 : $itemId);
+$currentMainPosition = $isCreateMode ? null : (int) $menuData["display_order"];
+$availableMainPositions = getAvailableMainMenuPositions($conn, $isCreateMode ? 0 : $itemId, $currentMainPosition);
+
+if ($isCreateMode && $menuData["parent_id"] === null && $availableMainPositions !== [] && !in_array((int) $menuData["display_order"], $availableMainPositions, true)) {
+    $menuData["display_order"] = (int) $availableMainPositions[0];
+}
 
 if ($menuData["parent_id"] !== null) {
     $rootDisplayOrder = getMenuRootDisplayOrder($conn, (int) $menuData["parent_id"]);
@@ -182,6 +188,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         } elseif (!$isHomeItem && ($menuData["display_order"] < 2 || $menuData["display_order"] > 8)) {
             $errors[] = "La posicion seleccionada no es valida.";
+        } elseif (!$isHomeItem && !isMainMenuPositionAvailable($conn, $menuData["display_order"], $isCreateMode ? 0 : $itemId)) {
+            $errors[] = "La posici&oacute;n seleccionada ya est&aacute; ocupada por otra opci&oacute;n principal.";
         }
 
         if ($errors === []) {
@@ -375,9 +383,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <div class="helper">Inicio siempre permanece en la primera posicion del menu.</div>
                             <?php else: ?>
                                 <select id="display_order_select" data-display-order-select<?php echo $menuData["parent_id"] !== null ? " disabled" : ""; ?>>
-                                    <?php for ($i = 2; $i <= 8; $i++): ?>
-                                        <option value="<?php echo $i; ?>" <?php echo (int) $menuData["display_order"] === $i ? "selected" : ""; ?>><?php echo $i; ?></option>
-                                    <?php endfor; ?>
+                                    <?php foreach ($availableMainPositions as $position): ?>
+                                        <option value="<?php echo $position; ?>" <?php echo (int) $menuData["display_order"] === $position ? "selected" : ""; ?>><?php echo $position; ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                                 <input type="hidden" id="display_order" name="display_order" value="<?php echo (int) $menuData["display_order"]; ?>" data-display-order-hidden>
                                 <div class="helper" data-display-order-help><?php echo $menuData["parent_id"] !== null ? "La posici&oacute;n se hereda de la opci&oacute;n principal superior." : "La posici&oacute;n define el orden como opci&oacute;n principal."; ?></div>
