@@ -67,7 +67,7 @@ return [
         ["field_key" => "emergency_banner_button_text", "label" => "Emergency banner botón texto", "field_type" => "text", "default" => "Call 911", "default_visible" => 1],
         ["field_key" => "emergency_banner_button_url", "label" => "Emergency banner botón URL", "field_type" => "url", "default" => "tel:911", "default_visible" => 1],
         ["field_key" => "quick_actions_title", "label" => "Título de la sección", "field_type" => "text", "default" => "Quick Actions", "default_visible" => 1],
-        ["field_key" => "emergency_tips_title", "label" => "Emergency Tips título", "field_type" => "text", "default" => "When to Seek Emergency Care", "default_visible" => 1],
+        ["field_key" => "emergency_tips_title", "label" => "Título de la sección", "field_type" => "text", "default" => "When to Seek Emergency Care", "default_visible" => 1],
     ],
     "repeaters" => [
         [
@@ -244,7 +244,7 @@ return [
         ],
         [
             "repeater_key" => "emergency_tips",
-            "label" => "Emergency Tips",
+            "label" => "Consejos de emergencia",
             "fields" => [
                 ["field_key" => "text", "label" => "Texto", "field_type" => "text", "default" => ""],
             ],

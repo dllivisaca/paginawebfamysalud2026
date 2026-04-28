@@ -930,7 +930,7 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["quick_actions_title"],
         ],
         [
-            "title" => "Emergency Tips",
+            "title" => "Consejos de emergencia",
             "description" => "Encabezado del bloque de consejos de emergencia.",
             "field_keys" => ["emergency_tips_title"],
         ],
