@@ -223,6 +223,37 @@ function getMenuItemDepth(mysqli $conn, int $itemId): int
     return $depth;
 }
 
+function getMenuRootDisplayOrder(mysqli $conn, int $itemId): ?int
+{
+    if ($itemId <= 0) {
+        return null;
+    }
+
+    $currentId = $itemId;
+    $rootDisplayOrder = null;
+    $visited = [];
+
+    while ($currentId > 0 && !isset($visited[$currentId])) {
+        $visited[$currentId] = true;
+        $item = getMenuItemById($conn, $currentId);
+
+        if (!$item) {
+            return $rootDisplayOrder;
+        }
+
+        $rootDisplayOrder = (int) ($item["display_order"] ?? 0);
+        $parentId = isset($item["parent_id"]) ? (int) $item["parent_id"] : 0;
+
+        if ($parentId <= 0) {
+            return $rootDisplayOrder;
+        }
+
+        $currentId = $parentId;
+    }
+
+    return $rootDisplayOrder;
+}
+
 function wouldCreateMenuCycle(mysqli $conn, int $itemId, ?int $parentId): bool
 {
     if ($itemId <= 0 || $parentId === null) {
@@ -378,6 +409,7 @@ function getMenuParentOptions(mysqli $conn, int $excludeItemId = 0): array
             continue;
         }
 
+        $item["root_display_order"] = getMenuRootDisplayOrder($conn, $itemId) ?? (int) ($item["display_order"] ?? 0);
         $options[] = $item;
     }
 

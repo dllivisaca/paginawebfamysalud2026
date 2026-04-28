@@ -75,6 +75,13 @@ if ($isCreateMode && $_SERVER["REQUEST_METHOD"] !== "POST" && ($sitePages === []
 
 $parentOptions = getMenuParentOptions($conn, $isCreateMode ? 0 : $itemId);
 
+if ($menuData["parent_id"] !== null) {
+    $rootDisplayOrder = getMenuRootDisplayOrder($conn, (int) $menuData["parent_id"]);
+    if ($rootDisplayOrder !== null) {
+        $menuData["display_order"] = $rootDisplayOrder;
+    }
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $csrfToken = (string) ($_POST["csrf_token"] ?? "");
 
@@ -159,13 +166,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $menuData["display_order"] = 1;
             $menuData["is_active"] = 1;
             $menuData["parent_id"] = null;
-        } elseif ($menuData["display_order"] < 2 || $menuData["display_order"] > 8) {
-            $errors[] = "La posicion seleccionada no es valida.";
         }
 
         $parentValidationError = null;
         if (!validateMenuParent($conn, $isCreateMode ? 0 : $itemId, $menuData["parent_id"], $parentValidationError)) {
             $errors[] = $parentValidationError ?? "La opcion superior seleccionada no es valida.";
+        }
+
+        if (!$isHomeItem && $menuData["parent_id"] !== null) {
+            $rootDisplayOrder = getMenuRootDisplayOrder($conn, (int) $menuData["parent_id"]);
+            if ($rootDisplayOrder === null || $rootDisplayOrder < 2 || $rootDisplayOrder > 8) {
+                $errors[] = "No fue posible calcular la posicion heredada de la opcion superior.";
+            } else {
+                $menuData["display_order"] = $rootDisplayOrder;
+            }
+        } elseif (!$isHomeItem && ($menuData["display_order"] < 2 || $menuData["display_order"] > 8)) {
+            $errors[] = "La posicion seleccionada no es valida.";
         }
 
         if ($errors === []) {
@@ -342,7 +358,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <select id="parent_id" name="parent_id">
                                     <option value="">Ninguna, ser&aacute; opci&oacute;n principal</option>
                                     <?php foreach ($parentOptions as $parentOption): ?>
-                                        <option value="<?php echo (int) $parentOption["id"]; ?>" <?php echo $menuData["parent_id"] !== null && (int) $menuData["parent_id"] === (int) $parentOption["id"] ? "selected" : ""; ?>>
+                                        <option value="<?php echo (int) $parentOption["id"]; ?>" data-root-order="<?php echo (int) ($parentOption["root_display_order"] ?? $parentOption["display_order"] ?? 0); ?>" <?php echo $menuData["parent_id"] !== null && (int) $menuData["parent_id"] === (int) $parentOption["id"] ? "selected" : ""; ?>>
                                             <?php echo str_repeat("&nbsp;&nbsp;", (int) ($parentOption["tree_depth"] ?? 0)); ?><?php echo (int) ($parentOption["tree_depth"] ?? 0) > 0 ? "&#8627; " : ""; ?><?php echo htmlspecialchars((string) ($parentOption["label"] ?? ""), ENT_QUOTES, "UTF-8"); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -358,12 +374,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <input type="hidden" id="display_order" name="display_order" value="1">
                                 <div class="helper">Inicio siempre permanece en la primera posicion del menu.</div>
                             <?php else: ?>
-                                <select id="display_order" name="display_order">
+                                <select id="display_order_select" data-display-order-select<?php echo $menuData["parent_id"] !== null ? " disabled" : ""; ?>>
                                     <?php for ($i = 2; $i <= 8; $i++): ?>
                                         <option value="<?php echo $i; ?>" <?php echo (int) $menuData["display_order"] === $i ? "selected" : ""; ?>><?php echo $i; ?></option>
                                     <?php endfor; ?>
                                 </select>
-                                <div class="helper">La posici&oacute;n 1 est&aacute; reservada para Inicio.</div>
+                                <input type="hidden" id="display_order" name="display_order" value="<?php echo (int) $menuData["display_order"]; ?>" data-display-order-hidden>
+                                <div class="helper" data-display-order-help><?php echo $menuData["parent_id"] !== null ? "La posici&oacute;n se hereda de la opci&oacute;n principal superior." : "La posici&oacute;n define el orden como opci&oacute;n principal."; ?></div>
                             <?php endif; ?>
                         </div>
 
@@ -401,6 +418,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 var nameInput = form.querySelector("[data-menu-name]");
                 var urlInput = form.querySelector("[data-menu-url]");
                 var urlHelp = form.querySelector("[data-menu-url-help]");
+                var parentSelect = form.querySelector("#parent_id");
+                var displayOrderSelect = form.querySelector("[data-display-order-select]");
+                var displayOrderHidden = form.querySelector("[data-display-order-hidden]");
+                var displayOrderHelp = form.querySelector("[data-display-order-help]");
 
                 if (!linkTypeSelect || !nameInput || !urlInput) {
                     return;
@@ -414,6 +435,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 function selectedPageOption() {
                     return pageSelect ? pageSelect.options[pageSelect.selectedIndex] : null;
+                }
+
+                function selectedParentOption() {
+                    return parentSelect ? parentSelect.options[parentSelect.selectedIndex] : null;
+                }
+
+                function syncDisplayOrderState() {
+                    if (!displayOrderSelect || !displayOrderHidden) {
+                        return;
+                    }
+
+                    var option = selectedParentOption();
+                    var inheritedOrder = option && option.value !== "" ? option.getAttribute("data-root-order") : "";
+
+                    if (inheritedOrder !== "") {
+                        displayOrderSelect.value = inheritedOrder;
+                        displayOrderHidden.value = inheritedOrder;
+                        displayOrderSelect.disabled = true;
+                        if (displayOrderHelp) {
+                            displayOrderHelp.textContent = "La posici\u00f3n se hereda de la opci\u00f3n principal superior.";
+                        }
+                    } else {
+                        displayOrderSelect.disabled = false;
+                        displayOrderHidden.value = displayOrderSelect.value;
+                        if (displayOrderHelp) {
+                            displayOrderHelp.textContent = "La posici\u00f3n define el orden como opci\u00f3n principal.";
+                        }
+                    }
                 }
 
                 function syncFromSelectedPage() {
@@ -456,6 +505,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     if (internalMode) {
                         syncFromSelectedPage();
                     }
+
+                    syncDisplayOrderState();
+                }
+
+                if (parentSelect) {
+                    parentSelect.addEventListener("change", syncDisplayOrderState);
+                }
+
+                if (displayOrderSelect) {
+                    displayOrderSelect.addEventListener("change", function () {
+                        if (displayOrderHidden && !displayOrderSelect.disabled) {
+                            displayOrderHidden.value = displayOrderSelect.value;
+                        }
+                    });
                 }
 
                 nameInput.addEventListener("input", function () {
