@@ -163,6 +163,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isHeroFeatureIconField = $repeaterKey === "hero_features" && $fieldKey === "icon_class";
                         $isHomeAboutFeatureIconField = $repeaterKey === "home_about_features" && $fieldKey === "icon_class";
                         $isCtaFeatureIconField = $repeaterKey === "cta_features" && $fieldKey === "icon_class";
+                        $isQuickActionIconField = $repeaterKey === "quick_actions" && $fieldKey === "icon_class";
                         $isEmergencyContactIconField = $repeaterKey === "emergency_contacts" && $fieldKey === "icon_class";
                         $isCtaFeatureLinkTextField = $repeaterKey === "cta_features" && $fieldKey === "link_text";
                         $isCtaFeatureLinkTypeField = $repeaterKey === "cta_features" && $fieldKey === "link_type";
@@ -246,6 +247,12 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             "bi bi-calendar-check" => "Calendario",
                             "bi bi-people" => "Personas",
                         ];
+                        $quickActionIconOptions = [
+                            "bi bi-geo-alt-fill" => "Ubicación",
+                            "bi bi-calendar-check" => "Calendario",
+                            "bi bi-person-badge" => "Usuario / Doctor",
+                            "bi bi-chat-dots" => "Chat",
+                        ];
                         $emergencyContactIconOptions = [
                             "bi bi-hospital" => "Hospital",
                             "bi bi-clock" => "Reloj",
@@ -283,9 +290,13 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                 <label class="file-input-label" for="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
                                 <input class="form-file js-image-upload" type="file" id="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">
                                 <img id="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
-                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField || $isEmergencyContactIconField || $isFeaturedDepartmentIconField || $isFeaturedServiceIconField): ?>
+                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField || $isQuickActionIconField || $isEmergencyContactIconField || $isFeaturedDepartmentIconField || $isFeaturedServiceIconField): ?>
                                 <select class="form-input" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]">
-                                    <?php foreach (($isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : ($isCtaFeatureIconField ? $ctaFeatureIconOptions : ($isEmergencyContactIconField ? $emergencyContactIconOptions : ($isFeaturedDepartmentIconField ? $featuredDepartmentIconOptions : $featuredServiceIconOptions))))) as $iconValue => $iconLabel): ?>
+                                    <?php $iconOptions = $isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : ($isCtaFeatureIconField ? $ctaFeatureIconOptions : ($isQuickActionIconField ? $quickActionIconOptions : ($isEmergencyContactIconField ? $emergencyContactIconOptions : ($isFeaturedDepartmentIconField ? $featuredDepartmentIconOptions : $featuredServiceIconOptions))))); ?>
+                                    <?php if ($isQuickActionIconField && $fieldValue !== "" && !array_key_exists($fieldValue, $quickActionIconOptions)): ?>
+                                        <option value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>" selected>Icono actual: <?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></option>
+                                    <?php endif; ?>
+                                    <?php foreach ($iconOptions as $iconValue => $iconLabel): ?>
                                         <option value="<?php echo htmlspecialchars($iconValue, ENT_QUOTES, "UTF-8"); ?>"<?php echo $fieldValue === $iconValue ? " selected" : ""; ?>><?php echo htmlspecialchars($iconLabel, ENT_QUOTES, "UTF-8"); ?></option>
                                     <?php endforeach; ?>
                                 </select>
