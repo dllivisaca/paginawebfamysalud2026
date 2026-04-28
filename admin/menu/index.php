@@ -113,15 +113,22 @@ foreach ($items as $item) {
 
 $menuOptions = buildAdminMenuTree($menuOptions);
 
-$visibleOptionsCount = 0;
+$mainOptionsCount = $homeItem !== null ? 1 : 0;
+$visibleMainOptionsCount = $homeItem !== null && (int) ($homeItem["is_active"] ?? 0) === 1 ? 1 : 0;
 foreach ($menuOptions as $item) {
+    if (($item["parent_id"] ?? null) !== null) {
+        continue;
+    }
+
+    $mainOptionsCount++;
+
     if ((int) ($item["is_active"] ?? 0) === 1) {
-        $visibleOptionsCount++;
+        $visibleMainOptionsCount++;
     }
 }
 
 $buttonConfigured = $primaryButton !== null;
-$totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
+$totalOptionsCount = $mainOptionsCount;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -169,8 +176,8 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                 <h2>Resumen</h2>
                 <p>Vista resumida de las opciones del men&uacute; y su estado actual dentro del sitio.</p>
                 <div class="summary-grid">
-                    <div class="summary-box"><div class="summary-label">Opciones registradas</div><div class="summary-value"><?php echo $totalOptionsCount; ?> de 8</div></div>
-                    <div class="summary-box"><div class="summary-label">Opciones visibles</div><div class="summary-value"><?php echo $visibleOptionsCount + ($homeItem !== null ? 1 : 0); ?></div></div>
+                    <div class="summary-box"><div class="summary-label">Opciones principales registradas</div><div class="summary-value"><?php echo $totalOptionsCount; ?> de 8</div></div>
+                    <div class="summary-box"><div class="summary-label">Opciones principales visibles</div><div class="summary-value"><?php echo $visibleMainOptionsCount; ?></div></div>
                     <div class="summary-box"><div class="summary-label">Bot&oacute;n principal</div><div class="summary-value"><?php echo $buttonConfigured ? "Configurado" : "Pendiente"; ?></div></div>
                 </div>
             </section>
