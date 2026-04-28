@@ -244,7 +244,7 @@ return [
         ],
         [
             "repeater_key" => "emergency_tips",
-            "label" => "Consejos de emergencia",
+            "label" => "Consejos de emergencia - Tips",
             "fields" => [
                 ["field_key" => "text", "label" => "Texto", "field_type" => "text", "default" => ""],
             ],

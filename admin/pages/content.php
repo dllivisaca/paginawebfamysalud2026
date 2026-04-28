@@ -1008,7 +1008,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .emergency-contacts-admin-section .card { background: #f9fafb; }
         .section-block.quick-actions-admin-section { background: #fff; }
         .quick-actions-admin-section .card { background: #f9fafb; }
-        .section-block.emergency-tips-admin-section { background: #fff; }
+        .section-block.emergency-tips-admin-section { background: #fff; margin-top: 16px; }
         .emergency-tips-admin-section .card { background: #f9fafb; }
         .section-block.emergency-contacts-admin-section > h3 { font-size: 17px; }
         .emergency-contacts-admin-section .item-title h3 { font-size: 17px; }
