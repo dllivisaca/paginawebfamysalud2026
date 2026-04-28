@@ -762,6 +762,29 @@ if (($schema["template_key"] ?? "") === "about") {
         ],
     ];
     $aboutStatsRepeaterConfig = $schema["repeaters"][0] ?? null;
+} elseif (($schema["template_key"] ?? "") === "departments") {
+    $simpleFieldGroups = [
+        [
+            "title" => "Encabezado",
+            "description" => "Titulo y subtitulo principal de la pagina.",
+            "field_keys" => ["hero_title", "hero_subtitle"],
+        ],
+        [
+            "title" => "Introducción",
+            "description" => "Texto introductorio que aparece antes del listado de departamentos.",
+            "field_keys" => ["intro_title", "intro_text"],
+        ],
+        [
+            "title" => "Sección de departamentos",
+            "description" => "Encabezado del bloque de tarjetas de departamentos.",
+            "field_keys" => ["section_title", "section_subtitle"],
+        ],
+        [
+            "title" => "CTA final",
+            "description" => "Contenido y enlace del llamado a la accion final.",
+            "field_keys" => ["cta_title", "cta_text", "cta_button_text", "cta_button_link_type", "cta_button_page_id", "cta_button_url"],
+        ],
+    ];
 } elseif (($schema["template_key"] ?? "") === "home") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
     $simpleFieldGroups = [
