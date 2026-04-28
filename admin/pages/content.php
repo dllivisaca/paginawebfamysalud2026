@@ -167,6 +167,18 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $fieldKey = (string) ($fieldConfig["field_key"] ?? "");
                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                         $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
+                        if ($repeaterKey === "departments" && $fieldKey === "layout_variant") {
+                            $layoutVariantValue = $fieldValue === "featured" ? "featured" : "card";
+                            $layoutVariantLabel = $layoutVariantValue === "featured" ? "Destacado" : "Tarjeta estándar";
+                            ?>
+                            <div class="field-group">
+                                <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>_readonly">Tipo de tarjeta</label>
+                                <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($layoutVariantValue, ENT_QUOTES, "UTF-8"); ?>">
+                                <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>_readonly" value="<?php echo htmlspecialchars($layoutVariantLabel, ENT_QUOTES, "UTF-8"); ?>" readonly>
+                            </div>
+                            <?php
+                            continue;
+                        }
                         if ($repeaterKey === "departments" && in_array($fieldKey, $departmentsHiddenFields, true)) {
                             ?>
                             <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
