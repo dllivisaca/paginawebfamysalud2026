@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $homeContent = is_array($pageContent ?? null) ? $pageContent : ["simple_fields" => [], "repeaters" => []];
 $homeFields = $homeContent["simple_fields"] ?? [];
 $homeRepeaters = $homeContent["repeaters"] ?? [];
@@ -205,7 +205,7 @@ require __DIR__ . "/../../includes/header.php";
 ?>
 
 <main class="main">
-  <section id="hero" class="hero section dark-background">
+  <section id="hero" class="hero section dark-background" style="--hero-bg-image: url('<?php echo htmlspecialchars($heroImage, ENT_QUOTES, "UTF-8"); ?>');">
     <div class="container-fluid p-0">
       <div class="hero-wrapper">
         <div class="hero-image">

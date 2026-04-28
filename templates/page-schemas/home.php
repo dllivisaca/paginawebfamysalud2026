@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     "template_key" => "home",
