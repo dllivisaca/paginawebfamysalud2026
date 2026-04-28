@@ -444,16 +444,16 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                 <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_button_text", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][button_text]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
 
                                 <div class="button-destination-box">
-                                    <div class="field-group field-group-full">
+                                    <div class="field-group field-group-full" style="display: none;">
                                         <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_button_link_type", ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
                                         <select class="form-select js-link-type" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_button_link_type", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][button_link_type]" data-link-scope="<?php echo htmlspecialchars($emergencyContactButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
-                                            <option value="internal"<?php echo $emergencyContactButtonLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
-                                            <option value="custom"<?php echo $emergencyContactButtonLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                            <option value="internal">P&aacute;gina interna</option>
+                                            <option value="custom" selected>URL personalizada</option>
                                         </select>
                                     </div>
 
                                     <div class="button-destination-grid">
-                                        <div class="field-group field-group-full js-link-panel <?php echo $emergencyContactButtonLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($emergencyContactButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                        <div class="field-group field-group-full js-link-panel <?php echo $emergencyContactButtonLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($emergencyContactButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>" style="display: none;">
                                             <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_button_page_id", ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
                                             <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_button_page_id", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][button_page_id]">
                                                 <option value="">Selecciona una p&aacute;gina</option>
@@ -463,8 +463,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                             </select>
                                         </div>
 
-                                        <div class="field-group field-group-full js-link-panel <?php echo $emergencyContactButtonLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($emergencyContactButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
-                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_button_url", ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                        <div class="field-group field-group-full js-link-panel" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($emergencyContactButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_button_url", ENT_QUOTES, "UTF-8"); ?>">Teléfono o enlace del botón</label>
                                             <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_button_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][button_url]" value="<?php echo htmlspecialchars($emergencyContactButtonUrlValue, ENT_QUOTES, "UTF-8"); ?>">
                                         </div>
                                     </div>
