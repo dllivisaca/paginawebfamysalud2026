@@ -168,7 +168,7 @@ function ensureHomeMenuItem(mysqli $conn): void
 function getMenuItemById(mysqli $conn, int $id): ?array
 {
     $schema = getMenuItemsLinkSupport($conn);
-    $selectFields = "id, item_key, label, url, display_order, is_active, is_button, target";
+    $selectFields = "id, parent_id, item_key, label, url, display_order, is_active, is_button, target";
     if ($schema["link_type"]) {
         $selectFields .= ", link_type";
     }
@@ -191,10 +191,197 @@ function getMenuItemById(mysqli $conn, int $id): ?array
         return null;
     }
 
+    $row["parent_id"] = isset($row["parent_id"]) ? (int) $row["parent_id"] : null;
     $row["link_type"] = ($row["link_type"] ?? "custom") === "internal" ? "internal" : "custom";
     $row["site_page_id"] = isset($row["site_page_id"]) ? (int) $row["site_page_id"] : 0;
 
     return $row;
+}
+
+function getMenuItemDepth(mysqli $conn, int $itemId): int
+{
+    if ($itemId <= 0) {
+        return 0;
+    }
+
+    $depth = 0;
+    $currentId = $itemId;
+    $visited = [];
+
+    while ($currentId > 0 && !isset($visited[$currentId]) && $depth < 20) {
+        $visited[$currentId] = true;
+        $item = getMenuItemById($conn, $currentId);
+
+        if (!$item) {
+            break;
+        }
+
+        $depth++;
+        $currentId = isset($item["parent_id"]) ? (int) $item["parent_id"] : 0;
+    }
+
+    return $depth;
+}
+
+function wouldCreateMenuCycle(mysqli $conn, int $itemId, ?int $parentId): bool
+{
+    if ($itemId <= 0 || $parentId === null) {
+        return false;
+    }
+
+    $currentId = $parentId;
+    $visited = [];
+
+    while ($currentId > 0 && !isset($visited[$currentId])) {
+        if ($currentId === $itemId) {
+            return true;
+        }
+
+        $visited[$currentId] = true;
+        $item = getMenuItemById($conn, $currentId);
+
+        if (!$item) {
+            return false;
+        }
+
+        $currentId = isset($item["parent_id"]) ? (int) $item["parent_id"] : 0;
+    }
+
+    return false;
+}
+
+function validateMenuParent(mysqli $conn, int $itemId, ?int $parentId, ?string &$error = null): bool
+{
+    $error = null;
+
+    if ($parentId === null) {
+        return true;
+    }
+
+    if ($itemId > 0 && $parentId === $itemId) {
+        $error = "Una opcion no puede ser superior de si misma.";
+        return false;
+    }
+
+    $parentItem = getMenuItemById($conn, $parentId);
+    if (!$parentItem || (int) ($parentItem["is_button"] ?? 0) !== 0 || isHomeMenuItem($parentItem)) {
+        $error = "La opcion superior seleccionada no es valida.";
+        return false;
+    }
+
+    if (wouldCreateMenuCycle($conn, $itemId, $parentId)) {
+        $error = "La opcion superior seleccionada crearia un ciclo.";
+        return false;
+    }
+
+    if (getMenuItemDepth($conn, $parentId) >= 3) {
+        $error = "La jerarquia solo permite un maximo de 3 niveles.";
+        return false;
+    }
+
+    return true;
+}
+
+function buildAdminMenuTree(array $items): array
+{
+    $itemsById = [];
+    $itemsByParent = [];
+
+    foreach ($items as $item) {
+        $item["id"] = (int) ($item["id"] ?? 0);
+        $item["parent_id"] = isset($item["parent_id"]) ? (int) $item["parent_id"] : null;
+        $itemsById[$item["id"]] = $item;
+    }
+
+    foreach ($itemsById as $item) {
+        $parentId = $item["parent_id"];
+        $parentKey = ($parentId !== null && isset($itemsById[$parentId])) ? (string) $parentId : "root";
+        $itemsByParent[$parentKey][] = $item;
+    }
+
+    foreach ($itemsByParent as &$siblings) {
+        usort($siblings, function (array $first, array $second): int {
+            $orderCompare = ((int) ($first["display_order"] ?? 0)) <=> ((int) ($second["display_order"] ?? 0));
+            return $orderCompare !== 0 ? $orderCompare : ((int) ($first["id"] ?? 0)) <=> ((int) ($second["id"] ?? 0));
+        });
+    }
+    unset($siblings);
+
+    $flatTree = [];
+    $visited = [];
+    $appendChildren = function ($parentId, int $depth, string $prefix) use (&$appendChildren, &$itemsByParent, &$flatTree, &$visited): void {
+        $parentKey = $parentId === null ? "root" : (string) $parentId;
+        $position = 0;
+
+        foreach ($itemsByParent[$parentKey] ?? [] as $item) {
+            $itemId = (int) ($item["id"] ?? 0);
+            if (isset($visited[$itemId])) {
+                continue;
+            }
+
+            $visited[$itemId] = true;
+            $position++;
+            $number = $depth === 0 ? (string) ((int) ($item["display_order"] ?? $position)) : $prefix . "." . $position;
+            $item["tree_depth"] = $depth;
+            $item["tree_number"] = $number;
+            $flatTree[] = $item;
+            $appendChildren($itemId, $depth + 1, $number);
+        }
+    };
+
+    $appendChildren(null, 0, "");
+
+    foreach ($itemsById as $item) {
+        $itemId = (int) ($item["id"] ?? 0);
+        if (!isset($visited[$itemId])) {
+            $item["tree_depth"] = 0;
+            $item["tree_number"] = (string) ((int) ($item["display_order"] ?? 0));
+            $flatTree[] = $item;
+            $visited[$itemId] = true;
+        }
+    }
+
+    return $flatTree;
+}
+
+function getMenuParentOptions(mysqli $conn, int $excludeItemId = 0): array
+{
+    $schema = getMenuItemsLinkSupport($conn);
+    $selectFields = "id, parent_id, item_key, label, url, display_order, is_active, is_button, target";
+    if ($schema["link_type"]) {
+        $selectFields .= ", link_type";
+    }
+    if ($schema["site_page_id"]) {
+        $selectFields .= ", site_page_id";
+    }
+
+    $items = [];
+    $result = $conn->query("SELECT {$selectFields} FROM menu_items WHERE is_button = 0 ORDER BY display_order ASC, id ASC");
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $row["id"] = (int) ($row["id"] ?? 0);
+            $row["parent_id"] = isset($row["parent_id"]) ? (int) $row["parent_id"] : null;
+            $row["link_type"] = ($row["link_type"] ?? "custom") === "internal" ? "internal" : "custom";
+            $row["site_page_id"] = isset($row["site_page_id"]) ? (int) $row["site_page_id"] : 0;
+            $items[] = $row;
+        }
+    }
+
+    $options = [];
+    foreach (buildAdminMenuTree($items) as $item) {
+        $itemId = (int) ($item["id"] ?? 0);
+        if ($itemId <= 0 || $itemId === $excludeItemId || isHomeMenuItem($item) || (int) ($item["tree_depth"] ?? 0) >= 2) {
+            continue;
+        }
+
+        if (wouldCreateMenuCycle($conn, $excludeItemId, $itemId)) {
+            continue;
+        }
+
+        $options[] = $item;
+    }
+
+    return $options;
 }
 
 function isHomeMenuItem(?array $item): bool

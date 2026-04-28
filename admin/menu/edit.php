@@ -27,6 +27,7 @@ $menuData = [
     "is_active" => 1,
     "link_type" => "internal",
     "site_page_id" => 0,
+    "parent_id" => null,
 ];
 
 if ($status === "created") {
@@ -52,6 +53,7 @@ if (!$isCreateMode) {
             "is_active" => $isHomeItem ? 1 : (int) ($existingItem["is_active"] ?? 1),
             "link_type" => menuLinkType((string) ($existingItem["link_type"] ?? "custom"), $supportsMenuLinkTypes),
             "site_page_id" => (int) ($existingItem["site_page_id"] ?? 0),
+            "parent_id" => isset($existingItem["parent_id"]) ? (int) $existingItem["parent_id"] : null,
         ];
     }
 }
@@ -70,6 +72,8 @@ if ($supportsMenuLinkTypes) {
 if ($isCreateMode && $_SERVER["REQUEST_METHOD"] !== "POST" && ($sitePages === [] || !$supportsMenuLinkTypes)) {
     $menuData["link_type"] = "custom";
 }
+
+$parentOptions = getMenuParentOptions($conn, $isCreateMode ? 0 : $itemId);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $csrfToken = (string) ($_POST["csrf_token"] ?? "");
@@ -100,12 +104,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "is_active" => isset($_POST["is_active"]) ? 1 : 0,
             "link_type" => menuLinkType((string) ($_POST["link_type"] ?? "custom"), $supportsMenuLinkTypes),
             "site_page_id" => (int) ($_POST["site_page_id"] ?? 0),
+            "parent_id" => isset($_POST["parent_id"]) ? (int) $_POST["parent_id"] : 0,
         ];
+
+        $menuData["parent_id"] = (int) $menuData["parent_id"] > 0 ? (int) $menuData["parent_id"] : null;
 
         if ($isHomeItem) {
             $menuData["name"] = "Inicio";
             $menuData["display_order"] = 1;
             $menuData["is_active"] = 1;
+            $menuData["parent_id"] = null;
         }
 
         if ($isCreateMode && countByType($conn, 0) >= 8) {
@@ -150,47 +158,56 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($isHomeItem) {
             $menuData["display_order"] = 1;
             $menuData["is_active"] = 1;
+            $menuData["parent_id"] = null;
         } elseif ($menuData["display_order"] < 2 || $menuData["display_order"] > 8) {
             $errors[] = "La posicion seleccionada no es valida.";
+        }
+
+        $parentValidationError = null;
+        if (!validateMenuParent($conn, $isCreateMode ? 0 : $itemId, $menuData["parent_id"], $parentValidationError)) {
+            $errors[] = $parentValidationError ?? "La opcion superior seleccionada no es valida.";
         }
 
         if ($errors === []) {
             if ($supportsMenuLinkTypes) {
                 $sitePageId = $menuData["site_page_id"] > 0 ? $menuData["site_page_id"] : null;
+                $parentId = $menuData["parent_id"] !== null ? (int) $menuData["parent_id"] : null;
 
                 if ($isCreateMode) {
-                    $stmt = $conn->prepare("INSERT INTO menu_items (parent_id, label, link_type, site_page_id, url, display_order, is_active, is_button, target, created_at, updated_at) VALUES (NULL, ?, ?, ?, ?, ?, ?, 0, ?, NOW(), NOW())");
+                    $stmt = $conn->prepare("INSERT INTO menu_items (parent_id, label, link_type, site_page_id, url, display_order, is_active, is_button, target, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, NOW(), NOW())");
 
                     if (!$stmt) {
                         $errors[] = "No fue posible guardar la opcion del menu.";
                     } else {
-                        $stmt->bind_param("ssisiis", $menuData["name"], $menuData["link_type"], $sitePageId, $menuData["path"], $menuData["display_order"], $menuData["is_active"], $menuData["target"]);
+                        $stmt->bind_param("issisiis", $parentId, $menuData["name"], $menuData["link_type"], $sitePageId, $menuData["path"], $menuData["display_order"], $menuData["is_active"], $menuData["target"]);
                     }
                 } else {
-                    $stmt = $conn->prepare("UPDATE menu_items SET label = ?, link_type = ?, site_page_id = ?, url = ?, display_order = ?, is_active = ?, target = ?, updated_at = NOW() WHERE id = ? AND is_button = 0 LIMIT 1");
+                    $stmt = $conn->prepare("UPDATE menu_items SET parent_id = ?, label = ?, link_type = ?, site_page_id = ?, url = ?, display_order = ?, is_active = ?, target = ?, updated_at = NOW() WHERE id = ? AND is_button = 0 LIMIT 1");
 
                     if (!$stmt) {
                         $errors[] = "No fue posible actualizar la opcion del menu.";
                     } else {
-                        $stmt->bind_param("ssisiisi", $menuData["name"], $menuData["link_type"], $sitePageId, $menuData["path"], $menuData["display_order"], $menuData["is_active"], $menuData["target"], $itemId);
+                        $stmt->bind_param("issisiisi", $parentId, $menuData["name"], $menuData["link_type"], $sitePageId, $menuData["path"], $menuData["display_order"], $menuData["is_active"], $menuData["target"], $itemId);
                     }
                 }
             } else {
+                $parentId = $menuData["parent_id"] !== null ? (int) $menuData["parent_id"] : null;
+
                 if ($isCreateMode) {
-                    $stmt = $conn->prepare("INSERT INTO menu_items (parent_id, label, url, display_order, is_active, is_button, target, created_at, updated_at) VALUES (NULL, ?, ?, ?, ?, 0, ?, NOW(), NOW())");
+                    $stmt = $conn->prepare("INSERT INTO menu_items (parent_id, label, url, display_order, is_active, is_button, target, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 0, ?, NOW(), NOW())");
 
                     if (!$stmt) {
                         $errors[] = "No fue posible guardar la opcion del menu.";
                     } else {
-                        $stmt->bind_param("ssiis", $menuData["name"], $menuData["path"], $menuData["display_order"], $menuData["is_active"], $menuData["target"]);
+                        $stmt->bind_param("issiis", $parentId, $menuData["name"], $menuData["path"], $menuData["display_order"], $menuData["is_active"], $menuData["target"]);
                     }
                 } else {
-                    $stmt = $conn->prepare("UPDATE menu_items SET label = ?, url = ?, display_order = ?, is_active = ?, target = ?, updated_at = NOW() WHERE id = ? AND is_button = 0 LIMIT 1");
+                    $stmt = $conn->prepare("UPDATE menu_items SET parent_id = ?, label = ?, url = ?, display_order = ?, is_active = ?, target = ?, updated_at = NOW() WHERE id = ? AND is_button = 0 LIMIT 1");
 
                     if (!$stmt) {
                         $errors[] = "No fue posible actualizar la opcion del menu.";
                     } else {
-                        $stmt->bind_param("ssiisi", $menuData["name"], $menuData["path"], $menuData["display_order"], $menuData["is_active"], $menuData["target"], $itemId);
+                        $stmt->bind_param("issiisi", $parentId, $menuData["name"], $menuData["path"], $menuData["display_order"], $menuData["is_active"], $menuData["target"], $itemId);
                     }
                 }
             }
@@ -313,6 +330,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <option value="_self" <?php echo $menuData["target"] === "_self" ? "selected" : ""; ?>>En la misma pesta&ntilde;a</option>
                                 <option value="_blank" <?php echo $menuData["target"] === "_blank" ? "selected" : ""; ?>>En una pesta&ntilde;a nueva</option>
                             </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="parent_id">Opci&oacute;n superior</label>
+                            <?php if ($isHomeItem): ?>
+                                <div class="readonly-box">Ninguna, ser&aacute; opci&oacute;n principal</div>
+                                <input type="hidden" id="parent_id" name="parent_id" value="">
+                                <div class="helper">Inicio no puede depender de otra opci&oacute;n.</div>
+                            <?php else: ?>
+                                <select id="parent_id" name="parent_id">
+                                    <option value="">Ninguna, ser&aacute; opci&oacute;n principal</option>
+                                    <?php foreach ($parentOptions as $parentOption): ?>
+                                        <option value="<?php echo (int) $parentOption["id"]; ?>" <?php echo $menuData["parent_id"] !== null && (int) $menuData["parent_id"] === (int) $parentOption["id"] ? "selected" : ""; ?>>
+                                            <?php echo str_repeat("&nbsp;&nbsp;", (int) ($parentOption["tree_depth"] ?? 0)); ?><?php echo (int) ($parentOption["tree_depth"] ?? 0) > 0 ? "&#8627; " : ""; ?><?php echo htmlspecialchars((string) ($parentOption["label"] ?? ""), ENT_QUOTES, "UTF-8"); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="helper">Puedes seleccionar una opci&oacute;n principal o de segundo nivel.</div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="form-group">

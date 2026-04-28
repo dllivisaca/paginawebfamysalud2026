@@ -81,7 +81,7 @@ $items = [];
 $menuOptions = [];
 $primaryButton = null;
 $homeItem = null;
-$selectFields = "id, item_key, label, url, display_order, is_active, is_button, target";
+$selectFields = "id, parent_id, item_key, label, url, display_order, is_active, is_button, target";
 if ($supportsMenuLinkTypes) {
     $selectFields .= ", link_type, site_page_id";
 }
@@ -89,6 +89,7 @@ if ($supportsMenuLinkTypes) {
 $result = $conn->query("SELECT {$selectFields} FROM menu_items ORDER BY is_button ASC, display_order ASC, id ASC");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
+        $row["parent_id"] = isset($row["parent_id"]) ? (int) $row["parent_id"] : null;
         $row["link_type"] = ($row["link_type"] ?? "custom") === "internal" ? "internal" : "custom";
         $row["site_page_id"] = isset($row["site_page_id"]) ? (int) $row["site_page_id"] : 0;
         $items[] = $row;
@@ -109,6 +110,8 @@ foreach ($items as $item) {
         $menuOptions[] = $item;
     }
 }
+
+$menuOptions = buildAdminMenuTree($menuOptions);
 
 $visibleOptionsCount = 0;
 foreach ($menuOptions as $item) {
@@ -211,8 +214,8 @@ $totalOptionsCount = count($menuOptions) + ($homeItem !== null ? 1 : 0);
                                 <?php foreach ($menuOptions as $item): ?>
                                     <?php $isActive = (int) ($item["is_active"] ?? 0) === 1; ?>
                                     <tr>
-                                        <td><?php echo (int) ($item["display_order"] ?? 0); ?></td>
-                                        <td><?php echo htmlspecialchars((string) ($item["label"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
+                                        <td><?php echo htmlspecialchars((string) ($item["tree_number"] ?? $item["display_order"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
+                                        <td><span style="display:inline-block;padding-left:<?php echo ((int) ($item["tree_depth"] ?? 0)) * 18; ?>px;"><?php echo (int) ($item["tree_depth"] ?? 0) > 0 ? "&#8627; " : ""; ?><?php echo htmlspecialchars((string) ($item["label"] ?? ""), ENT_QUOTES, "UTF-8"); ?></span></td>
                                         <td><?php echo ($item["link_type"] ?? "custom") === "internal" ? "P&aacute;gina interna" : "Enlace personalizado"; ?></td>
                                         <td><?php echo htmlspecialchars((string) ($item["url"] ?? ""), ENT_QUOTES, "UTF-8"); ?></td>
                                         <td><span class="status-pill <?php echo $isActive ? "status-visible" : "status-hidden"; ?>"><?php echo $isActive ? "Visible" : "Oculta"; ?></span></td>
