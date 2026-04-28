@@ -776,7 +776,7 @@ if (($schema["template_key"] ?? "") === "about") {
         ],
         [
             "title" => "Sección de departamentos",
-            "description" => "Encabezado del bloque de tarjetas de departamentos.",
+            "description" => "Encabezado del bloque de tarjetas de departamentos. Las tarjetas se editan en el bloque repetible Departamentos.",
             "field_keys" => ["section_title", "section_subtitle"],
         ],
         [
