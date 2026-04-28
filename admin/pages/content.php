@@ -108,12 +108,28 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
 {
     $repeaterKey = (string) ($repeaterConfig["repeater_key"] ?? "");
     $repeaterItems = $contentData["repeaters"][$repeaterKey] ?? [];
+    $renderItems = $repeaterConfig["items"] ?? [];
+    if ($repeaterKey === "departments") {
+        $featuredRenderItem = null;
+        $normalRenderItems = [];
+        foreach ($renderItems as $renderItemConfig) {
+            $renderItemIndex = (int) ($renderItemConfig["item_index"] ?? -1);
+            $renderItemData = $repeaterItems[$renderItemIndex] ?? ["fields" => []];
+            $renderLayoutVariant = strtolower(trim((string) ($renderItemData["fields"]["layout_variant"]["field_value"] ?? "")));
+            if ($featuredRenderItem === null && $renderLayoutVariant === "featured") {
+                $featuredRenderItem = $renderItemConfig;
+                continue;
+            }
+            $normalRenderItems[] = $renderItemConfig;
+        }
+        $renderItems = $featuredRenderItem !== null ? array_merge([$featuredRenderItem], $normalRenderItems) : $normalRenderItems;
+    }
     global $linkableSitePages;
     ?>
     <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?>">
         <h3><?php echo htmlspecialchars($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : ($repeaterKey === "featured_doctors" ? "Doctores destacados - tarjetas" : (string) ($repeaterConfig["label"] ?? $repeaterKey)), ENT_QUOTES, "UTF-8"); ?></h3>
 
-        <?php foreach ($repeaterConfig["items"] as $itemConfig): ?>
+        <?php foreach ($renderItems as $itemConfig): ?>
             <?php
             $itemIndex = (int) $itemConfig["item_index"];
             $itemTitle = trim((string) ($itemConfig["item_label"] ?? ""));
