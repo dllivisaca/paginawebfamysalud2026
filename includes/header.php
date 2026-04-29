@@ -190,6 +190,92 @@ $canonicalUrlEscaped = htmlspecialchars($canonicalUrl, ENT_QUOTES, "UTF-8");
 $ogImageEscaped = htmlspecialchars($ogImage, ENT_QUOTES, "UTF-8");
 $bodyClassEscaped = htmlspecialchars($bodyClass ?? "site-page", ENT_QUOTES, "UTF-8");
 $currentPublicSlug = (string) ($currentPublicSlug ?? "");
+
+if (!function_exists("getDefaultPublicSiteSettings")) {
+    function getDefaultPublicSiteSettings(): array
+    {
+        return [
+            "__has_row" => false,
+            "site_name" => "FamySalud",
+            "site_logo_path" => "",
+            "footer_about_text" => "Atención médica con enfoque humano, cercano y profesional.\nInformación institucional y canales de contacto en proceso de actualización.",
+            "footer_copyright" => "Todos los derechos reservados",
+            "facebook_url" => "#",
+            "instagram_url" => "#",
+            "twitter_url" => "#",
+            "linkedin_url" => "#",
+            "youtube_url" => "",
+            "background_color" => "#ffffff",
+            "default_color" => "#2c3031",
+            "heading_color" => "#18444c",
+            "accent_color" => "#049ebb",
+            "nav_color" => "#496268",
+            "nav_hover_color" => "#049ebb",
+        ];
+    }
+}
+
+if (!function_exists("isSafePublicColorValue")) {
+    function isSafePublicColorValue(string $value): bool
+    {
+        return preg_match('/^#[0-9a-fA-F]{6}$/', trim($value)) === 1;
+    }
+}
+
+if (!function_exists("siteSettingsTableExists")) {
+    function siteSettingsTableExists(mysqli $conn): bool
+    {
+        $result = $conn->query("SHOW TABLES LIKE 'site_settings'");
+        return $result instanceof mysqli_result && $result->num_rows > 0;
+    }
+}
+
+if (!function_exists("loadPublicSiteSettings")) {
+    function loadPublicSiteSettings(mysqli $conn): array
+    {
+        $settings = getDefaultPublicSiteSettings();
+        if (!siteSettingsTableExists($conn)) {
+            return $settings;
+        }
+        $stmt = $conn->prepare("SELECT site_name, site_logo_path, footer_about_text, footer_copyright, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, background_color, default_color, heading_color, accent_color, nav_color, nav_hover_color FROM site_settings WHERE id = 1 LIMIT 1");
+        if (!$stmt) {
+            return $settings;
+        }
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result ? $result->fetch_assoc() : null;
+        $stmt->close();
+        if (!is_array($row)) {
+            return $settings;
+        }
+        $settings["__has_row"] = true;
+        foreach (["site_name", "site_logo_path", "footer_about_text", "footer_copyright"] as $textKey) {
+            $value = trim((string) ($row[$textKey] ?? ""));
+            if ($value !== "") {
+                $settings[$textKey] = $value;
+            }
+        }
+        foreach (["facebook_url", "instagram_url", "twitter_url", "linkedin_url", "youtube_url"] as $urlKey) {
+            $settings[$urlKey] = trim((string) ($row[$urlKey] ?? ""));
+        }
+        foreach (["background_color", "default_color", "heading_color", "accent_color", "nav_color", "nav_hover_color"] as $colorKey) {
+            $value = trim((string) ($row[$colorKey] ?? ""));
+            if (isSafePublicColorValue($value)) {
+                $settings[$colorKey] = $value;
+            }
+        }
+        return $settings;
+    }
+}
+
+$publicSiteSettings = isset($conn) && $conn instanceof mysqli ? loadPublicSiteSettings($conn) : getDefaultPublicSiteSettings();
+$publicSiteName = trim((string) ($publicSiteSettings["site_name"] ?? ""));
+if ($publicSiteName === "") {
+    $publicSiteName = "FamySalud";
+}
+$publicSiteNameEscaped = htmlspecialchars($publicSiteName, ENT_QUOTES, "UTF-8");
+$publicSiteLogoPath = trim((string) ($publicSiteSettings["site_logo_path"] ?? ""));
+$publicSiteLogoPathEscaped = htmlspecialchars($publicSiteLogoPath, ENT_QUOTES, "UTF-8");
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -225,13 +311,26 @@ $currentPublicSlug = (string) ($currentPublicSlug ?? "");
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/css/main.css" rel="stylesheet">
+  <style>
+    :root {
+      --background-color: <?php echo htmlspecialchars((string) $publicSiteSettings["background_color"], ENT_QUOTES, "UTF-8"); ?>;
+      --default-color: <?php echo htmlspecialchars((string) $publicSiteSettings["default_color"], ENT_QUOTES, "UTF-8"); ?>;
+      --heading-color: <?php echo htmlspecialchars((string) $publicSiteSettings["heading_color"], ENT_QUOTES, "UTF-8"); ?>;
+      --accent-color: <?php echo htmlspecialchars((string) $publicSiteSettings["accent_color"], ENT_QUOTES, "UTF-8"); ?>;
+      --nav-color: <?php echo htmlspecialchars((string) $publicSiteSettings["nav_color"], ENT_QUOTES, "UTF-8"); ?>;
+      --nav-hover-color: <?php echo htmlspecialchars((string) $publicSiteSettings["nav_hover_color"], ENT_QUOTES, "UTF-8"); ?>;
+    }
+  </style>
 </head>
 <body class="<?php echo $bodyClassEscaped; ?>">
 
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
       <a href="index.php" class="logo d-flex align-items-center me-auto me-xl-0">
-        <svg class="my-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <?php if ($publicSiteLogoPath !== ""): ?>
+          <img src="<?php echo $publicSiteLogoPathEscaped; ?>" alt="<?php echo $publicSiteNameEscaped; ?>">
+        <?php else: ?>
+          <svg class="my-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g id="iconCarrier">
             <path d="M22 22L2 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
             <path d="M17 22V6C17 4.11438 17 3.17157 16.4142 2.58579C15.8284 2 14.8856 2 13 2H11C9.11438 2 8.17157 2 7.58579 2.58579C7 3.17157 7 4.11438 7 6V22" stroke="currentColor" stroke-width="1.5"></path>
@@ -250,7 +349,8 @@ $currentPublicSlug = (string) ($currentPublicSlug ?? "");
             <path d="M14 7L10 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
           </g>
         </svg>
-        <h1 class="sitename">FamySalud</h1>
+        <?php endif; ?>
+        <h1 class="sitename"><?php echo $publicSiteNameEscaped; ?></h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
@@ -274,3 +374,4 @@ $currentPublicSlug = (string) ($currentPublicSlug ?? "");
       <?php endif; ?>
     </div>
   </header>
+

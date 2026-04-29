@@ -1,20 +1,86 @@
-  <footer id="footer" class="footer position-relative light-background">
+<?php
+if (!isset($publicSiteSettings) || !is_array($publicSiteSettings)) {
+    if (!function_exists("getDefaultPublicSiteSettings")) {
+        function getDefaultPublicSiteSettings(): array
+        {
+            return [
+                "__has_row" => false,
+                "site_name" => "FamySalud",
+                "site_logo_path" => "",
+                "footer_about_text" => "Atención médica con enfoque humano, cercano y profesional.\nInformación institucional y canales de contacto en proceso de actualización.",
+                "footer_copyright" => "Todos los derechos reservados",
+                "facebook_url" => "#",
+                "instagram_url" => "#",
+                "twitter_url" => "#",
+                "linkedin_url" => "#",
+                "youtube_url" => "",
+                "background_color" => "#ffffff",
+                "default_color" => "#2c3031",
+                "heading_color" => "#18444c",
+                "accent_color" => "#049ebb",
+                "nav_color" => "#496268",
+                "nav_hover_color" => "#049ebb",
+            ];
+        }
+    }
+    $publicSiteSettings = getDefaultPublicSiteSettings();
+}
+
+$footerSiteName = trim((string) ($publicSiteSettings["site_name"] ?? ""));
+if ($footerSiteName === "") {
+    $footerSiteName = "FamySalud";
+}
+$footerSiteNameEscaped = htmlspecialchars($footerSiteName, ENT_QUOTES, "UTF-8");
+
+$footerAboutText = trim((string) ($publicSiteSettings["footer_about_text"] ?? ""));
+if ($footerAboutText === "") {
+    $footerAboutText = "Atención médica con enfoque humano, cercano y profesional.\nInformación institucional y canales de contacto en proceso de actualización.";
+}
+$footerAboutParagraphs = array_values(array_filter(array_map("trim", preg_split('/\R+/', $footerAboutText))));
+
+$footerCopyright = trim((string) ($publicSiteSettings["footer_copyright"] ?? ""));
+if ($footerCopyright === "") {
+    $footerCopyright = "Todos los derechos reservados";
+}
+$footerCopyrightEscaped = htmlspecialchars($footerCopyright, ENT_QUOTES, "UTF-8");
+
+$footerSocialConfig = [
+    ["key" => "twitter_url", "label" => "X", "icon" => "bi bi-twitter-x"],
+    ["key" => "facebook_url", "label" => "Facebook", "icon" => "bi bi-facebook"],
+    ["key" => "instagram_url", "label" => "Instagram", "icon" => "bi bi-instagram"],
+    ["key" => "linkedin_url", "label" => "LinkedIn", "icon" => "bi bi-linkedin"],
+    ["key" => "youtube_url", "label" => "YouTube", "icon" => "bi bi-youtube"],
+];
+$footerSocialLinks = [];
+foreach ($footerSocialConfig as $socialItem) {
+    $url = trim((string) ($publicSiteSettings[$socialItem["key"]] ?? ""));
+    if ($url !== "") {
+        $footerSocialLinks[] = [
+            "url" => $url,
+            "label" => $socialItem["label"],
+            "icon" => $socialItem["icon"],
+        ];
+    }
+}
+?>  <footer id="footer" class="footer position-relative light-background">
     <div class="container footer-top">
       <div class="row gy-4">
         <div class="col-lg-4 col-md-6 footer-about">
           <a href="index.php" class="logo d-flex align-items-center">
-            <span class="sitename">FamySalud</span>
+            <span class="sitename"><?php echo $footerSiteNameEscaped; ?></span>
           </a>
           <div class="footer-contact pt-3">
-            <p>Atenci&oacute;n m&eacute;dica con enfoque humano, cercano y profesional.</p>
-            <p>Informaci&oacute;n institucional y canales de contacto en proceso de actualizaci&oacute;n.</p>
+            <?php foreach ($footerAboutParagraphs as $footerAboutParagraph): ?>
+              <p><?php echo htmlspecialchars($footerAboutParagraph, ENT_QUOTES, "UTF-8"); ?></p>
+            <?php endforeach; ?>
           </div>
+          <?php if ($footerSocialLinks !== []): ?>
           <div class="social-links d-flex mt-4">
-            <a href="#" aria-label="X"><i class="bi bi-twitter-x"></i></a>
-            <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-            <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-            <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+            <?php foreach ($footerSocialLinks as $footerSocialLink): ?>
+              <a href="<?php echo htmlspecialchars($footerSocialLink["url"], ENT_QUOTES, "UTF-8"); ?>" aria-label="<?php echo htmlspecialchars($footerSocialLink["label"], ENT_QUOTES, "UTF-8"); ?>"><i class="<?php echo htmlspecialchars($footerSocialLink["icon"], ENT_QUOTES, "UTF-8"); ?>"></i></a>
+            <?php endforeach; ?>
           </div>
+          <?php endif; ?>
         </div>
 
         <div class="col-lg-2 col-md-3 footer-links">
@@ -64,7 +130,7 @@
     </div>
 
     <div class="container copyright text-center mt-4">
-      <p>&copy; <span>Copyright</span> <strong class="px-1 sitename">FamySalud</strong> <span>Todos los derechos reservados</span></p>
+      <p>&copy; <span>Copyright</span> <strong class="px-1 sitename"><?php echo $footerSiteNameEscaped; ?></strong> <span><?php echo $footerCopyrightEscaped; ?></span></p>
     </div>
   </footer>
 
@@ -83,3 +149,4 @@
 
 </body>
 </html>
+
