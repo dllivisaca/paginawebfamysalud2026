@@ -4,6 +4,7 @@ function getPageTemplateContentSchemas(): array
 {
     return [
         "about" => require __DIR__ . "/about.php",
+        "appointment" => require __DIR__ . "/appointment.php",
         "contact" => require __DIR__ . "/contact.php",
         "department-details" => require __DIR__ . "/department-details.php",
         "departments" => require __DIR__ . "/departments.php",
