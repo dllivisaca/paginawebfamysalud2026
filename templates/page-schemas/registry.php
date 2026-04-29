@@ -12,5 +12,6 @@ function getPageTemplateContentSchemas(): array
         "home" => require __DIR__ . "/home.php",
         "service-details" => require __DIR__ . "/service-details.php",
         "services" => require __DIR__ . "/services.php",
+        "testimonials" => require __DIR__ . "/testimonials.php",
     ];
 }
