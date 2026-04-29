@@ -9,6 +9,7 @@ function getPageTemplateContentSchemas(): array
         "department-details" => require __DIR__ . "/department-details.php",
         "departments" => require __DIR__ . "/departments.php",
         "doctors" => require __DIR__ . "/doctors.php",
+        "faq" => require __DIR__ . "/faq.php",
         "home" => require __DIR__ . "/home.php",
         "service-details" => require __DIR__ . "/service-details.php",
         "services" => require __DIR__ . "/services.php",
