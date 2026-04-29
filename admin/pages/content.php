@@ -924,6 +924,14 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["hero_title", "hero_subtitle"],
         ],
     ];
+} elseif (($schema["template_key"] ?? "") === "services") {
+    $simpleFieldGroups = [
+        [
+            "title" => "Encabezado",
+            "description" => "Titulo y subtitulo principal de la pagina.",
+            "field_keys" => ["hero_title", "hero_subtitle"],
+        ],
+    ];
 } elseif (($schema["template_key"] ?? "") === "home") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
     $simpleFieldGroups = [
@@ -1782,6 +1790,43 @@ if (($schema["template_key"] ?? "") === "about") {
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : ""); ?>
+                            <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
+                                <div class="section-block">
+                                    <h3>Servicios - CTA</h3>
+                                    <div class="field-grid">
+                                        <?php foreach ($schema["simple_fields"] as $fieldConfig): ?>
+                                            <?php
+                                            $fieldKey = (string) ($fieldConfig["field_key"] ?? "");
+
+                                            if (!str_starts_with($fieldKey, "cta_")) {
+                                                continue;
+                                            }
+
+                                            $fieldData = $contentData["simple_fields"][$fieldKey] ?? null;
+                                            $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
+                                            $fieldValue = (string) ($fieldData["field_value"] ?? "");
+                                            $fieldVisible = (int) ($fieldData["is_visible"] ?? 1) === 1;
+                                            $isTextarea = $fieldType === "textarea";
+                                            ?>
+                                            <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
+                                                <div class="field-header">
+                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $fieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                    <label class="toggle-row">
+                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                                        <span>Mostrar</span>
+                                                    </label>
+                                                </div>
+
+                                                <?php if ($isTextarea): ?>
+                                                    <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                <?php else: ?>
+                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
                         <?php endforeach; ?>
 
                         <div class="actions">
