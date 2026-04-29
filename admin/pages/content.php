@@ -1,4 +1,4 @@
-﻿﻿﻿<?php
+﻿﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -136,7 +136,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
     }
     global $linkableSitePages;
     ?>
-    <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?>">
+    <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "service_categories" ? " service-categories-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?>">
         <h3><?php echo htmlspecialchars($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : ($repeaterKey === "featured_doctors" ? "Doctores destacados - tarjetas" : (string) ($repeaterConfig["label"] ?? $repeaterKey)), ENT_QUOTES, "UTF-8"); ?></h3>
 
         <?php foreach ($renderItems as $itemConfig): ?>
@@ -1198,6 +1198,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .departments-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-services-admin-section { background: #fff; }
         .featured-services-admin-section .card { background: #f9fafb; }
+        .section-block.service-categories-admin-section { background: #fff; }
+        .service-categories-admin-section .card { background: #f9fafb; }
         .section-block.cta-features-admin-section { background: #fff; }
         .cta-features-admin-section .card { background: #f9fafb; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
