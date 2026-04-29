@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿<?php
+﻿﻿﻿﻿﻿﻿﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -218,8 +218,20 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             "directions_button_icon",
                             "directions_button_url",
                         ];
+                        $hiddenEmergencyServiceFields = [
+                            "column_class",
+                            "variant_class",
+                            "link_text",
+                            "link_url",
+                        ];
 
                         if ($repeaterKey === "services" && $servicesItemMode === "general" && in_array($fieldKey, $hiddenGeneralServiceFields, true)) {
+                            ?>
+                            <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                            <?php
+                            continue;
+                        }
+                        if ($repeaterKey === "services" && $servicesItemMode === "emergency" && in_array($fieldKey, $hiddenEmergencyServiceFields, true)) {
                             ?>
                             <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                             <?php
