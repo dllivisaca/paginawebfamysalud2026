@@ -1,0 +1,78 @@
+<?php
+
+return [
+    "template_key" => "service-details",
+    "template_name" => "Detalles de servicio",
+    "simple_fields" => [
+        ["field_key" => "hero_title", "label" => "Titulo principal", "field_type" => "text", "default" => "Service Details", "default_visible" => 1],
+        ["field_key" => "hero_subtitle", "label" => "Subtitulo principal", "field_type" => "textarea", "default" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.", "default_visible" => 1],
+        ["field_key" => "service_image", "label" => "Servicio imagen", "field_type" => "image", "default" => "assets/img/health/cardiology-3.webp", "default_visible" => 1],
+        ["field_key" => "service_image_alt", "label" => "Servicio imagen alt", "field_type" => "text", "default" => "Cardiology Services", "default_visible" => 1],
+        ["field_key" => "service_tag", "label" => "Servicio tag", "field_type" => "text", "default" => "Specialized Care", "default_visible" => 1],
+        ["field_key" => "service_title", "label" => "Servicio titulo", "field_type" => "text", "default" => "Comprehensive Cardiology Services", "default_visible" => 1],
+        ["field_key" => "service_tagline", "label" => "Servicio tagline", "field_type" => "text", "default" => "Advanced heart care with cutting-edge technology and compassionate expertise", "default_visible" => 1],
+        ["field_key" => "service_text_1", "label" => "Servicio texto 1", "field_type" => "textarea", "default" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", "default_visible" => 1],
+        ["field_key" => "service_text_2", "label" => "Servicio texto 2", "field_type" => "textarea", "default" => "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", "default_visible" => 1],
+        ["field_key" => "features_title", "label" => "Features titulo", "field_type" => "text", "default" => "Our Services Include:", "default_visible" => 1],
+        ["field_key" => "primary_button_text", "label" => "Boton principal texto", "field_type" => "text", "default" => "Schedule Consultation", "default_visible" => 1],
+        ["field_key" => "primary_button_url", "label" => "Boton principal URL", "field_type" => "url", "default" => "#", "default_visible" => 1],
+        ["field_key" => "secondary_button_text", "label" => "Boton secundario texto", "field_type" => "text", "default" => "Learn More", "default_visible" => 1],
+        ["field_key" => "secondary_button_url", "label" => "Boton secundario URL", "field_type" => "url", "default" => "#", "default_visible" => 1],
+        ["field_key" => "booking_title", "label" => "Booking titulo", "field_type" => "text", "default" => "Ready to Schedule Your Appointment?", "default_visible" => 1],
+        ["field_key" => "booking_text", "label" => "Booking texto", "field_type" => "textarea", "default" => "Our cardiology specialists are available for consultations Monday through Friday. Same-day appointments available for urgent cases.", "default_visible" => 1],
+        ["field_key" => "appointment_title", "label" => "Appointment titulo", "field_type" => "text", "default" => "Book Your Visit", "default_visible" => 1],
+        ["field_key" => "appointment_text", "label" => "Appointment texto", "field_type" => "text", "default" => "Quick and easy online scheduling", "default_visible" => 1],
+        ["field_key" => "appointment_button_text", "label" => "Appointment boton texto", "field_type" => "text", "default" => "Book Appointment", "default_visible" => 1],
+        ["field_key" => "appointment_button_url", "label" => "Appointment boton URL", "field_type" => "url", "default" => "appointment.html", "default_visible" => 1],
+        ["field_key" => "appointment_alternative_text", "label" => "Appointment alternativa texto", "field_type" => "text", "default" => "Or call us at", "default_visible" => 1],
+        ["field_key" => "appointment_phone_text", "label" => "Appointment telefono texto", "field_type" => "text", "default" => "+1 (555) 123-4567", "default_visible" => 1],
+        ["field_key" => "appointment_phone_url", "label" => "Appointment telefono URL", "field_type" => "url", "default" => "tel:+15551234567", "default_visible" => 1],
+    ],
+    "repeaters" => [
+        [
+            "repeater_key" => "features",
+            "label" => "Features",
+            "fields" => [
+                ["field_key" => "text", "label" => "Texto", "field_type" => "text", "default" => ""],
+            ],
+            "items" => [
+                ["item_index" => 0, "item_label" => "Comprehensive cardiac examinations", "default_visible" => 1, "defaults" => ["text" => "Comprehensive cardiac examinations"]],
+                ["item_index" => 1, "item_label" => "Advanced diagnostic imaging", "default_visible" => 1, "defaults" => ["text" => "Advanced diagnostic imaging"]],
+                ["item_index" => 2, "item_label" => "Preventive heart screening programs", "default_visible" => 1, "defaults" => ["text" => "Preventive heart screening programs"]],
+                ["item_index" => 3, "item_label" => "Cardiac rehabilitation therapy", "default_visible" => 1, "defaults" => ["text" => "Cardiac rehabilitation therapy"]],
+                ["item_index" => 4, "item_label" => "Emergency cardiac intervention", "default_visible" => 1, "defaults" => ["text" => "Emergency cardiac intervention"]],
+                ["item_index" => 5, "item_label" => "Post-operative care and monitoring", "default_visible" => 1, "defaults" => ["text" => "Post-operative care and monitoring"]],
+            ],
+        ],
+        [
+            "repeater_key" => "service_cards",
+            "label" => "Service cards",
+            "fields" => [
+                ["field_key" => "icon_class", "label" => "Icono", "field_type" => "text", "default" => ""],
+                ["field_key" => "title", "label" => "Titulo", "field_type" => "text", "default" => ""],
+                ["field_key" => "text", "label" => "Texto", "field_type" => "textarea", "default" => ""],
+                ["field_key" => "link_text", "label" => "Enlace texto", "field_type" => "text", "default" => ""],
+                ["field_key" => "link_url", "label" => "Enlace URL", "field_type" => "url", "default" => "#"],
+            ],
+            "items" => [
+                ["item_index" => 0, "item_label" => "Diagnostic Testing", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse", "title" => "Diagnostic Testing", "text" => "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.", "link_text" => "Book Now", "link_url" => "#"]],
+                ["item_index" => 1, "item_label" => "Surgical Procedures", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-hospital", "title" => "Surgical Procedures", "text" => "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque.", "link_text" => "Schedule Surgery", "link_url" => "#"]],
+                ["item_index" => 2, "item_label" => "Preventive Care", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-shield-check", "title" => "Preventive Care", "text" => "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", "link_text" => "Get Screened", "link_url" => "#"]],
+            ],
+        ],
+        [
+            "repeater_key" => "availability_items",
+            "label" => "Availability info",
+            "fields" => [
+                ["field_key" => "icon_class", "label" => "Icono", "field_type" => "text", "default" => ""],
+                ["field_key" => "title", "label" => "Titulo", "field_type" => "text", "default" => ""],
+                ["field_key" => "text", "label" => "Texto", "field_type" => "text", "default" => ""],
+            ],
+            "items" => [
+                ["item_index" => 0, "item_label" => "Office Hours", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-clock", "title" => "Office Hours", "text" => "Mon-Fri: 8:00 AM - 6:00 PM"]],
+                ["item_index" => 1, "item_label" => "Emergency Line", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-telephone", "title" => "Emergency Line", "text" => "+1 (555) 123-4567"]],
+                ["item_index" => 2, "item_label" => "Location", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-geo-alt", "title" => "Location", "text" => "123 Medical Center Dr, Boston, MA 02101"]],
+            ],
+        ],
+    ],
+];
