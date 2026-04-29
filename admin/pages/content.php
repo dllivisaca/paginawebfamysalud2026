@@ -148,7 +148,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                     $itemTitle = $departmentsTitleValue !== "" ? "Departamento estándar: " . $departmentsTitleValue : "Departamento estándar";
                 }
                 $departmentsHiddenFields = $departmentsLayoutVariant === "featured"
-                    ? ["stats_number", "stats_label", "feature_1", "feature_2", "feature_3"]
+                    ? ["featured_badge_text", "stats_number", "stats_label", "feature_1", "feature_2", "feature_3"]
                     : ["featured_badge_text", "achievement_1_icon", "achievement_1_text", "achievement_2_icon", "achievement_2_text", "tag_1", "tag_2", "tag_3", "tag_4"];
             }
             ?>
