@@ -109,6 +109,16 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
     $repeaterKey = (string) ($repeaterConfig["repeater_key"] ?? "");
     $repeaterItems = $contentData["repeaters"][$repeaterKey] ?? [];
     $renderItems = $repeaterConfig["items"] ?? [];
+    $serviceCategoryOptions = [];
+
+    foreach (($contentData["repeaters"]["service_categories"] ?? []) as $serviceCategoryItem) {
+        $categoryKey = trim((string) ($serviceCategoryItem["fields"]["category_key"]["field_value"] ?? ""));
+        $categoryLabel = trim((string) ($serviceCategoryItem["fields"]["label"]["field_value"] ?? ""));
+
+        if ($categoryKey !== "") {
+            $serviceCategoryOptions[$categoryKey] = $categoryLabel !== "" ? $categoryLabel : $categoryKey;
+        }
+    }
     if ($repeaterKey === "departments") {
         $featuredRenderItem = null;
         $normalRenderItems = [];
@@ -185,6 +195,12 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $fieldKey = (string) ($fieldConfig["field_key"] ?? "");
                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                         $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
+                        if ($repeaterKey === "service_categories" && $fieldKey === "category_key") {
+                            ?>
+                            <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                            <?php
+                            continue;
+                        }
                         if ($repeaterKey === "departments" && $fieldKey === "layout_variant") {
                             $layoutVariantValue = $fieldValue === "featured" ? "featured" : "card";
                             ?>
@@ -217,6 +233,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             } elseif ($fieldKey === "appointment_button_url") {
                                 $fieldLabel = "URL del botón de cita";
                             }
+                        } elseif ($repeaterKey === "services" && $fieldKey === "category_key") {
+                            $fieldLabel = "Categoría del servicio";
                         } elseif ($repeaterKey === "emergency_contacts" && $fieldKey === "variant") {
                             $fieldLabel = "Prioridad del contacto";
                         }
@@ -691,7 +709,15 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                         </div>
                                     </div>
                                 </div>
-                            <?php else: ?>
+                            <?php elseif ($repeaterKey === "services" && $fieldKey === "category_key" && $serviceCategoryOptions !== []): ?>
+                                <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]">
+                                    <?php if ($fieldValue !== "" && !isset($serviceCategoryOptions[$fieldValue])): ?>
+                                        <option value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>" selected><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></option>
+                                    <?php endif; ?>
+                                    <?php foreach ($serviceCategoryOptions as $categoryKey => $categoryLabel): ?>
+                                        <option value="<?php echo htmlspecialchars($categoryKey, ENT_QUOTES, "UTF-8"); ?>"<?php echo $fieldValue === $categoryKey ? " selected" : ""; ?>><?php echo htmlspecialchars($categoryLabel, ENT_QUOTES, "UTF-8"); ?></option>
+                                    <?php endforeach; ?>
+                                </select>                            <?php else: ?>
                                 <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                             <?php endif; ?>
                         </div>
