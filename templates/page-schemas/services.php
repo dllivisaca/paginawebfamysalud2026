@@ -17,7 +17,7 @@ return [
     "repeaters" => [
         [
             "repeater_key" => "service_categories",
-            "label" => "Servicios - tabs",
+            "label" => "Servicios - categorias",
             "fields" => [
                 ["field_key" => "category_key", "label" => "Clave del tab", "field_type" => "text", "default" => ""],
                 ["field_key" => "label", "label" => "Texto del tab", "field_type" => "text", "default" => ""],
