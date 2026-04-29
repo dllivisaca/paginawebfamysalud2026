@@ -139,6 +139,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
             $itemData = $repeaterItems[$itemIndex] ?? ["fields" => [], "is_visible" => 1];
             $itemVisible = (int) ($itemData["is_visible"] ?? 1) === 1;
             $departmentsHiddenFields = [];
+            $repeaterFields = $repeaterConfig["fields"];
             if ($repeaterKey === "departments") {
                 $departmentsLayoutVariant = strtolower(trim((string) ($itemData["fields"]["layout_variant"]["field_value"] ?? "")));
                 $departmentsTitleValue = trim((string) ($itemData["fields"]["title"]["field_value"] ?? ""));
@@ -150,6 +151,23 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                 $departmentsHiddenFields = $departmentsLayoutVariant === "featured"
                     ? ["featured_badge_text", "stats_number", "stats_label", "feature_1", "feature_2", "feature_3"]
                     : ["featured_badge_text", "achievement_1_icon", "achievement_1_text", "achievement_2_icon", "achievement_2_text", "tag_1", "tag_2", "tag_3", "tag_4"];
+                if ($departmentsLayoutVariant === "featured") {
+                    $departmentsFeaturedFieldOrder = ["icon_class", "title", "subtitle", "image", "image_alt", "description", "achievement_1_icon", "achievement_1_text", "achievement_2_icon", "achievement_2_text", "tag_1", "tag_2", "tag_3", "tag_4", "button_text", "button_link_type", "button_page_id", "button_url"];
+                    $departmentsOriginalFieldOrder = [];
+                    foreach ($repeaterFields as $repeaterFieldIndex => $repeaterFieldConfig) {
+                        $departmentsOriginalFieldOrder[(string) ($repeaterFieldConfig["field_key"] ?? "")] = $repeaterFieldIndex;
+                    }
+                    usort($repeaterFields, function ($leftField, $rightField) use ($departmentsFeaturedFieldOrder, $departmentsOriginalFieldOrder) {
+                        $leftFieldKey = (string) ($leftField["field_key"] ?? "");
+                        $rightFieldKey = (string) ($rightField["field_key"] ?? "");
+                        $leftPosition = array_search($leftFieldKey, $departmentsFeaturedFieldOrder, true);
+                        $rightPosition = array_search($rightFieldKey, $departmentsFeaturedFieldOrder, true);
+                        $leftOriginalPosition = $departmentsOriginalFieldOrder[$leftFieldKey] ?? PHP_INT_MAX;
+                        $rightOriginalPosition = $departmentsOriginalFieldOrder[$rightFieldKey] ?? PHP_INT_MAX;
+
+                        return [($leftPosition === false ? PHP_INT_MAX : $leftPosition), $leftOriginalPosition] <=> [($rightPosition === false ? PHP_INT_MAX : $rightPosition), $rightOriginalPosition];
+                    });
+                }
             }
             ?>
             <div class="card">
@@ -162,7 +180,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                 </div>
 
                 <div class="field-grid">
-                    <?php foreach ($repeaterConfig["fields"] as $fieldConfig): ?>
+                    <?php foreach ($repeaterFields as $fieldConfig): ?>
                         <?php
                         $fieldKey = (string) ($fieldConfig["field_key"] ?? "");
                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
@@ -236,6 +254,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isEmergencyContactButtonLinkTypeField = $repeaterKey === "emergency_contacts" && $fieldKey === "button_link_type";
                         $isEmergencyContactButtonPageIdField = $repeaterKey === "emergency_contacts" && $fieldKey === "button_page_id";
                         $isEmergencyContactButtonUrlField = $repeaterKey === "emergency_contacts" && $fieldKey === "button_url";
+                        $isDepartmentsFeaturedSubtitleField = $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "subtitle";
+                        $isDepartmentsFeaturedDescriptionField = $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "description";
                         $featuredDepartmentLinkTypeValue = trim((string) (($itemData["fields"]["link_type"]["field_value"] ?? "")));
                         $featuredDepartmentPageIdValue = trim((string) (($itemData["fields"]["page_id"]["field_value"] ?? "")));
                         $featuredDepartmentLinkUrlValue = (string) (($itemData["fields"]["link_url"]["field_value"] ?? ""));
@@ -342,7 +362,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             continue;
                         }
                         ?>
-                        <div class="field-group<?php echo ($isQuickActionIconField || $isQuickActionLabelField || $isQuickActionUrlField || $isCtaFeatureLinkTextField || $isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField || $isEmergencyContactButtonTextField) ? " field-group-full" : ""; ?>">
+                        <div class="field-group<?php echo ($isQuickActionIconField || $isQuickActionLabelField || $isQuickActionUrlField || $isCtaFeatureLinkTextField || $isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField || $isEmergencyContactButtonTextField || $isDepartmentsFeaturedSubtitleField || $isDepartmentsFeaturedDescriptionField) ? " field-group-full" : ""; ?>">
                             <?php if (!$isQuickActionUrlField && !$isCtaFeatureLinkTextField && !$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField && !$isEmergencyContactButtonTextField): ?>
                                 <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
                             <?php endif; ?>
