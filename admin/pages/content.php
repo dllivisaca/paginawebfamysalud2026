@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿<?php
+﻿﻿﻿﻿﻿﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -208,6 +208,23 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $fieldKey = (string) ($fieldConfig["field_key"] ?? "");
                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                         $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
+                        $hiddenGeneralServiceFields = [
+                            "column_class",
+                            "variant_class",
+                            "emergency_button_text",
+                            "emergency_button_icon",
+                            "emergency_button_url",
+                            "directions_button_text",
+                            "directions_button_icon",
+                            "directions_button_url",
+                        ];
+
+                        if ($repeaterKey === "services" && $servicesItemMode === "general" && in_array($fieldKey, $hiddenGeneralServiceFields, true)) {
+                            ?>
+                            <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                            <?php
+                            continue;
+                        }
                         if ($repeaterKey === "service_categories" && $fieldKey === "category_key") {
                             ?>
                             <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
