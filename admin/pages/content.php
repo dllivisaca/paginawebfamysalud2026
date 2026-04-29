@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿<?php
+﻿﻿﻿﻿﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -104,7 +104,7 @@ function storeSimpleFieldImageUpload(array $file, string $fieldKey, string $temp
         "error" => "",
     ];
 }
-function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, string $sectionClass = ""): void
+function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, string $sectionClass = "", ?string $sectionTitle = null, string $servicesItemMode = ""): void
 {
     $repeaterKey = (string) ($repeaterConfig["repeater_key"] ?? "");
     $repeaterItems = $contentData["repeaters"][$repeaterKey] ?? [];
@@ -137,7 +137,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
     global $linkableSitePages;
     ?>
     <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "services" ? " services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "service_categories" ? " service-categories-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?>">
-        <h3><?php echo htmlspecialchars($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : ($repeaterKey === "featured_doctors" ? "Doctores destacados - tarjetas" : (string) ($repeaterConfig["label"] ?? $repeaterKey)), ENT_QUOTES, "UTF-8"); ?></h3>
+        <h3><?php echo htmlspecialchars($sectionTitle ?? ($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : ($repeaterKey === "featured_doctors" ? "Doctores destacados - tarjetas" : (string) ($repeaterConfig["label"] ?? $repeaterKey))), ENT_QUOTES, "UTF-8"); ?></h3>
 
         <?php foreach ($renderItems as $itemConfig): ?>
             <?php
@@ -147,6 +147,13 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                 $itemTitle = "Estadística " . ($itemIndex + 1);
             }
             $itemData = $repeaterItems[$itemIndex] ?? ["fields" => [], "is_visible" => 1];
+            $isEmergencyServiceItem = $repeaterKey === "services" && trim((string) ($itemData["fields"]["category_key"]["field_value"] ?? ($itemConfig["defaults"]["category_key"] ?? ""))) === "emergency";
+            if ($servicesItemMode === "general" && $isEmergencyServiceItem) {
+                continue;
+            }
+            if ($servicesItemMode === "emergency" && !$isEmergencyServiceItem) {
+                continue;
+            }
             if ($repeaterKey === "service_categories") {
                 $serviceCategoryTitle = trim((string) ($itemData["fields"]["label"]["field_value"] ?? ""));
                 if ($serviceCategoryTitle !== "") {
@@ -1826,7 +1833,12 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php if ($templateKey === "home" && in_array((string) ($repeaterConfig["repeater_key"] ?? ""), ["hero_features", "home_about_features", "home_certifications", "cta_features", "featured_departments", "featured_services", "featured_doctors", "emergency_contacts", "quick_actions"], true)): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
-                            <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : ""); ?>
+                            <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
+                                <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : "", "Servicios - generales", "general"); ?>
+                                <?php renderAdminRepeaterSection($repeaterConfig, $contentData, "services-emergency-admin-section", "Servicio destacado de emergencia", "emergency"); ?>
+                            <?php else: ?>
+                                <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : ""); ?>
+                            <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
                                 <div class="section-block services-cta-admin-section">
                                     <h3>Servicios - CTA</h3>
