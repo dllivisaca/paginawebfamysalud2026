@@ -24,11 +24,38 @@ function departmentsVisibleRepeaterItems(array $items): array
     }));
 }
 
+function departmentsNormalizeCustomHref(string $url): string
+{
+    $url = trim($url);
+
+    if ($url === "") {
+        return "";
+    }
+
+    if ($url[0] === "#" || $url[0] === "/") {
+        return $url;
+    }
+
+    if (preg_match('~^(?:https?:)?//~i', $url) === 1) {
+        return $url;
+    }
+
+    if (preg_match('~^[a-z][a-z0-9+.-]*:~i', $url) === 1) {
+        return $url;
+    }
+
+    if (preg_match('~^www\.~i', $url) === 1) {
+        return 'https://' . $url;
+    }
+
+    return $url;
+}
+
 function departmentsRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl = "#"): string
 {
     $linkType = trim((string) ($fields["button_link_type"] ?? ""));
     $pageId = (int) trim((string) ($fields["button_page_id"] ?? "0"));
-    $customUrl = trim((string) ($fields["button_url"] ?? ""));
+    $customUrl = departmentsNormalizeCustomHref((string) ($fields["button_url"] ?? ""));
 
     if ($linkType === "internal" && $pageId > 0) {
         [, $pagesById] = getPageContentLinkablePages($conn, true);
