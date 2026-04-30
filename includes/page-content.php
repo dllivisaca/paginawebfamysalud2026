@@ -78,6 +78,7 @@ function getPageContentRepeaterDefaults(array $schema): array
                     "field_key" => $fieldKey,
                     "field_type" => (string) ($fieldConfig["field_type"] ?? "text"),
                     "field_value" => (string) ($itemConfig["defaults"][$fieldKey] ?? $fieldConfig["default"] ?? ""),
+                    "is_visible" => 1,
                 ];
             }
 
@@ -201,6 +202,16 @@ function getPageContentData(mysqli $conn, int $pageId, array $schema): array
             $repeaters[$repeaterKey][$itemIndex]["is_visible"] = (int) ($row["is_visible"] ?? 1);
             $fieldKey = (string) ($row["field_key"] ?? "");
 
+            if (str_starts_with($fieldKey, "__visible_")) {
+                $visibleFieldKey = substr($fieldKey, 10);
+
+                if (isset($repeaters[$repeaterKey][$itemIndex]["fields"][$visibleFieldKey])) {
+                    $repeaters[$repeaterKey][$itemIndex]["fields"][$visibleFieldKey]["is_visible"] = (string) ($row["field_value"] ?? "1") === "1" ? 1 : 0;
+                }
+
+                continue;
+            }
+
             if ($fieldKey === "" || !isset($repeaters[$repeaterKey][$itemIndex]["fields"][$fieldKey])) {
                 continue;
             }
@@ -307,14 +318,17 @@ function buildPageContentView(array $schema, array $contentData): array
 
         foreach ($items as $itemIndex => $itemData) {
             $fields = [];
+            $fieldVisibility = [];
 
             foreach ($itemData["fields"] ?? [] as $fieldKey => $fieldData) {
                 $fields[$fieldKey] = (string) ($fieldData["field_value"] ?? "");
+                $fieldVisibility[$fieldKey] = (int) ($fieldData["is_visible"] ?? 1) === 1;
             }
 
             $repeatersView[$repeaterKey][$itemIndex] = [
                 "is_visible" => (int) ($itemData["is_visible"] ?? 1) === 1,
                 "fields" => $fields,
+                "field_visibility" => $fieldVisibility,
             ];
         }
     }

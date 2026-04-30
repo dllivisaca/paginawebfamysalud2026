@@ -29,6 +29,19 @@ function doctorsRepeaterField(array $fields, string $fieldKey, string $default =
     return trim((string) ($fields[$fieldKey] ?? $default));
 }
 
+function doctorsRepeaterFieldVisible(array $item, string $fieldKey, bool $default = true): bool
+{
+    if (!isset($item["field_visibility"]) || !is_array($item["field_visibility"])) {
+        return $default;
+    }
+
+    if (!array_key_exists($fieldKey, $item["field_visibility"])) {
+        return $default;
+    }
+
+    return (bool) $item["field_visibility"][$fieldKey];
+}
+
 function doctorsNormalizeCustomHref(string $url): string
 {
     $url = trim($url);
@@ -111,39 +124,59 @@ require __DIR__ . "/../../includes/header.php";
             $linkedinUrl = doctorsNormalizeCustomHref(doctorsRepeaterField($doctorFields, "linkedin_url", "#"));
             $twitterUrl = doctorsNormalizeCustomHref(doctorsRepeaterField($doctorFields, "twitter_url", "#"));
             $emailUrl = doctorsNormalizeCustomHref(doctorsRepeaterField($doctorFields, "email_url", "#"));
+            $imageVisible = doctorsRepeaterFieldVisible($doctorItem, "image") && $image !== "";
+            $imageAltVisible = doctorsRepeaterFieldVisible($doctorItem, "image_alt") && $imageAlt !== "";
+            $nameVisible = doctorsRepeaterFieldVisible($doctorItem, "name") && $name !== "";
+            $specialtyVisible = doctorsRepeaterFieldVisible($doctorItem, "specialty") && $specialty !== "";
+            $bioVisible = doctorsRepeaterFieldVisible($doctorItem, "bio") && $bio !== "";
+            $experienceVisible = doctorsRepeaterFieldVisible($doctorItem, "experience") && $experience !== "";
+            $linkedinVisible = doctorsRepeaterFieldVisible($doctorItem, "linkedin_url") && $linkedinUrl !== "";
+            $twitterVisible = doctorsRepeaterFieldVisible($doctorItem, "twitter_url") && $twitterUrl !== "";
+            $emailVisible = doctorsRepeaterFieldVisible($doctorItem, "email_url") && $emailUrl !== "";
+            $buttonTextVisible = doctorsRepeaterFieldVisible($doctorItem, "button_text") && $buttonText !== "";
+            $buttonUrlVisible = doctorsRepeaterFieldVisible($doctorItem, "button_url") && $buttonUrl !== "";
+            $socialsVisible = $linkedinVisible || $twitterVisible || $emailVisible;
             $delay = 100 + (($doctorIndex % 4) * 100);
             ?>
           <div class="col-xl-3 col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?php echo $delay; ?>">
             <div class="doctor-card">
               <div class="doctor-image">
-                <?php if ($image !== ""): ?>
-                <img src="<?php echo htmlspecialchars($image, ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars($imageAlt !== "" ? $imageAlt : $name, ENT_QUOTES, "UTF-8"); ?>" class="img-fluid">
+                <?php if ($imageVisible): ?>
+                <img src="<?php echo htmlspecialchars($image, ENT_QUOTES, "UTF-8"); ?>" alt="<?php echo htmlspecialchars($imageAltVisible ? $imageAlt : ($nameVisible ? $name : ""), ENT_QUOTES, "UTF-8"); ?>" class="img-fluid">
                 <?php endif; ?>
+                <?php if ($socialsVisible): ?>
                 <div class="doctor-overlay">
                   <div class="doctor-social">
-                    <a href="<?php echo htmlspecialchars($linkedinUrl !== "" ? $linkedinUrl : "#", ENT_QUOTES, "UTF-8"); ?>" class="social-link"><i class="bi bi-linkedin"></i></a>
-                    <a href="<?php echo htmlspecialchars($twitterUrl !== "" ? $twitterUrl : "#", ENT_QUOTES, "UTF-8"); ?>" class="social-link"><i class="bi bi-twitter"></i></a>
-                    <a href="<?php echo htmlspecialchars($emailUrl !== "" ? $emailUrl : "#", ENT_QUOTES, "UTF-8"); ?>" class="social-link"><i class="bi bi-envelope"></i></a>
+                    <?php if ($linkedinVisible): ?>
+                    <a href="<?php echo htmlspecialchars($linkedinUrl, ENT_QUOTES, "UTF-8"); ?>" class="social-link"><i class="bi bi-linkedin"></i></a>
+                    <?php endif; ?>
+                    <?php if ($twitterVisible): ?>
+                    <a href="<?php echo htmlspecialchars($twitterUrl, ENT_QUOTES, "UTF-8"); ?>" class="social-link"><i class="bi bi-twitter"></i></a>
+                    <?php endif; ?>
+                    <?php if ($emailVisible): ?>
+                    <a href="<?php echo htmlspecialchars($emailUrl, ENT_QUOTES, "UTF-8"); ?>" class="social-link"><i class="bi bi-envelope"></i></a>
+                    <?php endif; ?>
                   </div>
                 </div>
+                <?php endif; ?>
               </div>
               <div class="doctor-content">
-                <?php if ($name !== ""): ?>
+                <?php if ($nameVisible): ?>
                 <h4 class="doctor-name"><?php echo htmlspecialchars($name, ENT_QUOTES, "UTF-8"); ?></h4>
                 <?php endif; ?>
-                <?php if ($specialty !== ""): ?>
+                <?php if ($specialtyVisible): ?>
                 <span class="doctor-specialty"><?php echo htmlspecialchars($specialty, ENT_QUOTES, "UTF-8"); ?></span>
                 <?php endif; ?>
-                <?php if ($bio !== ""): ?>
+                <?php if ($bioVisible): ?>
                 <p class="doctor-bio"><?php echo htmlspecialchars($bio, ENT_QUOTES, "UTF-8"); ?></p>
                 <?php endif; ?>
-                <?php if ($experience !== ""): ?>
+                <?php if ($experienceVisible): ?>
                 <div class="doctor-experience">
                   <span class="experience-badge"><?php echo htmlspecialchars($experience, ENT_QUOTES, "UTF-8"); ?></span>
                 </div>
                 <?php endif; ?>
-                <?php if ($buttonText !== ""): ?>
-                <a href="<?php echo htmlspecialchars($buttonUrl !== "" ? $buttonUrl : "#", ENT_QUOTES, "UTF-8"); ?>" class="btn-appointment"><?php echo htmlspecialchars($buttonText, ENT_QUOTES, "UTF-8"); ?></a>
+                <?php if ($buttonTextVisible): ?>
+                <a href="<?php echo htmlspecialchars($buttonUrlVisible ? $buttonUrl : "#", ENT_QUOTES, "UTF-8"); ?>" class="btn-appointment"><?php echo htmlspecialchars($buttonText, ENT_QUOTES, "UTF-8"); ?></a>
                 <?php endif; ?>
               </div>
             </div>

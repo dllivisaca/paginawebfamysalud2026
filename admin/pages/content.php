@@ -202,10 +202,14 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
             <div class="card">
                 <div class="item-title">
                     <h3><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
-                    <label class="toggle-row">
-                        <input type="checkbox" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][is_visible]" value="1"<?php echo $itemVisible ? " checked" : ""; ?>>
-                        <span>Mostrar este bloque</span>
-                    </label>
+                    <?php if ($repeaterKey === "doctors"): ?>
+                        <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][is_visible]" value="<?php echo $itemVisible ? "1" : "0"; ?>">
+                    <?php else: ?>
+                        <label class="toggle-row">
+                            <input type="checkbox" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][is_visible]" value="1"<?php echo $itemVisible ? " checked" : ""; ?>>
+                            <span>Mostrar este bloque</span>
+                        </label>
+                    <?php endif; ?>
                 </div>
 
                 <div class="field-grid">
@@ -214,6 +218,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $fieldKey = (string) ($fieldConfig["field_key"] ?? "");
                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                         $fieldValue = (string) (($itemData["fields"][$fieldKey]["field_value"] ?? ""));
+                        $fieldVisible = (int) (($itemData["fields"][$fieldKey]["is_visible"] ?? 1)) === 1;
                         $hiddenGeneralServiceFields = [
                             "column_class",
                             "variant_class",
@@ -507,7 +512,15 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         }
                         ?>
                         <div class="field-group<?php echo ($isQuickActionIconField || $isQuickActionLabelField || $isQuickActionUrlField || $isCtaFeatureLinkTextField || $isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isServiceGeneralLinkTextField || $isServiceEmergencyButtonTextField || $isServiceDirectionsButtonTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField || $isEmergencyContactButtonTextField || $isDepartmentsFeaturedSubtitleField || $isDepartmentsFeaturedDescriptionField || $isDepartmentsFeaturedButtonTextField || $isDepartmentsStandardFeatureThreeField || $isDepartmentsStandardButtonTextField) ? " field-group-full" : ""; ?>">
-                            <?php if (!$isQuickActionUrlField && !$isCtaFeatureLinkTextField && !$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isServiceGeneralLinkTextField && !$isServiceEmergencyButtonTextField && !$isServiceDirectionsButtonTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField && !$isEmergencyContactButtonTextField && !$isDepartmentsFeaturedButtonTextField && !$isDepartmentsStandardButtonTextField): ?>
+                            <?php if ($repeaterKey === "doctors"): ?>
+                                <div class="field-header">
+                                    <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
+                                    <label class="toggle-row">
+                                        <input type="checkbox" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields_visible][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                        <span>Mostrar</span>
+                                    </label>
+                                </div>
+                            <?php elseif (!$isQuickActionUrlField && !$isCtaFeatureLinkTextField && !$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isServiceGeneralLinkTextField && !$isServiceEmergencyButtonTextField && !$isServiceDirectionsButtonTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField && !$isEmergencyContactButtonTextField && !$isDepartmentsFeaturedButtonTextField && !$isDepartmentsStandardButtonTextField): ?>
                                 <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
                             <?php endif; ?>
                             <?php if ($fieldType === "image"): ?>
@@ -1041,7 +1054,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $page && $schema) {
                         continue;
                     }
 
-                    $itemVisible = isset($_POST["repeaters"][$repeaterKey][$itemIndex]["is_visible"]) ? 1 : 0;
+                    $itemVisible = (int) ($_POST["repeaters"][$repeaterKey][$itemIndex]["is_visible"] ?? 0) === 1 ? 1 : 0;
                     $repeaterItemId = getRepeaterItemId($conn, (int) $page["id"], $repeaterKey, $itemIndex, $itemVisible);
 
                     if ($repeaterItemId <= 0) {
@@ -1062,6 +1075,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $page && $schema) {
                         if (!upsertRepeaterItemField($conn, $repeaterItemId, $fieldKey, $fieldType, $fieldValue)) {
                             $errors[] = "No fue posible guardar los bloques repetibles.";
                             break 3;
+                        }
+
+                        if ($repeaterKey === "doctors") {
+                            $fieldVisible = isset($_POST["repeaters"][$repeaterKey][$itemIndex]["fields_visible"][$fieldKey]) ? "1" : "0";
+
+                            if (!upsertRepeaterItemField($conn, $repeaterItemId, "__visible_" . $fieldKey, "visibility", $fieldVisible)) {
+                                $errors[] = "No fue posible guardar la visibilidad de los campos de doctores.";
+                                break 3;
+                            }
                         }
                     }
                 }
