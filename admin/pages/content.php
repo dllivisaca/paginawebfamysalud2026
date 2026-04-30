@@ -166,6 +166,12 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                     $itemTitle = $serviceTitle;
                 }
             }
+            if ($repeaterKey === "doctors") {
+                $doctorNameTitle = trim((string) ($itemData["fields"]["name"]["field_value"] ?? ""));
+                if ($doctorNameTitle !== "") {
+                    $itemTitle = $doctorNameTitle;
+                }
+            }
             $itemVisible = (int) ($itemData["is_visible"] ?? 1) === 1;
             $departmentsHiddenFields = [];
             $repeaterFields = $repeaterConfig["fields"];
