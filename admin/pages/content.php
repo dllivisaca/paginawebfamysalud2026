@@ -376,6 +376,10 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             $serviceEmergencyButtonLinkTypeValue = $serviceEmergencyButtonUrlValue !== "" ? "custom" : ($serviceEmergencyButtonPageIdValue !== "" ? "internal" : "custom");
                         }
                         $serviceDirectionsButtonIconValue = (string) (($itemData["fields"]["directions_button_icon"]["field_value"] ?? ""));
+                        $serviceEmergencyActionIconOptions = [
+                            "fa fa-phone" => "Teléfono",
+                            "fa fa-map-marker-alt" => "Marcador de mapa",
+                        ];
                         $serviceDirectionsButtonLinkTypeValue = trim((string) (($itemData["fields"]["directions_button_link_type"]["field_value"] ?? "")));
                         $serviceDirectionsButtonPageIdValue = trim((string) (($itemData["fields"]["directions_button_page_id"]["field_value"] ?? "")));
                         $serviceDirectionsButtonUrlValue = (string) (($itemData["fields"]["directions_button_url"]["field_value"] ?? ""));
@@ -652,7 +656,11 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                         </div>
                                         <div class="field-group">
                                             <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_emergency_button_icon", ENT_QUOTES, "UTF-8"); ?>">Botón emergencia icono</label>
-                                            <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_emergency_button_icon", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][emergency_button_icon]" value="<?php echo htmlspecialchars($serviceEmergencyButtonIconValue, ENT_QUOTES, "UTF-8"); ?>">
+                                            <select class="form-input" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_emergency_button_icon", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][emergency_button_icon]">
+                                                <?php foreach ($serviceEmergencyActionIconOptions as $iconValue => $iconLabel): ?>
+                                                    <option value="<?php echo htmlspecialchars($iconValue, ENT_QUOTES, "UTF-8"); ?>"<?php echo $serviceEmergencyButtonIconValue === $iconValue ? " selected" : ""; ?>><?php echo htmlspecialchars($iconLabel, ENT_QUOTES, "UTF-8"); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="button-destination-grid">
@@ -688,7 +696,11 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                         </div>
                                         <div class="field-group">
                                             <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_directions_button_icon", ENT_QUOTES, "UTF-8"); ?>">Botón direcciones icono</label>
-                                            <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_directions_button_icon", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][directions_button_icon]" value="<?php echo htmlspecialchars($serviceDirectionsButtonIconValue, ENT_QUOTES, "UTF-8"); ?>">
+                                            <select class="form-input" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_directions_button_icon", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][directions_button_icon]">
+                                                <?php foreach ($serviceEmergencyActionIconOptions as $iconValue => $iconLabel): ?>
+                                                    <option value="<?php echo htmlspecialchars($iconValue, ENT_QUOTES, "UTF-8"); ?>"<?php echo $serviceDirectionsButtonIconValue === $iconValue ? " selected" : ""; ?>><?php echo htmlspecialchars($iconLabel, ENT_QUOTES, "UTF-8"); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="button-destination-grid">
@@ -2030,7 +2042,7 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
                                 <div class="section-block services-cta-admin-section">
-                                    <h3>Servicios - CTA</h3>
+                                    <h3>Servicios - Invitación a agendar</h3>
                                     <div class="field-grid">
                                         <?php foreach ($schema["simple_fields"] as $fieldConfig): ?>
                                             <?php
@@ -2055,7 +2067,11 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     </label>
                                                 </div>
 
-                                                <?php if ($isTextarea): ?>
+                                                <?php if ($fieldKey === "cta_icon"): ?>
+                                                    <select class="form-input" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]">
+                                                        <option value="fa fa-calendar-check"<?php echo $fieldValue === "fa fa-calendar-check" ? " selected" : ""; ?>>Calendario</option>
+                                                    </select>
+                                                <?php elseif ($isTextarea): ?>
                                                     <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
                                                 <?php else: ?>
                                                     <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">

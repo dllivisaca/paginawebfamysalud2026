@@ -6,13 +6,13 @@ return [
     "simple_fields" => [
         ["field_key" => "hero_title", "label" => "Titulo principal", "field_type" => "text", "default" => "Services", "default_visible" => 1],
         ["field_key" => "hero_subtitle", "label" => "Subtitulo principal", "field_type" => "textarea", "default" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.", "default_visible" => 1],
-        ["field_key" => "cta_icon", "label" => "CTA icono", "field_type" => "text", "default" => "fa fa-calendar-check", "default_visible" => 1],
-        ["field_key" => "cta_title", "label" => "CTA titulo", "field_type" => "text", "default" => "Ready to Schedule Your Appointment?", "default_visible" => 1],
-        ["field_key" => "cta_text", "label" => "CTA texto", "field_type" => "textarea", "default" => "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident.", "default_visible" => 1],
-        ["field_key" => "cta_primary_text", "label" => "CTA boton principal texto", "field_type" => "text", "default" => "Book Now", "default_visible" => 1],
-        ["field_key" => "cta_primary_url", "label" => "CTA boton principal URL", "field_type" => "url", "default" => "appointment.html", "default_visible" => 1],
-        ["field_key" => "cta_secondary_text", "label" => "CTA boton secundario texto", "field_type" => "text", "default" => "Contact Us", "default_visible" => 1],
-        ["field_key" => "cta_secondary_url", "label" => "CTA boton secundario URL", "field_type" => "url", "default" => "contact.html", "default_visible" => 1],
+        ["field_key" => "cta_icon", "label" => "Icono", "field_type" => "text", "default" => "fa fa-calendar-check", "default_visible" => 1],
+        ["field_key" => "cta_title", "label" => "Título", "field_type" => "text", "default" => "Ready to Schedule Your Appointment?", "default_visible" => 1],
+        ["field_key" => "cta_text", "label" => "Texto", "field_type" => "textarea", "default" => "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident.", "default_visible" => 1],
+        ["field_key" => "cta_primary_text", "label" => "Botón principal texto", "field_type" => "text", "default" => "Book Now", "default_visible" => 1],
+        ["field_key" => "cta_primary_url", "label" => "Botón principal URL", "field_type" => "url", "default" => "appointment.html", "default_visible" => 1],
+        ["field_key" => "cta_secondary_text", "label" => "Botón secundario texto", "field_type" => "text", "default" => "Contact Us", "default_visible" => 1],
+        ["field_key" => "cta_secondary_url", "label" => "Botón secundario URL", "field_type" => "url", "default" => "contact.html", "default_visible" => 1],
     ],
     "repeaters" => [
         [
