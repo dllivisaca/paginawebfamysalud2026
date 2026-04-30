@@ -1997,6 +1997,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 <img id="preview_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
                                                             <?php endif; ?>
                                                         </div>
+                                                        <?php if ($templateKey === "contact" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && $groupFieldKey === "info_text"): ?>
+                                                            <?php foreach ($schema["repeaters"] as $contactRepeaterConfig): ?>
+                                                                <?php if (((string) ($contactRepeaterConfig["repeater_key"] ?? "")) === "info_cards"): ?>
+                                                                    <?php renderAdminRepeaterSection($contactRepeaterConfig, $contentData); ?>
+                                                                    <?php break; ?>
+                                                                <?php endif; ?>
+                                                            <?php endforeach; ?>
+                                                        <?php endif; ?>
                                                     <?php endforeach; ?>
                                                 </div>
                                             <?php endif; ?>
@@ -2124,6 +2132,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "home" && in_array((string) ($repeaterConfig["repeater_key"] ?? ""), ["hero_features", "home_about_features", "home_certifications", "cta_features", "featured_departments", "featured_services", "featured_doctors", "emergency_contacts", "quick_actions"], true)): ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <?php if ($templateKey === "contact" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "info_cards"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
