@@ -294,6 +294,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isQuickActionUrlField = $repeaterKey === "quick_actions" && $fieldKey === "url";
                         $isEmergencyContactIconField = $repeaterKey === "emergency_contacts" && $fieldKey === "icon_class";
                         $isDepartmentsIconField = $repeaterKey === "departments" && $fieldKey === "icon_class";
+                        $isServiceIconField = $repeaterKey === "services" && $fieldKey === "icon_class";
                         $isCtaFeatureLinkTextField = $repeaterKey === "cta_features" && $fieldKey === "link_text";
                         $isCtaFeatureLinkTypeField = $repeaterKey === "cta_features" && $fieldKey === "link_type";
                         $isCtaFeaturePageIdField = $repeaterKey === "cta_features" && $fieldKey === "page_id";
@@ -437,6 +438,19 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             "fas fa-bone" => "Hueso",
                             "fas fa-ambulance" => "Ambulancia",
                         ];
+                        $serviceIconOptions = [
+                            "fa fa-stethoscope" => "Estetoscopio",
+                            "fa fa-syringe" => "Inyección",
+                            "fa fa-baby" => "Bebé",
+                            "fa fa-user-md" => "Doctor",
+                            "fa fa-heartbeat" => "Corazón",
+                            "fa fa-brain" => "Cerebro",
+                            "fa fa-bone" => "Hueso",
+                            "fa fa-user-nurse" => "Doctor especializado",
+                            "fa fa-vial" => "Tubo de muestra",
+                            "fa fa-x-ray" => "Imagen diagnóstica",
+                            "fa fa-ambulance" => "Ambulancia",
+                        ];
                         $departmentsIconOptions = [
                             "bi bi-heart-pulse" => "Cardiología",
                             "bi bi-shield-plus" => "Escudo médico",
@@ -461,9 +475,9 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                 <label class="file-input-label" for="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
                                 <input class="form-file js-image-upload" type="file" id="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">
                                 <img id="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
-                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField || $isQuickActionIconField || $isEmergencyContactIconField || $isFeaturedDepartmentIconField || $isFeaturedServiceIconField || $isDepartmentsIconField): ?>
+                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField || $isQuickActionIconField || $isEmergencyContactIconField || $isFeaturedDepartmentIconField || $isFeaturedServiceIconField || $isDepartmentsIconField || $isServiceIconField): ?>
                                 <select class="form-input" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]">
-                                    <?php $iconOptions = $isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : ($isCtaFeatureIconField ? $ctaFeatureIconOptions : ($isQuickActionIconField ? $quickActionIconOptions : ($isEmergencyContactIconField ? $emergencyContactIconOptions : ($isFeaturedDepartmentIconField ? $featuredDepartmentIconOptions : ($isDepartmentsIconField ? $departmentsIconOptions : $featuredServiceIconOptions)))))); ?>
+                                    <?php $iconOptions = $isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : ($isCtaFeatureIconField ? $ctaFeatureIconOptions : ($isQuickActionIconField ? $quickActionIconOptions : ($isEmergencyContactIconField ? $emergencyContactIconOptions : ($isFeaturedDepartmentIconField ? $featuredDepartmentIconOptions : ($isDepartmentsIconField ? $departmentsIconOptions : ($isServiceIconField ? $serviceIconOptions : $featuredServiceIconOptions))))))); ?>
                                     <?php if ($isQuickActionIconField && $fieldValue !== "" && !array_key_exists($fieldValue, $quickActionIconOptions)): ?>
                                         <option value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>" selected>Icono actual: <?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></option>
                                     <?php endif; ?>
