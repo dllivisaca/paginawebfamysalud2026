@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿<?php
+﻿﻿﻿﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -1250,7 +1250,12 @@ if (($schema["template_key"] ?? "") === "about") {
         [
             "title" => "Área informativa",
             "description" => "",
-            "field_keys" => ["info_title", "info_text", "social_title", "map_embed_url", "form_title", "form_text", "form_name_label", "form_email_label", "form_subject_label", "form_message_label", "form_loading_text", "form_sent_text", "form_button_text"],
+            "field_keys" => ["info_title", "info_text", "social_title"],
+        ],
+        [
+            "title" => "Área de formulario",
+            "description" => "",
+            "field_keys" => ["map_embed_url", "form_title", "form_text", "form_name_label", "form_email_label", "form_subject_label", "form_message_label", "form_loading_text", "form_sent_text", "form_button_text"],
         ],
     ];
 } elseif (($schema["template_key"] ?? "") === "services") {
