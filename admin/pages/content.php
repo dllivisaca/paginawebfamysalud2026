@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿<?php
+﻿﻿﻿﻿﻿﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -1998,12 +1998,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             <?php endif; ?>
                                                         </div>
                                                         <?php if ($templateKey === "contact" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && $groupFieldKey === "info_text"): ?>
-                                                            <?php foreach ($schema["repeaters"] as $contactRepeaterConfig): ?>
-                                                                <?php if (((string) ($contactRepeaterConfig["repeater_key"] ?? "")) === "info_cards"): ?>
-                                                                    <?php renderAdminRepeaterSection($contactRepeaterConfig, $contentData); ?>
-                                                                    <?php break; ?>
-                                                                <?php endif; ?>
-                                                            <?php endforeach; ?>
+                                                            <div class="field-group-full">
+                                                                <?php foreach ($schema["repeaters"] as $contactRepeaterConfig): ?>
+                                                                    <?php if (((string) ($contactRepeaterConfig["repeater_key"] ?? "")) === "info_cards"): ?>
+                                                                        <?php renderAdminRepeaterSection($contactRepeaterConfig, $contentData); ?>
+                                                                        <?php break; ?>
+                                                                    <?php endif; ?>
+                                                                <?php endforeach; ?>
+                                                            </div>
                                                         <?php endif; ?>
                                                     <?php endforeach; ?>
                                                 </div>
