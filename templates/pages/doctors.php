@@ -42,6 +42,27 @@ function doctorsRepeaterFieldVisible(array $item, string $fieldKey, bool $defaul
     return (bool) $item["field_visibility"][$fieldKey];
 }
 
+function doctorsRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl = "#"): string
+{
+    $linkType = trim((string) ($fields["button_link_type"] ?? ""));
+    $pageId = (int) trim((string) ($fields["button_page_id"] ?? "0"));
+    $customUrl = doctorsNormalizeCustomHref((string) ($fields["button_url"] ?? ""));
+
+    if ($linkType !== "internal" && $linkType !== "custom") {
+        $linkType = $customUrl !== "" ? "custom" : ($pageId > 0 ? "internal" : "custom");
+    }
+
+    if ($linkType === "internal" && $pageId > 0) {
+        [, $pagesById] = getPageContentLinkablePages($conn, true);
+
+        if (isset($pagesById[$pageId])) {
+            return (string) ($pagesById[$pageId]["public_url"] ?? $fallbackUrl);
+        }
+    }
+
+    return $customUrl !== "" ? $customUrl : $fallbackUrl;
+}
+
 function doctorsNormalizeCustomHref(string $url): string
 {
     $url = trim($url);
@@ -120,7 +141,8 @@ require __DIR__ . "/../../includes/header.php";
             $bio = doctorsRepeaterField($doctorFields, "bio");
             $experience = doctorsRepeaterField($doctorFields, "experience");
             $buttonText = doctorsRepeaterField($doctorFields, "button_text");
-            $buttonUrl = doctorsNormalizeCustomHref(doctorsRepeaterField($doctorFields, "button_url", "#"));
+            $buttonLinkType = doctorsRepeaterField($doctorFields, "button_link_type", "custom");
+            $buttonUrl = doctorsRepeaterLinkHref($conn, $doctorFields, "#");
             $linkedinUrl = doctorsNormalizeCustomHref(doctorsRepeaterField($doctorFields, "linkedin_url", "#"));
             $twitterUrl = doctorsNormalizeCustomHref(doctorsRepeaterField($doctorFields, "twitter_url", "#"));
             $emailUrl = doctorsNormalizeCustomHref(doctorsRepeaterField($doctorFields, "email_url", "#"));
@@ -134,7 +156,7 @@ require __DIR__ . "/../../includes/header.php";
             $twitterVisible = doctorsRepeaterFieldVisible($doctorItem, "twitter_url") && $twitterUrl !== "";
             $emailVisible = doctorsRepeaterFieldVisible($doctorItem, "email_url") && $emailUrl !== "";
             $buttonTextVisible = doctorsRepeaterFieldVisible($doctorItem, "button_text") && $buttonText !== "";
-            $buttonUrlVisible = doctorsRepeaterFieldVisible($doctorItem, "button_url") && $buttonUrl !== "";
+            $buttonUrlVisible = $buttonUrl !== "" && ($buttonLinkType === "internal" || doctorsRepeaterFieldVisible($doctorItem, "button_url"));
             $socialsVisible = $linkedinVisible || $twitterVisible || $emailVisible;
             $delay = 100 + (($doctorIndex % 4) * 100);
             ?>

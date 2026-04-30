@@ -22,6 +22,8 @@ return [
                 ["field_key" => "twitter_url", "label" => "Twitter URL", "field_type" => "url", "default" => "#"],
                 ["field_key" => "email_url", "label" => "Email URL", "field_type" => "url", "default" => "#"],
                 ["field_key" => "button_text", "label" => "Texto del boton", "field_type" => "text", "default" => "Book Appointment"],
+                ["field_key" => "button_link_type", "label" => "Tipo de enlace", "field_type" => "text", "default" => "custom"],
+                ["field_key" => "button_page_id", "label" => "Pagina interna", "field_type" => "text", "default" => ""],
                 ["field_key" => "button_url", "label" => "URL del boton", "field_type" => "url", "default" => "appointment.html"],
             ],
             "items" => [
