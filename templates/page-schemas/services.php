@@ -10,8 +10,12 @@ return [
         ["field_key" => "cta_title", "label" => "Título", "field_type" => "text", "default" => "Ready to Schedule Your Appointment?", "default_visible" => 1],
         ["field_key" => "cta_text", "label" => "Texto", "field_type" => "textarea", "default" => "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident.", "default_visible" => 1],
         ["field_key" => "cta_primary_text", "label" => "Botón principal texto", "field_type" => "text", "default" => "Book Now", "default_visible" => 1],
+        ["field_key" => "cta_primary_link_type", "label" => "Tipo de enlace", "field_type" => "text", "default" => "custom", "default_visible" => 1],
+        ["field_key" => "cta_primary_page_id", "label" => "Página interna", "field_type" => "text", "default" => "", "default_visible" => 1],
         ["field_key" => "cta_primary_url", "label" => "Botón principal URL", "field_type" => "url", "default" => "appointment.html", "default_visible" => 1],
         ["field_key" => "cta_secondary_text", "label" => "Botón secundario texto", "field_type" => "text", "default" => "Contact Us", "default_visible" => 1],
+        ["field_key" => "cta_secondary_link_type", "label" => "Tipo de enlace", "field_type" => "text", "default" => "custom", "default_visible" => 1],
+        ["field_key" => "cta_secondary_page_id", "label" => "Página interna", "field_type" => "text", "default" => "", "default_visible" => 1],
         ["field_key" => "cta_secondary_url", "label" => "Botón secundario URL", "field_type" => "url", "default" => "contact.html", "default_visible" => 1],
     ],
     "repeaters" => [

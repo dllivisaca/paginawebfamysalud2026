@@ -2043,6 +2043,7 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
                                 <div class="section-block services-cta-admin-section">
                                     <h3>Servicios - Invitación a agendar</h3>
+
                                     <div class="field-grid">
                                         <?php foreach ($schema["simple_fields"] as $fieldConfig): ?>
                                             <?php
@@ -2052,31 +2053,87 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 continue;
                                             }
 
+                                            if (in_array($fieldKey, ["cta_primary_link_type", "cta_primary_page_id", "cta_primary_url", "cta_secondary_link_type", "cta_secondary_page_id", "cta_secondary_url"], true)) {
+                                                continue;
+                                            }
+
                                             $fieldData = $contentData["simple_fields"][$fieldKey] ?? null;
                                             $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                                             $fieldValue = (string) ($fieldData["field_value"] ?? "");
                                             $fieldVisible = (int) ($fieldData["is_visible"] ?? 1) === 1;
                                             $isTextarea = $fieldType === "textarea";
                                             ?>
-                                            <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
-                                                <div class="field-header">
-                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $fieldKey), ENT_QUOTES, "UTF-8"); ?></label>
-                                                    <label class="toggle-row">
-                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
-                                                        <span>Mostrar</span>
-                                                    </label>
+                                            <?php if ($fieldKey === "cta_primary_text" || $fieldKey === "cta_secondary_text"): ?>
+                                                <?php
+                                                $buttonPrefix = $fieldKey === "cta_primary_text" ? "cta_primary" : "cta_secondary";
+                                                $buttonTitle = $buttonPrefix === "cta_primary" ? "Botón principal" : "Botón secundario";
+                                                $linkTypeKey = $buttonPrefix . "_link_type";
+                                                $pageIdKey = $buttonPrefix . "_page_id";
+                                                $urlKey = $buttonPrefix . "_url";
+                                                $linkTypeValue = trim((string) (($contentData["simple_fields"][$linkTypeKey]["field_value"] ?? "")));
+                                                $pageIdValue = trim((string) (($contentData["simple_fields"][$pageIdKey]["field_value"] ?? "")));
+                                                $urlValue = (string) (($contentData["simple_fields"][$urlKey]["field_value"] ?? ""));
+                                                $linkScope = "services_cta_" . $buttonPrefix;
+                                                if ($linkTypeValue !== "internal" && $linkTypeValue !== "custom") {
+                                                    $linkTypeValue = $urlValue !== "" ? "custom" : ($pageIdValue !== "" ? "internal" : "custom");
+                                                }
+                                                ?>
+                                                <div class="field-group field-group-full">
+                                                    <div class="button-destination-box">
+                                                        <h4><?php echo htmlspecialchars($buttonTitle, ENT_QUOTES, "UTF-8"); ?></h4>
+                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="<?php echo $fieldVisible ? "1" : "0"; ?>">
+                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+                                                        <div class="field-group field-group-full">
+                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>">Texto del botón</label>
+                                                            <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                        </div>
+                                                        <div class="button-destination-grid">
+                                                            <div class="field-group field-group-full">
+                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
+                                                                <select class="form-select js-link-type" id="simple_<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>][value]" data-link-scope="<?php echo htmlspecialchars($linkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                    <option value="internal"<?php echo $linkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                                                    <option value="custom"<?php echo $linkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="field-group field-group-full js-link-panel <?php echo $linkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($linkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
+                                                                <select class="form-select" id="simple_<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>][value]">
+                                                                    <option value="">Selecciona una p&aacute;gina</option>
+                                                                    <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                                        <option value="<?php echo (int) ($sitePageOption["id"] ?? 0); ?>"<?php echo (string) ($sitePageOption["id"] ?? "") === $pageIdValue ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="field-group field-group-full js-link-panel <?php echo $linkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($linkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                                                <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($urlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
+                                            <?php else: ?>
+                                                <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
+                                                    <div class="field-header">
+                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($fieldConfig["label"] ?? $fieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                        <label class="toggle-row">
+                                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                                            <span>Mostrar</span>
+                                                        </label>
+                                                    </div>
 
-                                                <?php if ($fieldKey === "cta_icon"): ?>
-                                                    <select class="form-input" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]">
-                                                        <option value="fa fa-calendar-check"<?php echo $fieldValue === "fa fa-calendar-check" ? " selected" : ""; ?>>Calendario</option>
-                                                    </select>
-                                                <?php elseif ($isTextarea): ?>
-                                                    <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
-                                                <?php else: ?>
-                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
-                                                <?php endif; ?>
-                                            </div>
+                                                    <?php if ($fieldKey === "cta_icon"): ?>
+                                                        <select class="form-input" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]">
+                                                            <option value="fa fa-calendar-check"<?php echo $fieldValue === "fa fa-calendar-check" ? " selected" : ""; ?>>Calendario</option>
+                                                        </select>
+                                                    <?php elseif ($isTextarea): ?>
+                                                        <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                    <?php else: ?>
+                                                        <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
                                         <?php endforeach; ?>
                                     </div>
                                 </div>

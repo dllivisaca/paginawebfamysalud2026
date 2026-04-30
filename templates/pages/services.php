@@ -77,6 +77,27 @@ function servicesRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackU
     return $customUrl !== "" ? $customUrl : $fallbackUrl;
 }
 
+function servicesSimpleLinkHref(mysqli $conn, array $fields, string $prefix, string $fallbackUrl = "#"): string
+{
+    $linkType = trim((string) ($fields[$prefix . "_link_type"]["value"] ?? ""));
+    $pageId = (int) trim((string) ($fields[$prefix . "_page_id"]["value"] ?? "0"));
+    $customUrl = servicesNormalizeCustomHref((string) ($fields[$prefix . "_url"]["value"] ?? ""));
+
+    if ($linkType !== "internal" && $linkType !== "custom") {
+        $linkType = $customUrl !== "" ? "custom" : ($pageId > 0 ? "internal" : "custom");
+    }
+
+    if ($linkType === "internal" && $pageId > 0) {
+        [, $pagesById] = getPageContentLinkablePages($conn, true);
+
+        if (isset($pagesById[$pageId])) {
+            return (string) ($pagesById[$pageId]["public_url"] ?? $fallbackUrl);
+        }
+    }
+
+    return $customUrl !== "" ? $customUrl : $fallbackUrl;
+}
+
 function servicesRenderServiceItem(mysqli $conn, array $serviceItem): void
 {
     $serviceFields = $serviceItem["fields"] ?? [];
@@ -160,9 +181,9 @@ $ctaIcon = servicesFieldValue($servicesFields, "cta_icon", "fa fa-calendar-check
 $ctaTitle = servicesFieldValue($servicesFields, "cta_title", "Ready to Schedule Your Appointment?");
 $ctaText = servicesFieldValue($servicesFields, "cta_text", "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident.");
 $ctaPrimaryText = servicesFieldValue($servicesFields, "cta_primary_text", "Book Now");
-$ctaPrimaryUrl = servicesNormalizeCustomHref(servicesFieldValue($servicesFields, "cta_primary_url", "appointment.html"));
+$ctaPrimaryUrl = servicesSimpleLinkHref($conn, $servicesFields, "cta_primary", "appointment.html");
 $ctaSecondaryText = servicesFieldValue($servicesFields, "cta_secondary_text", "Contact Us");
-$ctaSecondaryUrl = servicesNormalizeCustomHref(servicesFieldValue($servicesFields, "cta_secondary_url", "contact.html"));
+$ctaSecondaryUrl = servicesSimpleLinkHref($conn, $servicesFields, "cta_secondary", "contact.html");
 $categoryItems = servicesVisibleRepeaterItems($servicesRepeaters["service_categories"] ?? []);
 $serviceItems = servicesVisibleRepeaterItems($servicesRepeaters["services"] ?? []);
 $servicesByCategory = [];
