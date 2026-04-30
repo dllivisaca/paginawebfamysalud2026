@@ -2080,8 +2080,13 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 ?>
                                                 <div class="field-group field-group-full">
                                                     <div class="button-destination-box">
-                                                        <h4><?php echo htmlspecialchars($buttonTitle, ENT_QUOTES, "UTF-8"); ?></h4>
-                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="<?php echo $fieldVisible ? "1" : "0"; ?>">
+                                                        <div class="field-header">
+                                                            <h4><?php echo htmlspecialchars($buttonTitle, ENT_QUOTES, "UTF-8"); ?></h4>
+                                                            <label class="toggle-row">
+                                                                <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                                                <span>Mostrar</span>
+                                                            </label>
+                                                        </div>
                                                         <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($linkTypeKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
                                                         <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($pageIdKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
                                                         <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($urlKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
