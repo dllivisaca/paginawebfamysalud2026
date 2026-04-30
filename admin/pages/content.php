@@ -1056,6 +1056,7 @@ if (($schema["template_key"] ?? "") === "about") {
         ],
     ];
 } elseif (($schema["template_key"] ?? "") === "services") {
+    [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
     $simpleFieldGroups = [
         [
             "title" => "Encabezado",
