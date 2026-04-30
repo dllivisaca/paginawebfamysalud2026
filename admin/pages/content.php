@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿<?php
+﻿﻿﻿﻿﻿﻿﻿<?php
 require_once "../auth-check.php";
 require_once "../../db.php";
 require_once "../../includes/page-content.php";
@@ -1517,6 +1517,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .doctors-admin-section .card { background: #f9fafb; }
         .section-block.emergency-contacts-admin-section { background: #fff; }
         .emergency-contacts-admin-section .card { background: #f9fafb; }
+        .section-block.contact-info-cards-admin-section { background: #fff; }
+        .contact-info-cards-admin-section .card { background: #f9fafb; }
         .section-block.quick-actions-admin-section { background: #fff; }
         .quick-actions-admin-section .card { background: #f9fafb; }
         .section-block.emergency-tips-admin-section { background: #fff; margin-top: 16px; }
@@ -2001,7 +2003,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             <div class="field-group-full">
                                                                 <?php foreach ($schema["repeaters"] as $contactRepeaterConfig): ?>
                                                                     <?php if (((string) ($contactRepeaterConfig["repeater_key"] ?? "")) === "info_cards"): ?>
-                                                                        <?php renderAdminRepeaterSection($contactRepeaterConfig, $contentData); ?>
+                                                                        <?php renderAdminRepeaterSection($contactRepeaterConfig, $contentData, "contact-info-cards-admin-section"); ?>
                                                                         <?php break; ?>
                                                                     <?php endif; ?>
                                                                 <?php endforeach; ?>
