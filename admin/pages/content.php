@@ -1240,6 +1240,19 @@ if (($schema["template_key"] ?? "") === "about") {
     ];
 } elseif (($schema["template_key"] ?? "") === "doctors") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
+} elseif (($schema["template_key"] ?? "") === "contact") {
+    $simpleFieldGroups = [
+        [
+            "title" => "Texto introductorio",
+            "description" => "",
+            "field_keys" => ["hero_title", "hero_subtitle"],
+        ],
+        [
+            "title" => "Área informativa",
+            "description" => "",
+            "field_keys" => ["info_title", "info_text", "social_title", "map_embed_url", "form_title", "form_text", "form_name_label", "form_email_label", "form_subject_label", "form_message_label", "form_loading_text", "form_sent_text", "form_button_text"],
+        ],
+    ];
 } elseif (($schema["template_key"] ?? "") === "services") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
     $simpleFieldGroups = [
