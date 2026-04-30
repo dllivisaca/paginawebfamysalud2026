@@ -44,6 +44,8 @@ return [
                 ["field_key" => "benefit_3", "label" => "Beneficio 3", "field_type" => "text", "default" => ""],
                 ["field_key" => "benefit_4", "label" => "Beneficio 4", "field_type" => "text", "default" => ""],
                 ["field_key" => "link_text", "label" => "Texto del enlace", "field_type" => "text", "default" => ""],
+                ["field_key" => "link_type", "label" => "Tipo de enlace", "field_type" => "text", "default" => "custom"],
+                ["field_key" => "page_id", "label" => "Pagina interna", "field_type" => "text", "default" => ""],
                 ["field_key" => "link_url", "label" => "URL del enlace", "field_type" => "url", "default" => ""],
                 ["field_key" => "emergency_button_text", "label" => "Boton emergencia texto", "field_type" => "text", "default" => ""],
                 ["field_key" => "emergency_button_icon", "label" => "Boton emergencia icono", "field_type" => "text", "default" => ""],

@@ -228,6 +228,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             "column_class",
                             "variant_class",
                             "link_text",
+                            "link_type",
+                            "page_id",
                             "link_url",
                         ];
 
@@ -309,6 +311,10 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isFeaturedServiceLinkTypeField = $repeaterKey === "featured_services" && $fieldKey === "link_type";
                         $isFeaturedServicePageIdField = $repeaterKey === "featured_services" && $fieldKey === "page_id";
                         $isFeaturedServiceLinkUrlField = $repeaterKey === "featured_services" && $fieldKey === "link_url";
+                        $isServiceGeneralLinkTextField = $repeaterKey === "services" && $servicesItemMode === "general" && $fieldKey === "link_text";
+                        $isServiceGeneralLinkTypeField = $repeaterKey === "services" && $servicesItemMode === "general" && $fieldKey === "link_type";
+                        $isServiceGeneralPageIdField = $repeaterKey === "services" && $servicesItemMode === "general" && $fieldKey === "page_id";
+                        $isServiceGeneralLinkUrlField = $repeaterKey === "services" && $servicesItemMode === "general" && $fieldKey === "link_url";
                         $isFeaturedDoctorProfileButtonTextField = $repeaterKey === "featured_doctors" && $fieldKey === "profile_button_text";
                         $isFeaturedDoctorProfileButtonLinkTypeField = $repeaterKey === "featured_doctors" && $fieldKey === "profile_button_link_type";
                         $isFeaturedDoctorProfileButtonPageIdField = $repeaterKey === "featured_doctors" && $fieldKey === "profile_button_page_id";
@@ -345,6 +351,13 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $featuredServiceLinkScope = $repeaterKey . "_" . $itemIndex . "_link";
                         if ($featuredServiceLinkTypeValue !== "internal" && $featuredServiceLinkTypeValue !== "custom") {
                             $featuredServiceLinkTypeValue = $featuredServiceLinkUrlValue !== "" ? "custom" : ($featuredServicePageIdValue !== "" ? "internal" : "custom");
+                        }
+                        $serviceGeneralLinkTypeValue = trim((string) (($itemData["fields"]["link_type"]["field_value"] ?? "")));
+                        $serviceGeneralPageIdValue = trim((string) (($itemData["fields"]["page_id"]["field_value"] ?? "")));
+                        $serviceGeneralLinkUrlValue = (string) (($itemData["fields"]["link_url"]["field_value"] ?? ""));
+                        $serviceGeneralLinkScope = $repeaterKey . "_" . $itemIndex . "_link";
+                        if ($serviceGeneralLinkTypeValue !== "internal" && $serviceGeneralLinkTypeValue !== "custom") {
+                            $serviceGeneralLinkTypeValue = $serviceGeneralLinkUrlValue !== "" ? "custom" : ($serviceGeneralPageIdValue !== "" ? "internal" : "custom");
                         }
                         $ctaFeatureLinkTypeValue = trim((string) (($itemData["fields"]["link_type"]["field_value"] ?? "")));
                         $ctaFeaturePageIdValue = trim((string) (($itemData["fields"]["page_id"]["field_value"] ?? "")));
@@ -461,12 +474,12 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         if ($repeaterKey === "about_stats" && $fieldKey === "value") {
                             $fieldLabel = "Valor";
                         }
-                        if ($isCtaFeatureLinkTypeField || $isCtaFeaturePageIdField || $isCtaFeatureLinkUrlField || $isFeaturedDepartmentLinkTypeField || $isFeaturedDepartmentPageIdField || $isFeaturedDepartmentLinkUrlField || $isFeaturedServiceLinkTypeField || $isFeaturedServicePageIdField || $isFeaturedServiceLinkUrlField || $isFeaturedDoctorProfileButtonLinkTypeField || $isFeaturedDoctorProfileButtonPageIdField || $isFeaturedDoctorProfileButtonUrlField || $isFeaturedDoctorAppointmentButtonLinkTypeField || $isFeaturedDoctorAppointmentButtonPageIdField || $isFeaturedDoctorAppointmentButtonUrlField || $isEmergencyContactButtonLinkTypeField || $isEmergencyContactButtonPageIdField || $isEmergencyContactButtonUrlField || $isDepartmentsFeaturedButtonLinkTypeField || $isDepartmentsFeaturedButtonPageIdField || $isDepartmentsFeaturedButtonUrlField || $isDepartmentsStandardButtonLinkTypeField || $isDepartmentsStandardButtonPageIdField || $isDepartmentsStandardButtonUrlField) {
+                        if ($isCtaFeatureLinkTypeField || $isCtaFeaturePageIdField || $isCtaFeatureLinkUrlField || $isFeaturedDepartmentLinkTypeField || $isFeaturedDepartmentPageIdField || $isFeaturedDepartmentLinkUrlField || $isFeaturedServiceLinkTypeField || $isFeaturedServicePageIdField || $isFeaturedServiceLinkUrlField || $isServiceGeneralLinkTypeField || $isServiceGeneralPageIdField || $isServiceGeneralLinkUrlField || $isFeaturedDoctorProfileButtonLinkTypeField || $isFeaturedDoctorProfileButtonPageIdField || $isFeaturedDoctorProfileButtonUrlField || $isFeaturedDoctorAppointmentButtonLinkTypeField || $isFeaturedDoctorAppointmentButtonPageIdField || $isFeaturedDoctorAppointmentButtonUrlField || $isEmergencyContactButtonLinkTypeField || $isEmergencyContactButtonPageIdField || $isEmergencyContactButtonUrlField || $isDepartmentsFeaturedButtonLinkTypeField || $isDepartmentsFeaturedButtonPageIdField || $isDepartmentsFeaturedButtonUrlField || $isDepartmentsStandardButtonLinkTypeField || $isDepartmentsStandardButtonPageIdField || $isDepartmentsStandardButtonUrlField) {
                             continue;
                         }
                         ?>
-                        <div class="field-group<?php echo ($isQuickActionIconField || $isQuickActionLabelField || $isQuickActionUrlField || $isCtaFeatureLinkTextField || $isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField || $isEmergencyContactButtonTextField || $isDepartmentsFeaturedSubtitleField || $isDepartmentsFeaturedDescriptionField || $isDepartmentsFeaturedButtonTextField || $isDepartmentsStandardFeatureThreeField || $isDepartmentsStandardButtonTextField) ? " field-group-full" : ""; ?>">
-                            <?php if (!$isQuickActionUrlField && !$isCtaFeatureLinkTextField && !$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField && !$isEmergencyContactButtonTextField && !$isDepartmentsFeaturedButtonTextField && !$isDepartmentsStandardButtonTextField): ?>
+                        <div class="field-group<?php echo ($isQuickActionIconField || $isQuickActionLabelField || $isQuickActionUrlField || $isCtaFeatureLinkTextField || $isFeaturedDepartmentLinkTextField || $isFeaturedServiceLinkTextField || $isServiceGeneralLinkTextField || $isFeaturedDoctorProfileButtonTextField || $isFeaturedDoctorAppointmentButtonTextField || $isEmergencyContactButtonTextField || $isDepartmentsFeaturedSubtitleField || $isDepartmentsFeaturedDescriptionField || $isDepartmentsFeaturedButtonTextField || $isDepartmentsStandardFeatureThreeField || $isDepartmentsStandardButtonTextField) ? " field-group-full" : ""; ?>">
+                            <?php if (!$isQuickActionUrlField && !$isCtaFeatureLinkTextField && !$isFeaturedDepartmentLinkTextField && !$isFeaturedServiceLinkTextField && !$isServiceGeneralLinkTextField && !$isFeaturedDoctorProfileButtonTextField && !$isFeaturedDoctorAppointmentButtonTextField && !$isEmergencyContactButtonTextField && !$isDepartmentsFeaturedButtonTextField && !$isDepartmentsStandardButtonTextField): ?>
                                 <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel($fieldLabel); ?></label>
                             <?php endif; ?>
                             <?php if ($fieldType === "image"): ?>
@@ -542,6 +555,36 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                         <div class="field-group field-group-full js-link-panel <?php echo $featuredDepartmentLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($featuredDepartmentLinkScope, ENT_QUOTES, "UTF-8"); ?>">
                                             <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
                                             <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_url]" value="<?php echo htmlspecialchars($featuredDepartmentLinkUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php elseif ($isServiceGeneralLinkTextField): ?>
+                                <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_text", ENT_QUOTES, "UTF-8"); ?>">Texto del botón</label>
+                                <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_text", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_text]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+
+                                <div class="button-destination-box">
+                                    <div class="field-group field-group-full">
+                                        <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_type", ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
+                                        <select class="form-select js-link-type" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_type", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_type]" data-link-scope="<?php echo htmlspecialchars($serviceGeneralLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <option value="internal"<?php echo $serviceGeneralLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                            <option value="custom"<?php echo $serviceGeneralLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="button-destination-grid">
+                                        <div class="field-group field-group-full js-link-panel <?php echo $serviceGeneralLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($serviceGeneralLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_page_id", ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
+                                            <select class="form-select" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_page_id", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][page_id]">
+                                                <option value="">Selecciona una p&aacute;gina</option>
+                                                <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                    <option value="<?php echo (int) ($sitePageOption["id"] ?? 0); ?>"<?php echo (string) ($sitePageOption["id"] ?? "") === $serviceGeneralPageIdValue ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="field-group field-group-full js-link-panel <?php echo $serviceGeneralLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($serviceGeneralLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                            <label class="field-label" for="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                            <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_link_url", ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][link_url]" value="<?php echo htmlspecialchars($serviceGeneralLinkUrlValue, ENT_QUOTES, "UTF-8"); ?>">
                                         </div>
                                     </div>
                                 </div>

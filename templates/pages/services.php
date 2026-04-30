@@ -56,7 +56,28 @@ function servicesNormalizeCustomHref(string $url): string
     return $url;
 }
 
-function servicesRenderServiceItem(array $serviceItem): void
+function servicesRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl = "#"): string
+{
+    $linkType = servicesRepeaterField($fields, "link_type");
+    $pageId = (int) servicesRepeaterField($fields, "page_id", "0");
+    $customUrl = servicesNormalizeCustomHref(servicesRepeaterField($fields, "link_url"));
+
+    if ($linkType !== "internal" && $linkType !== "custom") {
+        $linkType = $customUrl !== "" ? "custom" : ($pageId > 0 ? "internal" : "custom");
+    }
+
+    if ($linkType === "internal" && $pageId > 0) {
+        [, $pagesById] = getPageContentLinkablePages($conn, true);
+
+        if (isset($pagesById[$pageId])) {
+            return (string) ($pagesById[$pageId]["public_url"] ?? $fallbackUrl);
+        }
+    }
+
+    return $customUrl !== "" ? $customUrl : $fallbackUrl;
+}
+
+function servicesRenderServiceItem(mysqli $conn, array $serviceItem): void
 {
     $serviceFields = $serviceItem["fields"] ?? [];
     $iconClass = servicesRepeaterField($serviceFields, "icon_class");
@@ -64,8 +85,9 @@ function servicesRenderServiceItem(array $serviceItem): void
     $description = servicesRepeaterField($serviceFields, "description");
     $variantClass = servicesRepeaterField($serviceFields, "variant_class");
     $columnClass = servicesRepeaterField($serviceFields, "column_class", "col-lg-6");
+    $isEmergencyService = servicesRepeaterField($serviceFields, "category_key") === "emergency";
     $linkText = servicesRepeaterField($serviceFields, "link_text");
-    $linkUrl = servicesNormalizeCustomHref(servicesRepeaterField($serviceFields, "link_url"));
+    $linkUrl = $isEmergencyService ? servicesNormalizeCustomHref(servicesRepeaterField($serviceFields, "link_url")) : servicesRepeaterLinkHref($conn, $serviceFields, "#");
     $emergencyButtonText = servicesRepeaterField($serviceFields, "emergency_button_text");
     $emergencyButtonIcon = servicesRepeaterField($serviceFields, "emergency_button_icon", "fa fa-phone");
     $emergencyButtonUrl = servicesNormalizeCustomHref(servicesRepeaterField($serviceFields, "emergency_button_url"));
@@ -211,7 +233,7 @@ require __DIR__ . "/../../includes/header.php";
             <div class="tab-pane fade<?php echo $categoryIndex === 0 ? " show active" : ""; ?>" id="<?php echo htmlspecialchars($tabId, ENT_QUOTES, "UTF-8"); ?>" role="tabpanel">
               <div class="row g-4">
                 <?php foreach ($servicesByCategory[$categoryKey] ?? [] as $serviceItem): ?>
-                  <?php servicesRenderServiceItem($serviceItem); ?>
+                  <?php servicesRenderServiceItem($conn, $serviceItem); ?>
                 <?php endforeach; ?>
               </div>
             </div>
