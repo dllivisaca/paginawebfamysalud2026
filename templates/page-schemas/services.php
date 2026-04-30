@@ -49,9 +49,13 @@ return [
                 ["field_key" => "link_url", "label" => "URL del enlace", "field_type" => "url", "default" => ""],
                 ["field_key" => "emergency_button_text", "label" => "Boton emergencia texto", "field_type" => "text", "default" => ""],
                 ["field_key" => "emergency_button_icon", "label" => "Boton emergencia icono", "field_type" => "text", "default" => ""],
+                ["field_key" => "emergency_button_link_type", "label" => "Tipo de enlace", "field_type" => "text", "default" => "custom"],
+                ["field_key" => "emergency_button_page_id", "label" => "Pagina interna", "field_type" => "text", "default" => ""],
                 ["field_key" => "emergency_button_url", "label" => "Boton emergencia URL", "field_type" => "url", "default" => ""],
                 ["field_key" => "directions_button_text", "label" => "Boton direcciones texto", "field_type" => "text", "default" => ""],
                 ["field_key" => "directions_button_icon", "label" => "Boton direcciones icono", "field_type" => "text", "default" => ""],
+                ["field_key" => "directions_button_link_type", "label" => "Tipo de enlace", "field_type" => "text", "default" => "custom"],
+                ["field_key" => "directions_button_page_id", "label" => "Pagina interna", "field_type" => "text", "default" => ""],
                 ["field_key" => "directions_button_url", "label" => "Boton direcciones URL", "field_type" => "url", "default" => ""],
             ],
             "items" => [

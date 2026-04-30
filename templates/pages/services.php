@@ -56,11 +56,11 @@ function servicesNormalizeCustomHref(string $url): string
     return $url;
 }
 
-function servicesRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl = "#"): string
+function servicesRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl = "#", string $linkTypeKey = "link_type", string $pageIdKey = "page_id", string $urlKey = "link_url"): string
 {
-    $linkType = servicesRepeaterField($fields, "link_type");
-    $pageId = (int) servicesRepeaterField($fields, "page_id", "0");
-    $customUrl = servicesNormalizeCustomHref(servicesRepeaterField($fields, "link_url"));
+    $linkType = servicesRepeaterField($fields, $linkTypeKey);
+    $pageId = (int) servicesRepeaterField($fields, $pageIdKey, "0");
+    $customUrl = servicesNormalizeCustomHref(servicesRepeaterField($fields, $urlKey));
 
     if ($linkType !== "internal" && $linkType !== "custom") {
         $linkType = $customUrl !== "" ? "custom" : ($pageId > 0 ? "internal" : "custom");
@@ -90,10 +90,10 @@ function servicesRenderServiceItem(mysqli $conn, array $serviceItem): void
     $linkUrl = $isEmergencyService ? servicesNormalizeCustomHref(servicesRepeaterField($serviceFields, "link_url")) : servicesRepeaterLinkHref($conn, $serviceFields, "#");
     $emergencyButtonText = servicesRepeaterField($serviceFields, "emergency_button_text");
     $emergencyButtonIcon = servicesRepeaterField($serviceFields, "emergency_button_icon", "fa fa-phone");
-    $emergencyButtonUrl = servicesNormalizeCustomHref(servicesRepeaterField($serviceFields, "emergency_button_url"));
+    $emergencyButtonUrl = servicesRepeaterLinkHref($conn, $serviceFields, "#", "emergency_button_link_type", "emergency_button_page_id", "emergency_button_url");
     $directionsButtonText = servicesRepeaterField($serviceFields, "directions_button_text");
     $directionsButtonIcon = servicesRepeaterField($serviceFields, "directions_button_icon", "fa fa-map-marker-alt");
-    $directionsButtonUrl = servicesNormalizeCustomHref(servicesRepeaterField($serviceFields, "directions_button_url"));
+    $directionsButtonUrl = servicesRepeaterLinkHref($conn, $serviceFields, "#", "directions_button_link_type", "directions_button_page_id", "directions_button_url");
     $benefits = array_values(array_filter([
         servicesRepeaterField($serviceFields, "benefit_1"),
         servicesRepeaterField($serviceFields, "benefit_2"),
