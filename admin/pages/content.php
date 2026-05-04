@@ -2169,7 +2169,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                     <?php foreach ($schema["simple_fields"] as $fieldConfig): ?>
                                         <?php
                                         $fieldKey = (string) $fieldConfig["field_key"];
-                                        if ($templateKey === "department-details" && in_array($fieldKey, ["intro_title", "intro_text"], true)) {
+                                        if ($templateKey === "department-details" && in_array($fieldKey, ["intro_title", "intro_text", "overview_image", "overview_image_alt", "experience_number", "experience_text"], true)) {
                                             continue;
                                         }
                                         $fieldData = $contentData["simple_fields"][$fieldKey] ?? null;
@@ -2246,6 +2246,57 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="field-group-full">
+                                                <div class="section-block department-info-one-admin-section">
+                                                    <h3>Área informativa 1</h3>
+                                                    <div class="field-grid">
+                                                        <?php foreach (["overview_image", "overview_image_alt", "experience_number", "experience_text"] as $departmentInfoOneFieldKey): ?>
+                                                            <?php
+                                                            $departmentInfoOneFieldConfig = null;
+                                                            foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                if ((string) ($simpleFieldConfig["field_key"] ?? "") === $departmentInfoOneFieldKey) {
+                                                                    $departmentInfoOneFieldConfig = $simpleFieldConfig;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!is_array($departmentInfoOneFieldConfig)) {
+                                                                continue;
+                                                            }
+                                                            $departmentInfoOneFieldData = $contentData["simple_fields"][$departmentInfoOneFieldKey] ?? null;
+                                                            $departmentInfoOneFieldType = (string) ($departmentInfoOneFieldConfig["field_type"] ?? "text");
+                                                            $departmentInfoOneFieldValue = (string) ($departmentInfoOneFieldData["field_value"] ?? "");
+                                                            $departmentInfoOneFieldVisible = (int) ($departmentInfoOneFieldData["is_visible"] ?? 1) === 1;
+                                                            $departmentInfoOneIsImage = $departmentInfoOneFieldType === "image";
+                                                            ?>
+                                                            <div class="field-group">
+                                                                <div class="field-header">
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($departmentInfoOneFieldConfig["label"] ?? $departmentInfoOneFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="toggle-row">
+                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $departmentInfoOneFieldVisible ? " checked" : ""; ?>>
+                                                                        <span>Mostrar</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <?php if ($departmentInfoOneIsImage): ?>
+                                                                    <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($departmentInfoOneFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                    <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($departmentInfoOneFieldValue !== "" ? basename($departmentInfoOneFieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
+                                                                    <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
+                                                                    <input class="form-file js-image-upload" type="file" id="simple_file_<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>">
+                                                                    <img id="preview_<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $departmentInfoOneFieldValue !== "" ? "../../" . htmlspecialchars(ltrim($departmentInfoOneFieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $departmentInfoOneFieldValue !== "" ? "" : " is-empty"; ?>">
+                                                                <?php else: ?>
+                                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($departmentInfoOneFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                    <?php foreach ($schema["repeaters"] as $departmentInfoOneRepeaterConfig): ?>
+                                                        <?php if (((string) ($departmentInfoOneRepeaterConfig["repeater_key"] ?? "")) === "service_cards"): ?>
+                                                            <?php renderAdminRepeaterSection($departmentInfoOneRepeaterConfig, $contentData); ?>
+                                                            <?php break; ?>
+                                                        <?php endif; ?>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            </div>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
@@ -2263,6 +2314,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "contact" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "social_links"): ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <?php if ($templateKey === "department-details" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "service_cards"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
