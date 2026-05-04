@@ -1598,6 +1598,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .department-info-one-repeater { margin-top: 16px; }
         .section-block.department-stats-admin-section { background: #fff; }
         .department-stats-admin-section .card { background: #f9fafb; }
+        .section-block.department-info-two-admin-section { background: #fff; }
+        .section-block.department-cta-admin-section { background: #f9fafb; }
         .section-block.quick-actions-admin-section { background: #fff; }
         .quick-actions-admin-section .card { background: #f9fafb; }
         .section-block.emergency-tips-admin-section { background: #fff; margin-top: 16px; }
@@ -2375,7 +2377,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                     <div class="section-block department-info-two-admin-section">
                                         <h3>Área informativa 2</h3>
                                         <div class="field-grid">
-                                            <?php foreach (["key_services_title", "key_services_text", "cta_title", "cta_text", "cta_primary_text", "cta_primary_url", "cta_secondary_text", "cta_secondary_url", "cta_image", "cta_image_alt"] as $departmentInfoTwoFieldKey): ?>
+                                            <?php foreach (["key_services_title", "key_services_text"] as $departmentInfoTwoFieldKey): ?>
                                                 <?php
                                                 $departmentInfoTwoFieldConfig = null;
                                                 foreach ($schema["simple_fields"] as $simpleFieldConfig) {
@@ -2416,6 +2418,54 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     <?php endif; ?>
                                                 </div>
                                             <?php endforeach; ?>
+                                            <div class="field-group-full">
+                                                <div class="section-block department-cta-admin-section">
+                                                    <h3>Llamado a la acción</h3>
+                                                    <div class="field-grid">
+                                                        <?php foreach (["cta_title", "cta_text", "cta_primary_text", "cta_primary_url", "cta_secondary_text", "cta_secondary_url", "cta_image", "cta_image_alt"] as $departmentCtaFieldKey): ?>
+                                                            <?php
+                                                            $departmentCtaFieldConfig = null;
+                                                            foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                if ((string) ($simpleFieldConfig["field_key"] ?? "") === $departmentCtaFieldKey) {
+                                                                    $departmentCtaFieldConfig = $simpleFieldConfig;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!is_array($departmentCtaFieldConfig)) {
+                                                                continue;
+                                                            }
+                                                            $departmentCtaFieldData = $contentData["simple_fields"][$departmentCtaFieldKey] ?? null;
+                                                            $departmentCtaFieldType = (string) ($departmentCtaFieldConfig["field_type"] ?? "text");
+                                                            $departmentCtaFieldValue = (string) ($departmentCtaFieldData["field_value"] ?? "");
+                                                            $departmentCtaFieldVisible = (int) ($departmentCtaFieldData["is_visible"] ?? 1) === 1;
+                                                            $departmentCtaIsTextarea = $departmentCtaFieldType === "textarea";
+                                                            $departmentCtaIsImage = $departmentCtaFieldType === "image";
+                                                            ?>
+                                                            <div class="field-group <?php echo $departmentCtaIsTextarea ? "field-group-full" : ""; ?>">
+                                                                <div class="field-header">
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($departmentCtaFieldConfig["label"] ?? $departmentCtaFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="toggle-row">
+                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $departmentCtaFieldVisible ? " checked" : ""; ?>>
+                                                                        <span>Mostrar</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <?php if ($departmentCtaIsTextarea): ?>
+                                                                    <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($departmentCtaFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                                <?php elseif ($departmentCtaIsImage): ?>
+                                                                    <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($departmentCtaFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                    <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($departmentCtaFieldValue !== "" ? basename($departmentCtaFieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
+                                                                    <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
+                                                                    <input class="form-file js-image-upload" type="file" id="simple_file_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>">
+                                                                    <img id="preview_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $departmentCtaFieldValue !== "" ? "../../" . htmlspecialchars(ltrim($departmentCtaFieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $departmentCtaFieldValue !== "" ? "" : " is-empty"; ?>">
+                                                                <?php else: ?>
+                                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($departmentCtaFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
