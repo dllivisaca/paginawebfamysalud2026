@@ -162,7 +162,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
             $featuresTitleValue = (string) ($featuresTitleData["field_value"] ?? "");
             $featuresTitleVisible = (int) ($featuresTitleData["is_visible"] ?? 1) === 1;
             ?>
-            <div class="field-grid">
+            <div class="field-grid service-details-features-title-field">
                 <div class="field-group field-group-full">
                     <div class="field-header">
                         <label class="field-label" for="simple_features_title">Título</label>
@@ -1627,6 +1627,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .section-block.cta-features-admin-section { background: #fff; }
         .cta-features-admin-section .card { background: #f9fafb; }
         .section-block.service-details-features-admin-section { background: #fff; }
+        .service-details-features-title-field { margin-bottom: 16px; }
         .service-details-features-admin-section .card { background: #f9fafb; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
         .cta-features-admin-section .item-title h3 { font-size: 17px; }
