@@ -2006,6 +2006,8 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Texto del botón";
                                                         } elseif ($groupFieldKey === "emergency_banner_button_url") {
                                                             $displayLabelHtml = "Teléfono o enlace del botón";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "map_embed_url") {
+                                                            $displayLabelHtml = "Ubicación en Google Maps";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {

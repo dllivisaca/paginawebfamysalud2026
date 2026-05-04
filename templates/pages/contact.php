@@ -63,6 +63,17 @@ $infoTitle = contactFieldValue($contactFields, "info_title", "Contact Informatio
 $infoText = contactFieldValue($contactFields, "info_text", "Dignissimos deleniti accusamus rerum voluptate. Dignissimos rerum sit maiores reiciendis voluptate inventore ut.");
 $socialTitle = contactFieldValue($contactFields, "social_title", "Follow Us");
 $mapEmbedUrl = contactFieldValue($contactFields, "map_embed_url", "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d48389.78314118045!2d-74.006138!3d40.710059!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a22a3bda30d%3A0xb89d1fe6bc499443!2sDowntown%20Conference%20Center!5e0!3m2!1sen!2sus!4v1676961268712!5m2!1sen!2sus");
+$mapLocationValue = trim($mapEmbedUrl);
+$mapIsEmbedUrl = $mapLocationValue !== "" && preg_match('~(?:google\.[^/]+/maps/embed|/maps/embed)~i', $mapLocationValue) === 1;
+$mapIsUrl = $mapLocationValue !== "" && preg_match('~^(?:https?:)?//~i', $mapLocationValue) === 1;
+$mapCoordinates = "";
+if (!$mapIsEmbedUrl && preg_match('~!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)~', $mapLocationValue, $mapCoordinateMatches) === 1) {
+    $mapCoordinates = $mapCoordinateMatches[1] . "," . $mapCoordinateMatches[2];
+} elseif (!$mapIsEmbedUrl && preg_match('~@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)~', $mapLocationValue, $mapCoordinateMatches) === 1) {
+    $mapCoordinates = $mapCoordinateMatches[1] . "," . $mapCoordinateMatches[2];
+}
+$mapIframeUrl = $mapIsEmbedUrl ? $mapLocationValue : ($mapCoordinates !== "" ? "https://www.google.com/maps?q=" . rawurlencode($mapCoordinates) . "&z=17&output=embed" : ($mapLocationValue !== "" ? "https://www.google.com/maps?q=" . rawurlencode($mapLocationValue) . "&output=embed" : ""));
+$mapOpenUrl = $mapIsEmbedUrl ? $mapLocationValue : ($mapIsUrl ? $mapLocationValue : ($mapLocationValue !== "" ? "https://www.google.com/maps/search/?api=1&query=" . rawurlencode($mapLocationValue) : ""));
 $formTitle = contactFieldValue($contactFields, "form_title", "Send Us a Message");
 $formText = contactFieldValue($contactFields, "form_text", "Lorem ipsum dolor sit amet consectetur adipiscing elit mauris hendrerit faucibus imperdiet nec eget felis.");
 $formNameLabel = contactFieldValue($contactFields, "form_name_label", "Full Name");
@@ -162,10 +173,13 @@ require __DIR__ . "/../../includes/header.php";
           </div>
 
           <div class="contact-form-panel">
-            <?php if (contactFieldVisible($contactFields, "map_embed_url") && $mapEmbedUrl !== ""): ?>
+            <?php if (contactFieldVisible($contactFields, "map_embed_url") && $mapIframeUrl !== ""): ?>
             <div class="map-container">
-              <iframe src="<?php echo htmlspecialchars($mapEmbedUrl, ENT_QUOTES, "UTF-8"); ?>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <iframe src="<?php echo htmlspecialchars($mapIframeUrl, ENT_QUOTES, "UTF-8"); ?>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
+            <?php if ($mapOpenUrl !== ""): ?>
+            <a href="<?php echo htmlspecialchars($mapOpenUrl, ENT_QUOTES, "UTF-8"); ?>" target="_blank" rel="noopener">Open in Maps</a>
+            <?php endif; ?>
             <?php endif; ?>
 
             <div class="form-container">
