@@ -405,6 +405,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isContactInfoCardIconField = $templateKey === "contact" && $repeaterKey === "info_cards" && $fieldKey === "icon_class";
                         $isContactSocialLinkIconField = $templateKey === "contact" && $repeaterKey === "social_links" && $fieldKey === "icon_class";
                         $isDepartmentServiceCardIconField = $templateKey === "department-details" && $repeaterKey === "service_cards" && $fieldKey === "icon_class";
+                        $isServiceDetailsCardIconField = $templateKey === "service-details" && $repeaterKey === "service_cards" && $fieldKey === "icon_class";
                         $isCtaFeatureLinkTextField = $repeaterKey === "cta_features" && $fieldKey === "link_text";
                         $isCtaFeatureLinkTypeField = $repeaterKey === "cta_features" && $fieldKey === "link_type";
                         $isCtaFeaturePageIdField = $repeaterKey === "cta_features" && $fieldKey === "page_id";
@@ -625,6 +626,11 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             "bi bi-activity" => "Signos vitales",
                             "bi bi-person-heart" => "Persona y corazón",
                         ];
+                        $serviceDetailsCardIconOptions = [
+                            "bi bi-heart-pulse" => "Corazón con pulso",
+                            "bi bi-hospital" => "Hospital",
+                            "bi bi-shield-check" => "Escudo",
+                        ];
                         if ($repeaterKey === "about_stats" && $fieldKey === "value") {
                             $fieldLabel = "Valor";
                         }
@@ -650,10 +656,10 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                 <label class="file-input-label" for="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
                                 <input class="form-file js-image-upload" type="file" id="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">
                                 <img id="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
-                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField || $isQuickActionIconField || $isEmergencyContactIconField || $isFeaturedDepartmentIconField || $isFeaturedServiceIconField || $isDepartmentsIconField || $isServiceIconField || $isContactInfoCardIconField || $isContactSocialLinkIconField || $isDepartmentServiceCardIconField): ?>
+                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField || $isQuickActionIconField || $isEmergencyContactIconField || $isFeaturedDepartmentIconField || $isFeaturedServiceIconField || $isDepartmentsIconField || $isServiceIconField || $isContactInfoCardIconField || $isContactSocialLinkIconField || $isDepartmentServiceCardIconField || $isServiceDetailsCardIconField): ?>
                                 <select class="form-input" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]"<?php echo $isContactSocialLinkIconField ? ' data-contact-social-link-icon-input="' . $itemIndex . '"' : ""; ?>>
-                                    <?php $iconOptions = $isDepartmentServiceCardIconField ? $departmentServiceCardIconOptions : ($isContactSocialLinkIconField ? $contactSocialLinkIconOptions : ($isContactInfoCardIconField ? $contactInfoCardIconOptions : ($isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : ($isCtaFeatureIconField ? $ctaFeatureIconOptions : ($isQuickActionIconField ? $quickActionIconOptions : ($isEmergencyContactIconField ? $emergencyContactIconOptions : ($isFeaturedDepartmentIconField ? $featuredDepartmentIconOptions : ($isDepartmentsIconField ? $departmentsIconOptions : ($isServiceIconField ? $serviceIconOptions : $featuredServiceIconOptions)))))))))); ?>
-                                    <?php if ($isQuickActionIconField && $fieldValue !== "" && !array_key_exists($fieldValue, $quickActionIconOptions)): ?>
+                                    <?php $iconOptions = $isServiceDetailsCardIconField ? $serviceDetailsCardIconOptions : ($isDepartmentServiceCardIconField ? $departmentServiceCardIconOptions : ($isContactSocialLinkIconField ? $contactSocialLinkIconOptions : ($isContactInfoCardIconField ? $contactInfoCardIconOptions : ($isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : ($isCtaFeatureIconField ? $ctaFeatureIconOptions : ($isQuickActionIconField ? $quickActionIconOptions : ($isEmergencyContactIconField ? $emergencyContactIconOptions : ($isFeaturedDepartmentIconField ? $featuredDepartmentIconOptions : ($isDepartmentsIconField ? $departmentsIconOptions : ($isServiceIconField ? $serviceIconOptions : $featuredServiceIconOptions))))))))))); ?>
+                                    <?php if (($isQuickActionIconField || $isServiceDetailsCardIconField) && $fieldValue !== "" && !array_key_exists($fieldValue, $iconOptions)): ?>
                                         <option value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>" selected>Icono actual: <?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></option>
                                     <?php endif; ?>
                                     <?php foreach ($iconOptions as $iconValue => $iconLabel): ?>
