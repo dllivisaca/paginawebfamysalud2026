@@ -73,6 +73,23 @@ function serviceDetailsButtonHref(mysqli $conn, array $fields, string $prefix, s
     return $customUrl !== "" ? $customUrl : $fallbackUrl;
 }
 
+function serviceDetailsRepeaterLinkHref(mysqli $conn, array $fields, string $fallbackUrl = "#"): string
+{
+    $linkType = trim((string) ($fields["link_type"] ?? ""));
+    $pageId = (int) trim((string) ($fields["page_id"] ?? "0"));
+    $customUrl = serviceDetailsNormalizeCustomHref((string) ($fields["link_url"] ?? ""));
+
+    if ($linkType === "internal" && $pageId > 0) {
+        [, $pagesById] = getPageContentLinkablePages($conn, true);
+
+        if (isset($pagesById[$pageId])) {
+            return (string) ($pagesById[$pageId]["public_url"] ?? $fallbackUrl);
+        }
+    }
+
+    return $customUrl !== "" ? $customUrl : $fallbackUrl;
+}
+
 $h1TitleEscaped = htmlspecialchars($h1Title, ENT_QUOTES, "UTF-8");
 $heroTitle = serviceDetailsFieldValue($serviceDetailsFields, "hero_title", (string) ($page["title"] ?? "Service Details"));
 $heroSubtitle = serviceDetailsFieldValue($serviceDetailsFields, "hero_subtitle", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.");
@@ -204,7 +221,7 @@ require __DIR__ . "/../../includes/header.php";
             $title = serviceDetailsRepeaterField($cardFields, "title");
             $text = serviceDetailsRepeaterField($cardFields, "text");
             $linkText = serviceDetailsRepeaterField($cardFields, "link_text");
-            $linkUrl = serviceDetailsNormalizeCustomHref(serviceDetailsRepeaterField($cardFields, "link_url", "#"));
+            $linkUrl = serviceDetailsRepeaterLinkHref($conn, $cardFields, "#");
             $delay = 100 + ($cardIndex * 100);
             ?>
           <div class="col-lg-4" data-aos="fade-up" data-aos-delay="<?php echo $delay; ?>">

@@ -56,7 +56,9 @@ return [
                 ["field_key" => "title", "label" => "Titulo", "field_type" => "text", "default" => ""],
                 ["field_key" => "text", "label" => "Texto", "field_type" => "textarea", "default" => ""],
                 ["field_key" => "link_text", "label" => "Enlace texto", "field_type" => "text", "default" => ""],
-                ["field_key" => "link_url", "label" => "Enlace URL", "field_type" => "url", "default" => "#"],
+                ["field_key" => "link_type", "label" => "Tipo de enlace", "field_type" => "text", "default" => "custom"],
+                ["field_key" => "page_id", "label" => "Página interna", "field_type" => "text", "default" => ""],
+                ["field_key" => "link_url", "label" => "URL personalizada", "field_type" => "url", "default" => "#"],
             ],
             "items" => [
                 ["item_index" => 0, "item_label" => "Diagnostic Testing", "default_visible" => 1, "defaults" => ["icon_class" => "bi bi-heart-pulse", "title" => "Diagnostic Testing", "text" => "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.", "link_text" => "Book Now", "link_url" => "#"]],
