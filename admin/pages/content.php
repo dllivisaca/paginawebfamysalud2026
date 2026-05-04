@@ -1308,6 +1308,8 @@ if (($schema["template_key"] ?? "") === "about") {
             "field_keys" => ["hero_title", "hero_subtitle"],
         ],
     ];
+} elseif (($schema["template_key"] ?? "") === "department-details") {
+    [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
 } elseif (($schema["template_key"] ?? "") === "doctors") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
 } elseif (($schema["template_key"] ?? "") === "contact") {
@@ -2439,7 +2441,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <div class="section-block department-cta-admin-section">
                                                     <h3>Llamado a la acción</h3>
                                                     <div class="field-grid">
-                                                        <?php foreach (["cta_title", "cta_text", "cta_primary_text", "cta_primary_url", "cta_secondary_text", "cta_secondary_url", "cta_image", "cta_image_alt"] as $departmentCtaFieldKey): ?>
+                                                        <?php foreach (["cta_title", "cta_text", "cta_image", "cta_image_alt"] as $departmentCtaFieldKey): ?>
                                                             <?php
                                                             $departmentCtaFieldConfig = null;
                                                             foreach ($schema["simple_fields"] as $simpleFieldConfig) {
@@ -2462,14 +2464,6 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 $departmentCtaLabel = "Título";
                                                             } elseif ($departmentCtaFieldKey === "cta_text") {
                                                                 $departmentCtaLabel = "Descripción";
-                                                            } elseif ($departmentCtaFieldKey === "cta_primary_text") {
-                                                                $departmentCtaLabel = "Texto botón principal";
-                                                            } elseif ($departmentCtaFieldKey === "cta_primary_url") {
-                                                                $departmentCtaLabel = "Enlace botón principal";
-                                                            } elseif ($departmentCtaFieldKey === "cta_secondary_text") {
-                                                                $departmentCtaLabel = "Texto botón secundario";
-                                                            } elseif ($departmentCtaFieldKey === "cta_secondary_url") {
-                                                                $departmentCtaLabel = "Enlace botón secundario";
                                                             } elseif ($departmentCtaFieldKey === "cta_image") {
                                                                 $departmentCtaLabel = "Imagen";
                                                             } elseif ($departmentCtaFieldKey === "cta_image_alt") {
@@ -2496,6 +2490,75 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 <?php else: ?>
                                                                     <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($departmentCtaFieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                 <?php endif; ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                        <?php foreach ([
+                                                            ["title" => "Botón principal", "text_key" => "cta_primary_text", "url_key" => "cta_primary_url"],
+                                                            ["title" => "Botón secundario", "text_key" => "cta_secondary_text", "url_key" => "cta_secondary_url"],
+                                                        ] as $departmentCtaButtonConfig): ?>
+                                                            <?php
+                                                            $departmentCtaTextKey = (string) $departmentCtaButtonConfig["text_key"];
+                                                            $departmentCtaUrlKey = (string) $departmentCtaButtonConfig["url_key"];
+                                                            $departmentCtaTextData = $contentData["simple_fields"][$departmentCtaTextKey] ?? null;
+                                                            $departmentCtaUrlData = $contentData["simple_fields"][$departmentCtaUrlKey] ?? null;
+                                                            $departmentCtaTextValue = (string) ($departmentCtaTextData["field_value"] ?? "");
+                                                            $departmentCtaUrlValue = (string) ($departmentCtaUrlData["field_value"] ?? "");
+                                                            $departmentCtaTextVisible = (int) ($departmentCtaTextData["is_visible"] ?? 1) === 1;
+                                                            $departmentCtaUrlVisible = (int) ($departmentCtaUrlData["is_visible"] ?? 1) === 1 ? 1 : 0;
+                                                            $departmentCtaLinkScope = "department_details_" . $departmentCtaUrlKey;
+                                                            $departmentCtaSelectedInternalUrl = "";
+
+                                                            foreach ($linkableSitePages as $sitePageOption) {
+                                                                $sitePagePublicUrl = (string) ($sitePageOption["public_url"] ?? "");
+
+                                                                if ($sitePagePublicUrl !== "" && $sitePagePublicUrl === $departmentCtaUrlValue) {
+                                                                    $departmentCtaSelectedInternalUrl = $sitePagePublicUrl;
+                                                                    break;
+                                                                }
+                                                            }
+
+                                                            $departmentCtaLinkTypeValue = $departmentCtaSelectedInternalUrl !== "" ? "internal" : "custom";
+                                                            $departmentCtaCustomUrlValue = $departmentCtaLinkTypeValue === "custom" ? $departmentCtaUrlValue : "";
+                                                            ?>
+                                                            <div class="field-group field-group-full">
+                                                                <div class="button-destination-box">
+                                                                    <div class="field-header">
+                                                                        <h4><?php echo htmlspecialchars((string) $departmentCtaButtonConfig["title"], ENT_QUOTES, "UTF-8"); ?></h4>
+                                                                        <label class="toggle-row">
+                                                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($departmentCtaTextKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $departmentCtaTextVisible ? " checked" : ""; ?>>
+                                                                            <span>Mostrar</span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($departmentCtaUrlKey, ENT_QUOTES, "UTF-8"); ?>][value]" class="js-department-cta-url" data-link-scope="<?php echo htmlspecialchars($departmentCtaLinkScope, ENT_QUOTES, "UTF-8"); ?>" value="<?php echo htmlspecialchars($departmentCtaUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                    <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($departmentCtaUrlKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="<?php echo $departmentCtaUrlVisible; ?>">
+                                                                    <div class="field-group field-group-full">
+                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentCtaTextKey, ENT_QUOTES, "UTF-8"); ?>">Texto botón <?php echo $departmentCtaTextKey === "cta_primary_text" ? "principal" : "secundario"; ?></label>
+                                                                        <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($departmentCtaTextKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentCtaTextKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($departmentCtaTextValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                    </div>
+                                                                    <div class="button-destination-grid">
+                                                                        <div class="field-group field-group-full">
+                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentCtaUrlKey, ENT_QUOTES, "UTF-8"); ?>_link_type">Tipo de enlace</label>
+                                                                            <select class="form-select js-link-type js-department-cta-link-type" id="simple_<?php echo htmlspecialchars($departmentCtaUrlKey, ENT_QUOTES, "UTF-8"); ?>_link_type" data-link-scope="<?php echo htmlspecialchars($departmentCtaLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                <option value="internal"<?php echo $departmentCtaLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                                                                <option value="custom"<?php echo $departmentCtaLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="field-group field-group-full js-link-panel <?php echo $departmentCtaLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($departmentCtaLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentCtaUrlKey, ENT_QUOTES, "UTF-8"); ?>_page">P&aacute;gina interna</label>
+                                                                            <select class="form-select js-department-cta-page" id="simple_<?php echo htmlspecialchars($departmentCtaUrlKey, ENT_QUOTES, "UTF-8"); ?>_page" data-link-scope="<?php echo htmlspecialchars($departmentCtaLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                <option value="">Selecciona una p&aacute;gina</option>
+                                                                                <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                                                    <?php $sitePagePublicUrl = (string) ($sitePageOption["public_url"] ?? ""); ?>
+                                                                                    <option value="<?php echo htmlspecialchars($sitePagePublicUrl, ENT_QUOTES, "UTF-8"); ?>" data-public-url="<?php echo htmlspecialchars($sitePagePublicUrl, ENT_QUOTES, "UTF-8"); ?>"<?php echo $sitePagePublicUrl !== "" && $sitePagePublicUrl === $departmentCtaSelectedInternalUrl ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                                                <?php endforeach; ?>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="field-group field-group-full js-link-panel <?php echo $departmentCtaLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($departmentCtaLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentCtaUrlKey, ENT_QUOTES, "UTF-8"); ?>_custom">URL personalizada</label>
+                                                                            <input class="form-input js-department-cta-custom-url" type="text" id="simple_<?php echo htmlspecialchars($departmentCtaUrlKey, ENT_QUOTES, "UTF-8"); ?>_custom" data-link-scope="<?php echo htmlspecialchars($departmentCtaLinkScope, ENT_QUOTES, "UTF-8"); ?>" value="<?php echo htmlspecialchars($departmentCtaCustomUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -2656,6 +2719,38 @@ if (($schema["template_key"] ?? "") === "about") {
 
                 selector.addEventListener("change", syncPanels);
                 syncPanels();
+            });
+
+            var departmentCtaLinkSelectors = document.querySelectorAll(".js-department-cta-link-type");
+
+            departmentCtaLinkSelectors.forEach(function (selector) {
+                var scope = selector.getAttribute("data-link-scope");
+                var finalUrlInput = document.querySelector('.js-department-cta-url[data-link-scope="' + scope + '"]');
+                var pageSelect = document.querySelector('.js-department-cta-page[data-link-scope="' + scope + '"]');
+                var customUrlInput = document.querySelector('.js-department-cta-custom-url[data-link-scope="' + scope + '"]');
+                var syncDepartmentCtaUrl = function () {
+                    if (!finalUrlInput) {
+                        return;
+                    }
+
+                    if (selector.value === "internal" && pageSelect) {
+                        var selectedPage = pageSelect.options[pageSelect.selectedIndex];
+                        finalUrlInput.value = selectedPage ? (selectedPage.getAttribute("data-public-url") || "") : "";
+                    } else if (customUrlInput) {
+                        finalUrlInput.value = customUrlInput.value;
+                    }
+                };
+
+                if (pageSelect) {
+                    pageSelect.addEventListener("change", syncDepartmentCtaUrl);
+                }
+
+                if (customUrlInput) {
+                    customUrlInput.addEventListener("input", syncDepartmentCtaUrl);
+                }
+
+                selector.addEventListener("change", syncDepartmentCtaUrl);
+                syncDepartmentCtaUrl();
             });
 
             var doctorAvailabilityMap = {
