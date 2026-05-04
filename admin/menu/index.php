@@ -116,7 +116,8 @@ $menuOptions = buildAdminMenuTree($menuOptions);
 $mainOptionsCount = $homeItem !== null ? 1 : 0;
 $visibleMainOptionsCount = $homeItem !== null && (int) ($homeItem["is_active"] ?? 0) === 1 ? 1 : 0;
 foreach ($menuOptions as $item) {
-    if (($item["parent_id"] ?? null) !== null) {
+    $parentId = (int) ($item["parent_id"] ?? 0);
+    if ($parentId !== 0) {
         continue;
     }
 

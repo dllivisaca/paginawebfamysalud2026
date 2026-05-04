@@ -149,6 +149,24 @@ function countByType(mysqli $conn, int $isButton): int
     return (int) ($row["total"] ?? 0);
 }
 
+function countMainMenuOptions(mysqli $conn): int
+{
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) AS total
+        FROM menu_items
+        WHERE is_button = 0
+          AND (parent_id IS NULL OR parent_id = 0)
+    ");
+    if (!$stmt) {
+        return 0;
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    return (int) ($row["total"] ?? 0);
+}
+
 function getAvailableMainMenuPositions(mysqli $conn, int $excludeItemId = 0, ?int $currentPosition = null): array
 {
     $occupiedPositions = [];

@@ -129,7 +129,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $menuData["parent_id"] = null;
         }
 
-        if ($isCreateMode && countByType($conn, 0) >= 8) {
+        $parentId = $menuData["parent_id"] ?? null;
+        $isMainOption = empty($parentId) || (int) $parentId === 0;
+
+        if ($isCreateMode && $isMainOption && countMainMenuOptions($conn) >= 8) {
             $errors[] = "Ya tienes configuradas las 8 opciones permitidas para el menu.";
         }
 
