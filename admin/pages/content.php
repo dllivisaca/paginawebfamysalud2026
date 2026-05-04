@@ -2029,6 +2029,16 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 <?php endforeach; ?>
                                                             </div>
                                                         <?php endif; ?>
+                                                        <?php if ($templateKey === "contact" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && $groupFieldKey === "social_title"): ?>
+                                                            <div class="field-group-full">
+                                                                <?php foreach ($schema["repeaters"] as $contactRepeaterConfig): ?>
+                                                                    <?php if (((string) ($contactRepeaterConfig["repeater_key"] ?? "")) === "social_links"): ?>
+                                                                        <?php renderAdminRepeaterSection($contactRepeaterConfig, $contentData); ?>
+                                                                        <?php break; ?>
+                                                                    <?php endif; ?>
+                                                                <?php endforeach; ?>
+                                                            </div>
+                                                        <?php endif; ?>
                                                     <?php endforeach; ?>
                                                 </div>
                                             <?php endif; ?>
@@ -2159,6 +2169,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "contact" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "info_cards"): ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <?php if ($templateKey === "contact" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "social_links"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
