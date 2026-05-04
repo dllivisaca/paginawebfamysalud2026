@@ -2169,6 +2169,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                     <?php foreach ($schema["simple_fields"] as $fieldConfig): ?>
                                         <?php
                                         $fieldKey = (string) $fieldConfig["field_key"];
+                                        if ($templateKey === "department-details" && in_array($fieldKey, ["intro_title", "intro_text"], true)) {
+                                            continue;
+                                        }
                                         $fieldData = $contentData["simple_fields"][$fieldKey] ?? null;
                                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                                         $fieldValue = (string) ($fieldData["field_value"] ?? "");
@@ -2200,6 +2203,50 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <img id="preview_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
                                             <?php endif; ?>
                                         </div>
+                                        <?php if ($templateKey === "department-details" && $fieldKey === "hero_subtitle"): ?>
+                                            <div class="field-group-full">
+                                                <div class="section-block department-intro-admin-section">
+                                                    <h3>Introducción</h3>
+                                                    <div class="field-grid">
+                                                        <?php foreach (["intro_title", "intro_text"] as $departmentIntroFieldKey): ?>
+                                                            <?php
+                                                            $departmentIntroFieldConfig = null;
+                                                            foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                if ((string) ($simpleFieldConfig["field_key"] ?? "") === $departmentIntroFieldKey) {
+                                                                    $departmentIntroFieldConfig = $simpleFieldConfig;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!is_array($departmentIntroFieldConfig)) {
+                                                                continue;
+                                                            }
+                                                            $departmentIntroFieldData = $contentData["simple_fields"][$departmentIntroFieldKey] ?? null;
+                                                            $departmentIntroFieldType = (string) ($departmentIntroFieldConfig["field_type"] ?? "text");
+                                                            $departmentIntroFieldValue = (string) ($departmentIntroFieldData["field_value"] ?? "");
+                                                            $departmentIntroFieldVisible = (int) ($departmentIntroFieldData["is_visible"] ?? 1) === 1;
+                                                            $departmentIntroIsTextarea = $departmentIntroFieldType === "textarea";
+                                                            $departmentIntroLabel = $departmentIntroFieldKey === "intro_title" ? "Título" : "Descripción";
+                                                            ?>
+                                                            <div class="field-group <?php echo $departmentIntroIsTextarea ? "field-group-full" : ""; ?>">
+                                                                <div class="field-header">
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentIntroFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $departmentIntroLabel; ?></label>
+                                                                    <label class="toggle-row">
+                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($departmentIntroFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $departmentIntroFieldVisible ? " checked" : ""; ?>>
+                                                                        <span>Mostrar</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <?php if ($departmentIntroIsTextarea): ?>
+                                                                    <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($departmentIntroFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentIntroFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($departmentIntroFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                                <?php else: ?>
+                                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($departmentIntroFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentIntroFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($departmentIntroFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
                             <?php endif; ?>
