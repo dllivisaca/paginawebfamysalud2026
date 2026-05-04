@@ -1563,6 +1563,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .contact-info-cards-admin-section .item-title h3 { font-size: 17px; }
         .section-block.contact-social-links-admin-section { background: #fff; }
         .contact-social-links-admin-section .card { background: #f9fafb; }
+        .section-block.department-intro-admin-section { background: #fff; }
+        .section-block.department-info-one-admin-section { background: #fff; }
         .section-block.quick-actions-admin-section { background: #fff; }
         .quick-actions-admin-section .card { background: #f9fafb; }
         .section-block.emergency-tips-admin-section { background: #fff; margin-top: 16px; }
