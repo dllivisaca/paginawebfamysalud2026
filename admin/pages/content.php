@@ -147,6 +147,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
         $repeaterTitle = "Servicios destacados";
     } elseif ($templateKey === "department-details" && $repeaterKey === "stats") {
         $repeaterTitle = "Estadísticas";
+    } elseif ($templateKey === "department-details" && $repeaterKey === "key_services") {
+        $repeaterTitle = "Items destacados";
     }
     ?>
     <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "services" ? " services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "doctors" ? " doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "service_categories" ? " service-categories-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?><?php echo $templateKey === "contact" && $repeaterKey === "social_links" ? " contact-social-links-admin-section" : ""; ?><?php echo $templateKey === "department-details" && $repeaterKey === "stats" ? " department-stats-admin-section" : ""; ?>">
@@ -251,7 +253,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $itemTitleAttributes = ' class="js-contact-social-link-title" data-contact-social-link-item="' . $itemIndex . '" data-contact-social-link-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"';
                     }
                     ?>
-                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats"], true))): ?>
+                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats", "key_services"], true))): ?>
                         <h3<?php echo $itemTitleAttributes; ?>><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
                     <?php endif; ?>
                     <?php if ($repeaterKey === "doctors"): ?>
@@ -323,6 +325,9 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             ?>
                             <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                             <?php
+                            continue;
+                        }
+                        if ($templateKey === "department-details" && $repeaterKey === "key_services" && $fieldKey !== "text") {
                             continue;
                         }
                         $fieldLabel = (string) ($fieldConfig["label"] ?? $fieldKey);
