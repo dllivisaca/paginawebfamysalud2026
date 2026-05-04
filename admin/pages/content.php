@@ -2009,8 +2009,20 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         $hideVisibilityToggle = $templateKey === "home" && $groupFieldKey === "cta_emergency_button_url";
                                                         $displayLabel = (string) ($fieldConfig["label"] ?? $groupFieldKey);
                                                         $displayLabelHtml = escapeAdminFieldLabel($displayLabel);
+                                                        $serviceDetailsInfoLabels = [
+                                                            "service_image" => "Imagen del servicio",
+                                                            "service_image_alt" => "Texto alternativo de la imagen",
+                                                            "service_tag" => "Etiqueta del servicio",
+                                                            "service_title" => "Título del servicio",
+                                                            "service_tagline" => "Subtítulo del servicio",
+                                                            "service_text_1" => "Descripción principal",
+                                                            "service_text_2" => "Descripción secundaria",
+                                                            "features_title" => "Título de características",
+                                                        ];
 
-                                                        if ($templateKey === "home" && $groupFieldKey === "hero_badge") {
+                                                        if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && isset($serviceDetailsInfoLabels[$groupFieldKey])) {
+                                                            $displayLabelHtml = htmlspecialchars($serviceDetailsInfoLabels[$groupFieldKey], ENT_QUOTES, "UTF-8");
+                                                        } elseif ($templateKey === "home" && $groupFieldKey === "hero_badge") {
                                                             $displayLabelHtml = "Etiqueta destacada";
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "hero_title") {
                                                             $displayLabelHtml = "Título principal";
