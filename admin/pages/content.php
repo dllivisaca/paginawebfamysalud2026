@@ -2008,6 +2008,24 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "Teléfono o enlace del botón";
                                                         } elseif ($templateKey === "contact" && $groupFieldKey === "map_embed_url") {
                                                             $displayLabelHtml = "Ubicación en Google Maps";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "form_title") {
+                                                            $displayLabelHtml = "Título";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "form_text") {
+                                                            $displayLabelHtml = "Descripción";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "form_name_label") {
+                                                            $displayLabelHtml = "Texto dentro del campo Nombre";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "form_email_label") {
+                                                            $displayLabelHtml = "Texto dentro del campo Correo electrónico";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "form_subject_label") {
+                                                            $displayLabelHtml = "Texto dentro del campo Asunto";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "form_message_label") {
+                                                            $displayLabelHtml = "Texto dentro del campo Mensaje";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "form_loading_text") {
+                                                            $displayLabelHtml = "Mensaje de carga";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "form_sent_text") {
+                                                            $displayLabelHtml = "Mensaje de éxito";
+                                                        } elseif ($templateKey === "contact" && $groupFieldKey === "form_button_text") {
+                                                            $displayLabelHtml = "Texto del botón";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_1") {
                                                             $displayLabelHtml = "P&aacute;rrafo 1";
                                                         } elseif ($isIntroGroup && $groupFieldKey === "intro_text_2") {
