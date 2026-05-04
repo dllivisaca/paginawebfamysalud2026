@@ -149,6 +149,8 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
         $repeaterTitle = "Estadísticas";
     } elseif ($templateKey === "department-details" && $repeaterKey === "key_services") {
         $repeaterTitle = "Items destacados";
+    } elseif ($templateKey === "service-details" && $repeaterKey === "features") {
+        $repeaterTitle = "Características";
     }
     ?>
     <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "services" ? " services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "doctors" ? " doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "service_categories" ? " service-categories-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?><?php echo $templateKey === "contact" && $repeaterKey === "social_links" ? " contact-social-links-admin-section" : ""; ?><?php echo $templateKey === "department-details" && $repeaterKey === "stats" ? " department-stats-admin-section" : ""; ?>">
@@ -253,7 +255,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $itemTitleAttributes = ' class="js-contact-social-link-title" data-contact-social-link-item="' . $itemIndex . '" data-contact-social-link-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"';
                     }
                     ?>
-                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats", "key_services"], true))): ?>
+                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats", "key_services"], true)) && !($templateKey === "service-details" && $repeaterKey === "features")): ?>
                         <h3<?php echo $itemTitleAttributes; ?>><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
                     <?php endif; ?>
                     <?php if ($repeaterKey === "doctors"): ?>
@@ -1604,6 +1606,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .service-categories-admin-section .card { background: #f9fafb; }
         .section-block.cta-features-admin-section { background: #fff; }
         .cta-features-admin-section .card { background: #f9fafb; }
+        .section-block.service-details-features-admin-section { background: #fff; }
+        .service-details-features-admin-section .card { background: #f9fafb; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
         .cta-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-doctors-admin-section { background: #fff; }
@@ -2017,7 +2021,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             "service_tagline" => "Subtítulo del servicio",
                                                             "service_text_1" => "Descripción principal",
                                                             "service_text_2" => "Descripción secundaria",
-                                                            "features_title" => "Título de características",
+                                                            "features_title" => "Título",
                                                         ];
 
                                                         if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && isset($serviceDetailsInfoLabels[$groupFieldKey])) {
@@ -2161,7 +2165,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             <div class="field-group-full">
                                                                 <?php foreach ($schema["repeaters"] as $serviceDetailsRepeaterConfig): ?>
                                                                     <?php if (((string) ($serviceDetailsRepeaterConfig["repeater_key"] ?? "")) === "features"): ?>
-                                                                        <?php renderAdminRepeaterSection($serviceDetailsRepeaterConfig, $contentData); ?>
+                                                                        <?php renderAdminRepeaterSection($serviceDetailsRepeaterConfig, $contentData, "service-details-features-admin-section"); ?>
                                                                         <?php break; ?>
                                                                     <?php endif; ?>
                                                                 <?php endforeach; ?>
