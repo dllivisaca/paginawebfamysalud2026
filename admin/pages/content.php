@@ -145,9 +145,11 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
     $repeaterTitle = $sectionTitle ?? ($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : ($repeaterKey === "featured_doctors" ? "Doctores destacados - tarjetas" : (string) ($repeaterConfig["label"] ?? $repeaterKey)));
     if ($templateKey === "department-details" && $repeaterKey === "service_cards") {
         $repeaterTitle = "Servicios destacados";
+    } elseif ($templateKey === "department-details" && $repeaterKey === "stats") {
+        $repeaterTitle = "Estadísticas";
     }
     ?>
-    <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "services" ? " services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "doctors" ? " doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "service_categories" ? " service-categories-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?><?php echo $templateKey === "contact" && $repeaterKey === "social_links" ? " contact-social-links-admin-section" : ""; ?>">
+    <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "services" ? " services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "doctors" ? " doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "service_categories" ? " service-categories-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?><?php echo $templateKey === "contact" && $repeaterKey === "social_links" ? " contact-social-links-admin-section" : ""; ?><?php echo $templateKey === "department-details" && $repeaterKey === "stats" ? " department-stats-admin-section" : ""; ?>">
         <h3><?php echo htmlspecialchars($repeaterTitle, ENT_QUOTES, "UTF-8"); ?></h3>
 
         <?php foreach ($renderItems as $itemConfig): ?>
@@ -249,7 +251,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $itemTitleAttributes = ' class="js-contact-social-link-title" data-contact-social-link-item="' . $itemIndex . '" data-contact-social-link-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"';
                     }
                     ?>
-                    <?php if (!($templateKey === "department-details" && $repeaterKey === "service_cards")): ?>
+                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats"], true))): ?>
                         <h3<?php echo $itemTitleAttributes; ?>><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
                     <?php endif; ?>
                     <?php if ($repeaterKey === "doctors"): ?>
@@ -346,6 +348,10 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             $fieldLabel = "Categoría del servicio";
                         } elseif ($repeaterKey === "emergency_contacts" && $fieldKey === "variant") {
                             $fieldLabel = "Prioridad del contacto";
+                        } elseif ($templateKey === "department-details" && $repeaterKey === "stats" && $fieldKey === "number") {
+                            $fieldLabel = "Número";
+                        } elseif ($templateKey === "department-details" && $repeaterKey === "stats" && $fieldKey === "label") {
+                            $fieldLabel = "Etiqueta";
                         }
                         $isHeroFeatureIconField = $repeaterKey === "hero_features" && $fieldKey === "icon_class";
                         $isHomeAboutFeatureIconField = $repeaterKey === "home_about_features" && $fieldKey === "icon_class";
@@ -1590,6 +1596,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .section-block.department-intro-admin-section { background: #fff; }
         .section-block.department-info-one-admin-section { background: #fff; }
         .department-info-one-repeater { margin-top: 16px; }
+        .section-block.department-stats-admin-section { background: #fff; }
+        .department-stats-admin-section .card { background: #f9fafb; }
         .section-block.quick-actions-admin-section { background: #fff; }
         .quick-actions-admin-section .card { background: #f9fafb; }
         .section-block.emergency-tips-admin-section { background: #fff; margin-top: 16px; }
