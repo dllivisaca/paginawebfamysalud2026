@@ -351,9 +351,6 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         }
                         $isServiceDetailsCardLinkHiddenField = $templateKey === "service-details" && $repeaterKey === "service_cards" && in_array($fieldKey, ["link_type", "page_id", "link_url"], true);
                         if ($isServiceDetailsCardLinkHiddenField) {
-                            ?>
-                            <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
-                            <?php
                             continue;
                         }
                         if ($repeaterKey === "departments" && $fieldKey === "layout_variant") {
