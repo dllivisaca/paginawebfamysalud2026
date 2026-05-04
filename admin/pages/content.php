@@ -2366,6 +2366,9 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php if ($templateKey === "department-details" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "service_cards"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
+                            <?php if ($templateKey === "department-details" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "key_services"): ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
                                 <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : "", "Servicios - generales", "general"); ?>
                                 <?php renderAdminRepeaterSection($repeaterConfig, $contentData, "services-emergency-admin-section", "Servicio destacado de emergencia", "emergency"); ?>
@@ -2395,10 +2398,11 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 $departmentInfoTwoFieldVisible = (int) ($departmentInfoTwoFieldData["is_visible"] ?? 1) === 1;
                                                 $departmentInfoTwoIsTextarea = $departmentInfoTwoFieldType === "textarea";
                                                 $departmentInfoTwoIsImage = $departmentInfoTwoFieldType === "image";
+                                                $departmentInfoTwoLabel = $departmentInfoTwoFieldKey === "key_services_title" ? "Título" : "Descripción";
                                                 ?>
                                                 <div class="field-group <?php echo $departmentInfoTwoIsTextarea ? "field-group-full" : ""; ?>">
                                                     <div class="field-header">
-                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($departmentInfoTwoFieldConfig["label"] ?? $departmentInfoTwoFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $departmentInfoTwoLabel; ?></label>
                                                         <label class="toggle-row">
                                                             <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $departmentInfoTwoFieldVisible ? " checked" : ""; ?>>
                                                             <span>Mostrar</span>
@@ -2418,6 +2422,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     <?php endif; ?>
                                                 </div>
                                             <?php endforeach; ?>
+                                            <div class="field-group-full">
+                                                <?php foreach ($schema["repeaters"] as $departmentInfoTwoRepeaterConfig): ?>
+                                                    <?php if (((string) ($departmentInfoTwoRepeaterConfig["repeater_key"] ?? "")) === "key_services"): ?>
+                                                        <?php renderAdminRepeaterSection($departmentInfoTwoRepeaterConfig, $contentData); ?>
+                                                        <?php break; ?>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </div>
                                             <div class="field-group-full">
                                                 <div class="section-block department-cta-admin-section">
                                                     <h3>Llamado a la acción</h3>
@@ -2440,10 +2452,28 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $departmentCtaFieldVisible = (int) ($departmentCtaFieldData["is_visible"] ?? 1) === 1;
                                                             $departmentCtaIsTextarea = $departmentCtaFieldType === "textarea";
                                                             $departmentCtaIsImage = $departmentCtaFieldType === "image";
+                                                            $departmentCtaLabel = (string) ($departmentCtaFieldConfig["label"] ?? $departmentCtaFieldKey);
+                                                            if ($departmentCtaFieldKey === "cta_title") {
+                                                                $departmentCtaLabel = "Título";
+                                                            } elseif ($departmentCtaFieldKey === "cta_text") {
+                                                                $departmentCtaLabel = "Descripción";
+                                                            } elseif ($departmentCtaFieldKey === "cta_primary_text") {
+                                                                $departmentCtaLabel = "Texto botón principal";
+                                                            } elseif ($departmentCtaFieldKey === "cta_primary_url") {
+                                                                $departmentCtaLabel = "Enlace botón principal";
+                                                            } elseif ($departmentCtaFieldKey === "cta_secondary_text") {
+                                                                $departmentCtaLabel = "Texto botón secundario";
+                                                            } elseif ($departmentCtaFieldKey === "cta_secondary_url") {
+                                                                $departmentCtaLabel = "Enlace botón secundario";
+                                                            } elseif ($departmentCtaFieldKey === "cta_image") {
+                                                                $departmentCtaLabel = "Imagen";
+                                                            } elseif ($departmentCtaFieldKey === "cta_image_alt") {
+                                                                $departmentCtaLabel = "Texto alternativo de la imagen";
+                                                            }
                                                             ?>
                                                             <div class="field-group <?php echo $departmentCtaIsTextarea ? "field-group-full" : ""; ?>">
                                                                 <div class="field-header">
-                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($departmentCtaFieldConfig["label"] ?? $departmentCtaFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $departmentCtaLabel; ?></label>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($departmentCtaFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $departmentCtaFieldVisible ? " checked" : ""; ?>>
                                                                         <span>Mostrar</span>
