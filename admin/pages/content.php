@@ -1333,6 +1333,7 @@ if (($schema["template_key"] ?? "") === "about") {
 } elseif (($schema["template_key"] ?? "") === "department-details") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
 } elseif (($schema["template_key"] ?? "") === "service-details") {
+    [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
     $simpleFieldGroups = [
         [
             "title" => "Encabezado",
@@ -1342,7 +1343,7 @@ if (($schema["template_key"] ?? "") === "about") {
         [
             "title" => "Área informativa",
             "description" => "",
-            "field_keys" => ["service_image", "service_image_alt", "service_tag", "service_title", "service_tagline", "service_text_1", "service_text_2", "features_title", "primary_button_text", "primary_button_url", "secondary_button_text", "secondary_button_url"],
+            "field_keys" => ["service_image", "service_image_alt", "service_tag", "service_title", "service_tagline", "service_text_1", "service_text_2", "features_title", "primary_button_text", "primary_button_link_type", "primary_button_page_id", "primary_button_url", "secondary_button_text", "secondary_button_link_type", "secondary_button_page_id", "secondary_button_url"],
         ],
         [
             "title" => "Agendamiento",
@@ -2012,6 +2013,10 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <div class="field-grid">
                                                     <?php foreach ($groupConfig["field_keys"] as $groupFieldKey): ?>
                                                         <?php
+                                                        if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && in_array($groupFieldKey, ["primary_button_link_type", "primary_button_page_id", "primary_button_url", "secondary_button_link_type", "secondary_button_page_id", "secondary_button_url"], true)) {
+                                                            continue;
+                                                        }
+
                                                         $fieldConfig = null;
 
                                                         foreach ($schema["simple_fields"] as $simpleFieldConfig) {
@@ -2131,6 +2136,65 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "P&aacute;rrafo 2";
                                                         }
                                                         ?>
+                                                        <?php if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && in_array($groupFieldKey, ["primary_button_text", "secondary_button_text"], true)): ?>
+                                                            <?php
+                                                            $serviceDetailsButtonPrefix = $groupFieldKey === "primary_button_text" ? "primary" : "secondary";
+                                                            $serviceDetailsButtonLabel = $serviceDetailsButtonPrefix === "primary" ? "Botón principal texto" : "Botón secundario texto";
+                                                            $serviceDetailsButtonScope = "service-details-" . $serviceDetailsButtonPrefix . "-button";
+                                                            $serviceDetailsButtonLinkTypeKey = $serviceDetailsButtonPrefix . "_button_link_type";
+                                                            $serviceDetailsButtonPageIdKey = $serviceDetailsButtonPrefix . "_button_page_id";
+                                                            $serviceDetailsButtonUrlKey = $serviceDetailsButtonPrefix . "_button_url";
+                                                            $serviceDetailsButtonLinkTypeValue = trim((string) (($contentData["simple_fields"][$serviceDetailsButtonLinkTypeKey]["field_value"] ?? "")));
+                                                            $serviceDetailsButtonPageIdValue = trim((string) (($contentData["simple_fields"][$serviceDetailsButtonPageIdKey]["field_value"] ?? "")));
+                                                            $serviceDetailsButtonUrlValue = (string) (($contentData["simple_fields"][$serviceDetailsButtonUrlKey]["field_value"] ?? ""));
+
+                                                            if ($serviceDetailsButtonLinkTypeValue !== "internal" && $serviceDetailsButtonLinkTypeValue !== "custom") {
+                                                                $serviceDetailsButtonLinkTypeValue = $serviceDetailsButtonUrlValue !== "" ? "custom" : ($serviceDetailsButtonPageIdValue !== "" ? "internal" : "custom");
+                                                            }
+                                                            ?>
+                                                            <div class="field-group field-group-full">
+                                                                <div class="field-header">
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars($serviceDetailsButtonLabel, ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="toggle-row">
+                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $fieldVisible ? " checked" : ""; ?>>
+                                                                        <span>Mostrar</span>
+                                                                    </label>
+                                                                </div>
+                                                                <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+
+                                                                <div class="button-destination-box">
+                                                                    <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsButtonLinkTypeKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+                                                                    <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsButtonPageIdKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+                                                                    <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+
+                                                                    <div class="field-group field-group-full">
+                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsButtonLinkTypeKey, ENT_QUOTES, "UTF-8"); ?>">Tipo de enlace</label>
+                                                                        <select class="form-select js-link-type" id="simple_<?php echo htmlspecialchars($serviceDetailsButtonLinkTypeKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsButtonLinkTypeKey, ENT_QUOTES, "UTF-8"); ?>][value]" data-link-scope="<?php echo htmlspecialchars($serviceDetailsButtonScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                            <option value="internal"<?php echo $serviceDetailsButtonLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                                                            <option value="custom"<?php echo $serviceDetailsButtonLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="button-destination-grid">
+                                                                        <div class="field-group field-group-full js-link-panel <?php echo $serviceDetailsButtonLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($serviceDetailsButtonScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsButtonPageIdKey, ENT_QUOTES, "UTF-8"); ?>">P&aacute;gina interna</label>
+                                                                            <select class="form-select" id="simple_<?php echo htmlspecialchars($serviceDetailsButtonPageIdKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsButtonPageIdKey, ENT_QUOTES, "UTF-8"); ?>][value]">
+                                                                                <option value="">Selecciona una p&aacute;gina</option>
+                                                                                <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                                                    <option value="<?php echo (int) ($sitePageOption["id"] ?? 0); ?>"<?php echo (string) ($sitePageOption["id"] ?? "") === $serviceDetailsButtonPageIdValue ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                                                <?php endforeach; ?>
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <div class="field-group field-group-full js-link-panel <?php echo $serviceDetailsButtonLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($serviceDetailsButtonScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>">URL personalizada</label>
+                                                                            <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($serviceDetailsButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($serviceDetailsButtonUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <?php continue; ?>
+                                                        <?php endif; ?>
                                                         <?php if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && $groupFieldKey === "features_title"): ?>
                                                             <div class="field-group-full">
                                                                 <?php foreach ($schema["repeaters"] as $serviceDetailsRepeaterConfig): ?>

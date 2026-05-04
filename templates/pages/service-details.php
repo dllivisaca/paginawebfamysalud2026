@@ -56,6 +56,23 @@ function serviceDetailsNormalizeCustomHref(string $url): string
     return $url;
 }
 
+function serviceDetailsButtonHref(mysqli $conn, array $fields, string $prefix, string $fallbackUrl = "#"): string
+{
+    $linkType = trim(serviceDetailsFieldValue($fields, $prefix . "_button_link_type", ""));
+    $pageId = (int) trim(serviceDetailsFieldValue($fields, $prefix . "_button_page_id", "0"));
+    $customUrl = serviceDetailsNormalizeCustomHref(serviceDetailsFieldValue($fields, $prefix . "_button_url", ""));
+
+    if ($linkType === "internal" && $pageId > 0) {
+        [, $pagesById] = getPageContentLinkablePages($conn, true);
+
+        if (isset($pagesById[$pageId])) {
+            return (string) ($pagesById[$pageId]["public_url"] ?? $fallbackUrl);
+        }
+    }
+
+    return $customUrl !== "" ? $customUrl : $fallbackUrl;
+}
+
 $h1TitleEscaped = htmlspecialchars($h1Title, ENT_QUOTES, "UTF-8");
 $heroTitle = serviceDetailsFieldValue($serviceDetailsFields, "hero_title", (string) ($page["title"] ?? "Service Details"));
 $heroSubtitle = serviceDetailsFieldValue($serviceDetailsFields, "hero_subtitle", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.");
@@ -68,9 +85,9 @@ $serviceTextOne = serviceDetailsFieldValue($serviceDetailsFields, "service_text_
 $serviceTextTwo = serviceDetailsFieldValue($serviceDetailsFields, "service_text_2", "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
 $featuresTitle = serviceDetailsFieldValue($serviceDetailsFields, "features_title", "Our Services Include:");
 $primaryButtonText = serviceDetailsFieldValue($serviceDetailsFields, "primary_button_text", "Schedule Consultation");
-$primaryButtonUrl = serviceDetailsNormalizeCustomHref(serviceDetailsFieldValue($serviceDetailsFields, "primary_button_url", "#"));
+$primaryButtonUrl = serviceDetailsButtonHref($conn, $serviceDetailsFields, "primary", "#");
 $secondaryButtonText = serviceDetailsFieldValue($serviceDetailsFields, "secondary_button_text", "Learn More");
-$secondaryButtonUrl = serviceDetailsNormalizeCustomHref(serviceDetailsFieldValue($serviceDetailsFields, "secondary_button_url", "#"));
+$secondaryButtonUrl = serviceDetailsButtonHref($conn, $serviceDetailsFields, "secondary", "#");
 $bookingTitle = serviceDetailsFieldValue($serviceDetailsFields, "booking_title", "Ready to Schedule Your Appointment?");
 $bookingText = serviceDetailsFieldValue($serviceDetailsFields, "booking_text", "Our cardiology specialists are available for consultations Monday through Friday. Same-day appointments available for urgent cases.");
 $appointmentTitle = serviceDetailsFieldValue($serviceDetailsFields, "appointment_title", "Book Your Visit");
