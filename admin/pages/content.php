@@ -2145,6 +2145,16 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 <?php endforeach; ?>
                                                             </div>
                                                         <?php endif; ?>
+                                                        <?php if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && $groupFieldKey === "features_title"): ?>
+                                                            <div class="field-group-full">
+                                                                <?php foreach ($schema["repeaters"] as $serviceDetailsRepeaterConfig): ?>
+                                                                    <?php if (((string) ($serviceDetailsRepeaterConfig["repeater_key"] ?? "")) === "features"): ?>
+                                                                        <?php renderAdminRepeaterSection($serviceDetailsRepeaterConfig, $contentData); ?>
+                                                                        <?php break; ?>
+                                                                    <?php endif; ?>
+                                                                <?php endforeach; ?>
+                                                            </div>
+                                                        <?php endif; ?>
                                                     <?php endforeach; ?>
                                                 </div>
                                             <?php endif; ?>
@@ -2392,6 +2402,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "department-details" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "key_services"): ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <?php if ($templateKey === "service-details" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "features"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
