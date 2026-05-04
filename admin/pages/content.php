@@ -2196,7 +2196,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                     <?php foreach ($schema["simple_fields"] as $fieldConfig): ?>
                                         <?php
                                         $fieldKey = (string) $fieldConfig["field_key"];
-                                        if ($templateKey === "department-details" && in_array($fieldKey, ["intro_title", "intro_text", "overview_image", "overview_image_alt", "experience_number", "experience_text"], true)) {
+                                        if ($templateKey === "department-details" && in_array($fieldKey, ["intro_title", "intro_text", "overview_image", "overview_image_alt", "experience_number", "experience_text", "key_services_title", "key_services_text", "cta_title", "cta_text", "cta_primary_text", "cta_primary_url", "cta_secondary_text", "cta_secondary_url", "cta_image", "cta_image_alt"], true)) {
                                             continue;
                                         }
                                         $fieldData = $contentData["simple_fields"][$fieldKey] ?? null;
@@ -2361,6 +2361,56 @@ if (($schema["template_key"] ?? "") === "about") {
                                 <?php renderAdminRepeaterSection($repeaterConfig, $contentData, "services-emergency-admin-section", "Servicio destacado de emergencia", "emergency"); ?>
                             <?php else: ?>
                                 <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : ""); ?>
+                            <?php endif; ?>
+                            <?php if ($templateKey === "department-details" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "stats"): ?>
+                                <div class="field-group-full">
+                                    <div class="section-block department-info-two-admin-section">
+                                        <h3>Área informativa 2</h3>
+                                        <div class="field-grid">
+                                            <?php foreach (["key_services_title", "key_services_text", "cta_title", "cta_text", "cta_primary_text", "cta_primary_url", "cta_secondary_text", "cta_secondary_url", "cta_image", "cta_image_alt"] as $departmentInfoTwoFieldKey): ?>
+                                                <?php
+                                                $departmentInfoTwoFieldConfig = null;
+                                                foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                    if ((string) ($simpleFieldConfig["field_key"] ?? "") === $departmentInfoTwoFieldKey) {
+                                                        $departmentInfoTwoFieldConfig = $simpleFieldConfig;
+                                                        break;
+                                                    }
+                                                }
+                                                if (!is_array($departmentInfoTwoFieldConfig)) {
+                                                    continue;
+                                                }
+                                                $departmentInfoTwoFieldData = $contentData["simple_fields"][$departmentInfoTwoFieldKey] ?? null;
+                                                $departmentInfoTwoFieldType = (string) ($departmentInfoTwoFieldConfig["field_type"] ?? "text");
+                                                $departmentInfoTwoFieldValue = (string) ($departmentInfoTwoFieldData["field_value"] ?? "");
+                                                $departmentInfoTwoFieldVisible = (int) ($departmentInfoTwoFieldData["is_visible"] ?? 1) === 1;
+                                                $departmentInfoTwoIsTextarea = $departmentInfoTwoFieldType === "textarea";
+                                                $departmentInfoTwoIsImage = $departmentInfoTwoFieldType === "image";
+                                                ?>
+                                                <div class="field-group <?php echo $departmentInfoTwoIsTextarea ? "field-group-full" : ""; ?>">
+                                                    <div class="field-header">
+                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($departmentInfoTwoFieldConfig["label"] ?? $departmentInfoTwoFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                        <label class="toggle-row">
+                                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $departmentInfoTwoFieldVisible ? " checked" : ""; ?>>
+                                                            <span>Mostrar</span>
+                                                        </label>
+                                                    </div>
+
+                                                    <?php if ($departmentInfoTwoIsTextarea): ?>
+                                                        <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($departmentInfoTwoFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                    <?php elseif ($departmentInfoTwoIsImage): ?>
+                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($departmentInfoTwoFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                        <div class="current-file"><strong>Archivo actual:</strong> <?php echo htmlspecialchars($departmentInfoTwoFieldValue !== "" ? basename($departmentInfoTwoFieldValue) : "Sin imagen seleccionada", ENT_QUOTES, "UTF-8"); ?></div>
+                                                        <label class="file-input-label" for="simple_file_<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
+                                                        <input class="form-file js-image-upload" type="file" id="simple_file_<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>][upload]" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>">
+                                                        <img id="preview_<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $departmentInfoTwoFieldValue !== "" ? "../../" . htmlspecialchars(ltrim($departmentInfoTwoFieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $departmentInfoTwoFieldValue !== "" ? "" : " is-empty"; ?>">
+                                                    <?php else: ?>
+                                                        <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($departmentInfoTwoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($departmentInfoTwoFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
                             <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
                                 <div class="section-block services-cta-admin-section">
