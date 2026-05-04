@@ -135,6 +135,13 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
         $renderItems = $featuredRenderItem !== null ? array_merge([$featuredRenderItem], $normalRenderItems) : $normalRenderItems;
     }
     global $linkableSitePages, $templateKey;
+    $contactSocialLinkIconOptions = [
+        "bi bi-facebook" => "Facebook",
+        "bi bi-twitter-x" => "Twitter X",
+        "bi bi-instagram" => "Instagram",
+        "bi bi-linkedin" => "LinkedIn",
+        "bi bi-youtube" => "YouTube",
+    ];
     ?>
     <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "services" ? " services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "doctors" ? " doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "service_categories" ? " service-categories-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?><?php echo $templateKey === "contact" && $repeaterKey === "social_links" ? " contact-social-links-admin-section" : ""; ?>">
         <h3><?php echo htmlspecialchars($sectionTitle ?? ($repeaterKey === "home_about_features" ? "Sobre nosotros - Caracteristicas destacadas" : ($repeaterKey === "featured_doctors" ? "Doctores destacados - tarjetas" : (string) ($repeaterConfig["label"] ?? $repeaterKey))), ENT_QUOTES, "UTF-8"); ?></h3>
@@ -178,6 +185,12 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                     $itemTitle = $contactInfoCardTitle;
                 }
             }
+            if ($templateKey === "contact" && $repeaterKey === "social_links") {
+                $contactSocialLinkIconClass = trim((string) ($itemData["fields"]["icon_class"]["field_value"] ?? ""));
+                if (isset($contactSocialLinkIconOptions[$contactSocialLinkIconClass])) {
+                    $itemTitle = $contactSocialLinkIconOptions[$contactSocialLinkIconClass];
+                }
+            }
             $itemVisible = (int) ($itemData["is_visible"] ?? 1) === 1;
             $departmentsHiddenFields = [];
             $repeaterFields = $repeaterConfig["fields"];
@@ -213,7 +226,15 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
             ?>
             <div class="card">
                 <div class="item-title">
-                    <h3<?php echo $repeaterKey === "info_cards" ? ' class="js-contact-info-card-title" data-contact-info-card-item="' . $itemIndex . '" data-contact-info-card-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"' : ""; ?>><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
+                    <?php
+                    $itemTitleAttributes = "";
+                    if ($repeaterKey === "info_cards") {
+                        $itemTitleAttributes = ' class="js-contact-info-card-title" data-contact-info-card-item="' . $itemIndex . '" data-contact-info-card-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"';
+                    } elseif ($templateKey === "contact" && $repeaterKey === "social_links") {
+                        $itemTitleAttributes = ' class="js-contact-social-link-title" data-contact-social-link-item="' . $itemIndex . '" data-contact-social-link-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"';
+                    }
+                    ?>
+                    <h3<?php echo $itemTitleAttributes; ?>><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
                     <?php if ($repeaterKey === "doctors"): ?>
                         <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][is_visible]" value="<?php echo $itemVisible ? "1" : "0"; ?>">
                     <?php else: ?>
@@ -534,13 +555,6 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             "bi bi-telephone-fill" => "Teléfono",
                             "bi bi-clock-history" => "Reloj",
                         ];
-                        $contactSocialLinkIconOptions = [
-                            "bi bi-facebook" => "Facebook",
-                            "bi bi-twitter-x" => "Twitter X",
-                            "bi bi-instagram" => "Instagram",
-                            "bi bi-linkedin" => "LinkedIn",
-                            "bi bi-youtube" => "YouTube",
-                        ];
                         if ($repeaterKey === "about_stats" && $fieldKey === "value") {
                             $fieldLabel = "Valor";
                         }
@@ -567,7 +581,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                 <input class="form-file js-image-upload" type="file" id="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">
                                 <img id="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
                             <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField || $isQuickActionIconField || $isEmergencyContactIconField || $isFeaturedDepartmentIconField || $isFeaturedServiceIconField || $isDepartmentsIconField || $isServiceIconField || $isContactInfoCardIconField || $isContactSocialLinkIconField): ?>
-                                <select class="form-input" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]">
+                                <select class="form-input" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]"<?php echo $isContactSocialLinkIconField ? ' data-contact-social-link-icon-input="' . $itemIndex . '"' : ""; ?>>
                                     <?php $iconOptions = $isContactSocialLinkIconField ? $contactSocialLinkIconOptions : ($isContactInfoCardIconField ? $contactInfoCardIconOptions : ($isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : ($isCtaFeatureIconField ? $ctaFeatureIconOptions : ($isQuickActionIconField ? $quickActionIconOptions : ($isEmergencyContactIconField ? $emergencyContactIconOptions : ($isFeaturedDepartmentIconField ? $featuredDepartmentIconOptions : ($isDepartmentsIconField ? $departmentsIconOptions : ($isServiceIconField ? $serviceIconOptions : $featuredServiceIconOptions))))))))); ?>
                                     <?php if ($isQuickActionIconField && $fieldValue !== "" && !array_key_exists($fieldValue, $quickActionIconOptions)): ?>
                                         <option value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>" selected>Icono actual: <?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></option>
@@ -2389,6 +2403,26 @@ if (($schema["template_key"] ?? "") === "about") {
 
                 input.addEventListener("input", syncContactInfoCardTitle);
                 syncContactInfoCardTitle();
+            });
+
+            var contactSocialLinkIconInputs = document.querySelectorAll("[data-contact-social-link-icon-input]");
+
+            contactSocialLinkIconInputs.forEach(function (input) {
+                var itemIndex = input.getAttribute("data-contact-social-link-icon-input");
+                var title = document.querySelector('[data-contact-social-link-item="' + itemIndex + '"]');
+
+                if (!title) {
+                    return;
+                }
+
+                var syncContactSocialLinkTitle = function () {
+                    var selectedOption = input.options[input.selectedIndex];
+                    var fallback = title.getAttribute("data-contact-social-link-fallback") || "";
+                    title.textContent = selectedOption ? selectedOption.text : fallback;
+                };
+
+                input.addEventListener("change", syncContactSocialLinkTitle);
+                syncContactSocialLinkTitle();
             });
 
             var imageInputs = document.querySelectorAll(".js-image-upload");
