@@ -172,6 +172,12 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                     $itemTitle = $doctorNameTitle;
                 }
             }
+            if ($repeaterKey === "info_cards") {
+                $contactInfoCardTitle = trim((string) ($itemData["fields"]["title"]["field_value"] ?? ""));
+                if ($contactInfoCardTitle !== "") {
+                    $itemTitle = $contactInfoCardTitle;
+                }
+            }
             $itemVisible = (int) ($itemData["is_visible"] ?? 1) === 1;
             $departmentsHiddenFields = [];
             $repeaterFields = $repeaterConfig["fields"];
@@ -207,7 +213,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
             ?>
             <div class="card">
                 <div class="item-title">
-                    <h3><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
+                    <h3<?php echo $repeaterKey === "info_cards" ? ' class="js-contact-info-card-title" data-contact-info-card-item="' . $itemIndex . '" data-contact-info-card-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"' : ""; ?>><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
                     <?php if ($repeaterKey === "doctors"): ?>
                         <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][is_visible]" value="<?php echo $itemVisible ? "1" : "0"; ?>">
                     <?php else: ?>
@@ -997,7 +1003,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                         <option value="<?php echo htmlspecialchars($categoryKey, ENT_QUOTES, "UTF-8"); ?>"<?php echo $fieldValue === $categoryKey ? " selected" : ""; ?>><?php echo htmlspecialchars($categoryLabel, ENT_QUOTES, "UTF-8"); ?></option>
                                     <?php endforeach; ?>
                                 </select>                            <?php else: ?>
-                                <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                <input class="form-input" type="text" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>"<?php echo $repeaterKey === "info_cards" && $fieldKey === "title" ? ' data-contact-info-card-title-input="' . $itemIndex . '"' : ""; ?>>
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
@@ -1524,6 +1530,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .emergency-contacts-admin-section .card { background: #f9fafb; }
         .section-block.contact-info-cards-admin-section { background: #fff; }
         .contact-info-cards-admin-section .card { background: #f9fafb; }
+        .section-block.contact-info-cards-admin-section > h3 { font-size: 17px; }
+        .contact-info-cards-admin-section .item-title h3 { font-size: 17px; }
         .section-block.quick-actions-admin-section { background: #fff; }
         .quick-actions-admin-section .card { background: #f9fafb; }
         .section-block.emergency-tips-admin-section { background: #fff; margin-top: 16px; }
@@ -2331,6 +2339,26 @@ if (($schema["template_key"] ?? "") === "about") {
                 });
 
                 syncDoctorAvailabilityText(itemIndex);
+            });
+
+            var contactInfoCardTitleInputs = document.querySelectorAll("[data-contact-info-card-title-input]");
+
+            contactInfoCardTitleInputs.forEach(function (input) {
+                var itemIndex = input.getAttribute("data-contact-info-card-title-input");
+                var title = document.querySelector('[data-contact-info-card-item="' + itemIndex + '"]');
+
+                if (!title) {
+                    return;
+                }
+
+                var syncContactInfoCardTitle = function () {
+                    var fallback = title.getAttribute("data-contact-info-card-fallback") || "";
+                    var value = input.value.trim();
+                    title.textContent = value !== "" ? value : fallback;
+                };
+
+                input.addEventListener("input", syncContactInfoCardTitle);
+                syncContactInfoCardTitle();
             });
 
             var imageInputs = document.querySelectorAll(".js-image-upload");
