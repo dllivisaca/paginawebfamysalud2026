@@ -174,12 +174,12 @@ require __DIR__ . "/../../includes/header.php";
 
           <div class="contact-form-panel">
             <?php if (contactFieldVisible($contactFields, "map_embed_url") && $mapIframeUrl !== ""): ?>
-            <div class="map-container">
+            <div class="map-container" style="position: relative;">
               <iframe src="<?php echo htmlspecialchars($mapIframeUrl, ENT_QUOTES, "UTF-8"); ?>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <?php if ($mapOpenUrl !== ""): ?>
+              <a class="contact-map-open-link" href="<?php echo htmlspecialchars($mapOpenUrl, ENT_QUOTES, "UTF-8"); ?>" target="_blank" rel="noopener" style="position: absolute; top: 12px; left: 12px; z-index: 2; background: #fff; color: #1f2937; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.16);">Abrir en Google Maps</a>
+              <?php endif; ?>
             </div>
-            <?php if ($mapOpenUrl !== ""): ?>
-            <a href="<?php echo htmlspecialchars($mapOpenUrl, ENT_QUOTES, "UTF-8"); ?>" target="_blank" rel="noopener">Open in Maps</a>
-            <?php endif; ?>
             <?php endif; ?>
 
             <div class="form-container">
