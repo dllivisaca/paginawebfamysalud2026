@@ -1565,6 +1565,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .contact-social-links-admin-section .card { background: #f9fafb; }
         .section-block.department-intro-admin-section { background: #fff; }
         .section-block.department-info-one-admin-section { background: #fff; }
+        .department-info-one-repeater { margin-top: 16px; }
         .section-block.quick-actions-admin-section { background: #fff; }
         .quick-actions-admin-section .card { background: #f9fafb; }
         .section-block.emergency-tips-admin-section { background: #fff; margin-top: 16px; }
@@ -2269,10 +2270,18 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $departmentInfoOneFieldValue = (string) ($departmentInfoOneFieldData["field_value"] ?? "");
                                                             $departmentInfoOneFieldVisible = (int) ($departmentInfoOneFieldData["is_visible"] ?? 1) === 1;
                                                             $departmentInfoOneIsImage = $departmentInfoOneFieldType === "image";
+                                                            $departmentInfoOneLabel = (string) ($departmentInfoOneFieldConfig["label"] ?? $departmentInfoOneFieldKey);
+                                                            if ($departmentInfoOneFieldKey === "overview_image") {
+                                                                $departmentInfoOneLabel = "Imagen";
+                                                            } elseif ($departmentInfoOneFieldKey === "overview_image_alt") {
+                                                                $departmentInfoOneLabel = "Texto alternativo de la imagen";
+                                                            } elseif ($departmentInfoOneFieldKey === "experience_number") {
+                                                                $departmentInfoOneLabel = "Número de experiencia";
+                                                            }
                                                             ?>
                                                             <div class="field-group">
                                                                 <div class="field-header">
-                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($departmentInfoOneFieldConfig["label"] ?? $departmentInfoOneFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars($departmentInfoOneLabel, ENT_QUOTES, "UTF-8"); ?></label>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($departmentInfoOneFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $departmentInfoOneFieldVisible ? " checked" : ""; ?>>
                                                                         <span>Mostrar</span>
@@ -2291,12 +2300,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
-                                                    <?php foreach ($schema["repeaters"] as $departmentInfoOneRepeaterConfig): ?>
-                                                        <?php if (((string) ($departmentInfoOneRepeaterConfig["repeater_key"] ?? "")) === "service_cards"): ?>
-                                                            <?php renderAdminRepeaterSection($departmentInfoOneRepeaterConfig, $contentData); ?>
-                                                            <?php break; ?>
-                                                        <?php endif; ?>
-                                                    <?php endforeach; ?>
+                                                    <div class="department-info-one-repeater">
+                                                        <?php foreach ($schema["repeaters"] as $departmentInfoOneRepeaterConfig): ?>
+                                                            <?php if (((string) ($departmentInfoOneRepeaterConfig["repeater_key"] ?? "")) === "service_cards"): ?>
+                                                                <?php renderAdminRepeaterSection($departmentInfoOneRepeaterConfig, $contentData); ?>
+                                                                <?php break; ?>
+                                                            <?php endif; ?>
+                                                        <?php endforeach; ?>
+                                                    </div>
                                                 </div>
                                             </div>
                                         <?php endif; ?>

@@ -11,7 +11,7 @@ return [
         ["field_key" => "overview_image", "label" => "Overview imagen", "field_type" => "image", "default" => "assets/img/health/cardiology-1.webp", "default_visible" => 1],
         ["field_key" => "overview_image_alt", "label" => "Overview imagen alt", "field_type" => "text", "default" => "Cardiology Department", "default_visible" => 1],
         ["field_key" => "experience_number", "label" => "Experiencia numero", "field_type" => "text", "default" => "15+", "default_visible" => 1],
-        ["field_key" => "experience_text", "label" => "Experiencia texto", "field_type" => "text", "default" => "Years of Excellence", "default_visible" => 1],
+        ["field_key" => "experience_text", "label" => "Descripción de experiencia", "field_type" => "text", "default" => "Years of Excellence", "default_visible" => 1],
         ["field_key" => "key_services_title", "label" => "Servicios clave titulo", "field_type" => "text", "default" => "Our Specialized Services", "default_visible" => 1],
         ["field_key" => "key_services_text", "label" => "Servicios clave texto", "field_type" => "textarea", "default" => "Donec rutrum congue leo eget malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ac diam sit amet quam vehicula.", "default_visible" => 1],
         ["field_key" => "cta_title", "label" => "CTA titulo", "field_type" => "text", "default" => "Expert Care When You Need It Most", "default_visible" => 1],
