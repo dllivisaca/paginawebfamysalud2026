@@ -1310,6 +1310,24 @@ if (($schema["template_key"] ?? "") === "about") {
     ];
 } elseif (($schema["template_key"] ?? "") === "department-details") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
+} elseif (($schema["template_key"] ?? "") === "service-details") {
+    $simpleFieldGroups = [
+        [
+            "title" => "Encabezado",
+            "description" => "Titulo y subtitulo principal de la pagina.",
+            "field_keys" => ["hero_title", "hero_subtitle"],
+        ],
+        [
+            "title" => "Área informativa",
+            "description" => "",
+            "field_keys" => ["service_image", "service_image_alt", "service_tag", "service_title", "service_tagline", "service_text_1", "service_text_2", "features_title", "primary_button_text", "primary_button_url", "secondary_button_text", "secondary_button_url"],
+        ],
+        [
+            "title" => "Agendamiento",
+            "description" => "",
+            "field_keys" => ["booking_title", "booking_text", "appointment_title", "appointment_text", "appointment_button_text", "appointment_button_url", "appointment_alternative_text", "appointment_phone_text", "appointment_phone_url"],
+        ],
+    ];
 } elseif (($schema["template_key"] ?? "") === "doctors") {
     [$linkableSitePages, $linkableSitePagesById] = getPageContentLinkablePages($conn, true);
 } elseif (($schema["template_key"] ?? "") === "contact") {
