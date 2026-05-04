@@ -156,6 +156,26 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
     <div class="section-block<?php echo $sectionClass !== "" ? " " . htmlspecialchars($sectionClass, ENT_QUOTES, "UTF-8") : ""; ?><?php echo $repeaterKey === "hero_features" ? " hero-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_about_features" ? " home-about-features-admin-section" : ""; ?><?php echo $repeaterKey === "home_certifications" ? " home-certifications-admin-section" : ""; ?><?php echo $repeaterKey === "featured_departments" ? " featured-departments-admin-section" : ""; ?><?php echo $repeaterKey === "featured_services" ? " featured-services-admin-section" : ""; ?><?php echo $repeaterKey === "services" ? " services-admin-section" : ""; ?><?php echo $repeaterKey === "featured_doctors" ? " featured-doctors-admin-section" : ""; ?><?php echo $repeaterKey === "doctors" ? " doctors-admin-section" : ""; ?><?php echo $repeaterKey === "cta_features" ? " cta-features-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_contacts" ? " emergency-contacts-admin-section" : ""; ?><?php echo $repeaterKey === "quick_actions" ? " quick-actions-admin-section" : ""; ?><?php echo $repeaterKey === "departments" ? " departments-admin-section" : ""; ?><?php echo $repeaterKey === "service_categories" ? " service-categories-admin-section" : ""; ?><?php echo $repeaterKey === "emergency_tips" ? " emergency-tips-admin-section" : ""; ?><?php echo $templateKey === "contact" && $repeaterKey === "social_links" ? " contact-social-links-admin-section" : ""; ?><?php echo $templateKey === "department-details" && $repeaterKey === "stats" ? " department-stats-admin-section" : ""; ?>">
         <h3><?php echo htmlspecialchars($repeaterTitle, ENT_QUOTES, "UTF-8"); ?></h3>
 
+        <?php if ($templateKey === "service-details" && $repeaterKey === "features"): ?>
+            <?php
+            $featuresTitleData = $contentData["simple_fields"]["features_title"] ?? null;
+            $featuresTitleValue = (string) ($featuresTitleData["field_value"] ?? "");
+            $featuresTitleVisible = (int) ($featuresTitleData["is_visible"] ?? 1) === 1;
+            ?>
+            <div class="field-grid">
+                <div class="field-group field-group-full">
+                    <div class="field-header">
+                        <label class="field-label" for="simple_features_title">Título</label>
+                        <label class="toggle-row">
+                            <input type="checkbox" name="simple_fields[features_title][is_visible]" value="1"<?php echo $featuresTitleVisible ? " checked" : ""; ?>>
+                            <span>Mostrar</span>
+                        </label>
+                    </div>
+                    <input class="form-input" type="text" id="simple_features_title" name="simple_fields[features_title][value]" value="<?php echo htmlspecialchars($featuresTitleValue, ENT_QUOTES, "UTF-8"); ?>">
+                </div>
+            </div>
+        <?php endif; ?>
+
         <?php foreach ($renderItems as $itemConfig): ?>
             <?php
             $itemIndex = (int) $itemConfig["item_index"];
@@ -2110,6 +2130,17 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $displayLabelHtml = "P&aacute;rrafo 2";
                                                         }
                                                         ?>
+                                                        <?php if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && $groupFieldKey === "features_title"): ?>
+                                                            <div class="field-group-full">
+                                                                <?php foreach ($schema["repeaters"] as $serviceDetailsRepeaterConfig): ?>
+                                                                    <?php if (((string) ($serviceDetailsRepeaterConfig["repeater_key"] ?? "")) === "features"): ?>
+                                                                        <?php renderAdminRepeaterSection($serviceDetailsRepeaterConfig, $contentData, "service-details-features-admin-section"); ?>
+                                                                        <?php break; ?>
+                                                                    <?php endif; ?>
+                                                                <?php endforeach; ?>
+                                                            </div>
+                                                            <?php continue; ?>
+                                                        <?php endif; ?>
                                                         <div class="field-group <?php echo $isTextarea ? "field-group-full" : ""; ?>">
                                                             <div class="field-header">
                                                                 <label class="field-label" for="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo $displayLabelHtml; ?></label>
@@ -2156,16 +2187,6 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 <?php foreach ($schema["repeaters"] as $contactRepeaterConfig): ?>
                                                                     <?php if (((string) ($contactRepeaterConfig["repeater_key"] ?? "")) === "social_links"): ?>
                                                                         <?php renderAdminRepeaterSection($contactRepeaterConfig, $contentData); ?>
-                                                                        <?php break; ?>
-                                                                    <?php endif; ?>
-                                                                <?php endforeach; ?>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                        <?php if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && $groupFieldKey === "features_title"): ?>
-                                                            <div class="field-group-full">
-                                                                <?php foreach ($schema["repeaters"] as $serviceDetailsRepeaterConfig): ?>
-                                                                    <?php if (((string) ($serviceDetailsRepeaterConfig["repeater_key"] ?? "")) === "features"): ?>
-                                                                        <?php renderAdminRepeaterSection($serviceDetailsRepeaterConfig, $contentData, "service-details-features-admin-section"); ?>
                                                                         <?php break; ?>
                                                                     <?php endif; ?>
                                                                 <?php endforeach; ?>
