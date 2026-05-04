@@ -237,6 +237,17 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                     return ($leftPosition === false ? PHP_INT_MAX : $leftPosition) <=> ($rightPosition === false ? PHP_INT_MAX : $rightPosition);
                 });
             }
+            if ($templateKey === "service-details" && $repeaterKey === "service_cards") {
+                $serviceDetailsCardFieldOrder = ["title", "icon_class"];
+                usort($repeaterFields, function ($leftField, $rightField) use ($serviceDetailsCardFieldOrder) {
+                    $leftFieldKey = (string) ($leftField["field_key"] ?? "");
+                    $rightFieldKey = (string) ($rightField["field_key"] ?? "");
+                    $leftPosition = array_search($leftFieldKey, $serviceDetailsCardFieldOrder, true);
+                    $rightPosition = array_search($rightFieldKey, $serviceDetailsCardFieldOrder, true);
+
+                    return ($leftPosition === false ? PHP_INT_MAX : $leftPosition) <=> ($rightPosition === false ? PHP_INT_MAX : $rightPosition);
+                });
+            }
             if ($repeaterKey === "departments") {
                 $departmentsLayoutVariant = strtolower(trim((string) ($itemData["fields"]["layout_variant"]["field_value"] ?? "")));
                 $departmentsTitleValue = trim((string) ($itemData["fields"]["title"]["field_value"] ?? ""));
@@ -277,7 +288,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $itemTitleAttributes = ' class="js-contact-social-link-title" data-contact-social-link-item="' . $itemIndex . '" data-contact-social-link-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"';
                     }
                     ?>
-                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats", "key_services"], true)) && !($templateKey === "service-details" && $repeaterKey === "features")): ?>
+                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats", "key_services"], true)) && !($templateKey === "service-details" && in_array($repeaterKey, ["features", "service_cards"], true))): ?>
                         <h3<?php echo $itemTitleAttributes; ?>><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
                     <?php endif; ?>
                     <?php if ($repeaterKey === "doctors"): ?>
