@@ -135,6 +135,7 @@ $appointmentButtonUrl = serviceDetailsNormalizeCustomHref(serviceDetailsFieldVal
 $appointmentAlternativeText = serviceDetailsFieldValue($serviceDetailsFields, "appointment_alternative_text", "Or call us at");
 $appointmentPhoneText = serviceDetailsFieldValue($serviceDetailsFields, "appointment_phone_text", "+1 (555) 123-4567");
 $appointmentPhoneUrl = serviceDetailsNormalizePhoneOrHref(serviceDetailsFieldValue($serviceDetailsFields, "appointment_phone_url", "tel:+15551234567"));
+$appointmentPhoneUrlVisible = serviceDetailsFieldVisible($serviceDetailsFields, "appointment_phone_url");
 $features = serviceDetailsVisibleRepeaterItems($serviceDetailsRepeaters["features"] ?? []);
 $serviceCards = serviceDetailsVisibleRepeaterItems($serviceDetailsRepeaters["service_cards"] ?? []);
 $availabilityItems = serviceDetailsVisibleRepeaterItems($serviceDetailsRepeaters["availability_items"] ?? []);
@@ -312,7 +313,13 @@ require __DIR__ . "/../../includes/header.php";
               <?php endif; ?>
               <div class="contact-alternative">
                 <?php if (serviceDetailsFieldVisible($serviceDetailsFields, "appointment_alternative_text") && $appointmentAlternativeText !== ""): ?><span><?php echo htmlspecialchars($appointmentAlternativeText, ENT_QUOTES, "UTF-8"); ?></span><?php endif; ?>
-                <?php if (serviceDetailsFieldVisible($serviceDetailsFields, "appointment_phone_text") && $appointmentPhoneText !== ""): ?><a href="<?php echo htmlspecialchars($appointmentPhoneUrl !== "" ? $appointmentPhoneUrl : "#", ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars($appointmentPhoneText, ENT_QUOTES, "UTF-8"); ?></a><?php endif; ?>
+                <?php if (serviceDetailsFieldVisible($serviceDetailsFields, "appointment_phone_text") && $appointmentPhoneText !== ""): ?>
+                  <?php if ($appointmentPhoneUrlVisible && $appointmentPhoneUrl !== ""): ?>
+                    <a href="<?php echo htmlspecialchars($appointmentPhoneUrl, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars($appointmentPhoneText, ENT_QUOTES, "UTF-8"); ?></a>
+                  <?php else: ?>
+                    <span><?php echo htmlspecialchars($appointmentPhoneText, ENT_QUOTES, "UTF-8"); ?></span>
+                  <?php endif; ?>
+                <?php endif; ?>
               </div>
             </div>
           </div>
