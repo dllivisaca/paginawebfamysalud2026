@@ -23,6 +23,26 @@ function escapeAdminFieldLabel($value)
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8");
 }
 
+function appointmentAdminSlugFromLabel(string $label): string
+{
+    $slug = trim($label);
+
+    if ($slug === "") {
+        return "";
+    }
+
+    $converted = function_exists("iconv") ? @iconv("UTF-8", "ASCII//TRANSLIT//IGNORE", $slug) : false;
+    if (is_string($converted) && $converted !== "") {
+        $slug = $converted;
+    }
+
+    $slug = strtolower($slug);
+    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? "";
+    $slug = preg_replace('/-+/', '-', $slug) ?? "";
+
+    return trim($slug, "-");
+}
+
 function getSimpleFieldUpload(array $files, string $fieldKey): ?array
 {
     if (!isset($files["simple_fields"])) {
@@ -387,6 +407,14 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         }
                         $isServiceDetailsCardLinkHiddenField = $templateKey === "service-details" && $repeaterKey === "service_cards" && in_array($fieldKey, ["link_type", "page_id", "link_url"], true);
                         if ($isServiceDetailsCardLinkHiddenField) {
+                            continue;
+                        }
+                        if ($templateKey === "appointment" && in_array($repeaterKey, ["departments", "doctors"], true) && $fieldKey === "value") {
+                            $appointmentRepeaterLabelValue = trim((string) ($itemData["fields"]["label"]["field_value"] ?? ""));
+                            $appointmentRepeaterTechnicalValue = $appointmentRepeaterLabelValue !== "" ? appointmentAdminSlugFromLabel($appointmentRepeaterLabelValue) : $fieldValue;
+                            ?>
+                            <input type="hidden" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]" value="<?php echo htmlspecialchars($appointmentRepeaterTechnicalValue, ENT_QUOTES, "UTF-8"); ?>">
+                            <?php
                             continue;
                         }
                         if ($repeaterKey === "departments" && $fieldKey === "layout_variant") {
@@ -1348,6 +1376,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $page && $schema) {
 
                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                         $fieldValue = trim((string) ($_POST["repeaters"][$repeaterKey][$itemIndex]["fields"][$fieldKey] ?? ""));
+                        if ($templateKey === "appointment" && in_array($repeaterKey, ["departments", "doctors"], true) && $fieldKey === "value") {
+                            $fieldValue = appointmentAdminSlugFromLabel((string) ($_POST["repeaters"][$repeaterKey][$itemIndex]["fields"]["label"] ?? ""));
+                        }
 
                         if (!upsertRepeaterItemField($conn, $repeaterItemId, $fieldKey, $fieldType, $fieldValue)) {
                             $errors[] = "No fue posible guardar los bloques repetibles.";
