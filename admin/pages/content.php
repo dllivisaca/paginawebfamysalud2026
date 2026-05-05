@@ -1722,6 +1722,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .appointment-info-items-inline { grid-column: 1 / -1; margin-top: 12px; }
         .appointment-info-area-inline { grid-column: 1 / -1; margin-top: 12px; }
         .appointment-info-area-inline .appointment-info-items-inline { margin-top: 12px; }
+        .appointment-form-inline { grid-column: 1 / -1; margin-top: 16px; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
         .cta-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-doctors-admin-section { background: #fff; }
@@ -2613,6 +2614,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                         if ($templateKey === "appointment" && in_array($fieldKey, ["info_title", "info_text", "emergency_title", "emergency_icon", "emergency_text"], true)) {
                                             continue;
                                         }
+                                        if ($templateKey === "appointment" && in_array($fieldKey, ["name_placeholder", "email_placeholder", "phone_placeholder", "department_placeholder", "doctor_placeholder", "message_placeholder", "loading_text", "sent_message", "button_text", "button_icon"], true)) {
+                                            continue;
+                                        }
                                         $fieldData = $contentData["simple_fields"][$fieldKey] ?? null;
                                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                                         $fieldValue = (string) ($fieldData["field_value"] ?? "");
@@ -2722,6 +2726,47 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                     <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
                                                                 <?php else: ?>
                                                                     <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="field-group-full">
+                                                <div class="section-block appointment-form-inline">
+                                                    <h3>Formulario</h3>
+                                                    <div class="field-grid">
+                                                        <?php foreach (["name_placeholder", "email_placeholder", "phone_placeholder", "department_placeholder", "doctor_placeholder", "message_placeholder", "loading_text", "sent_message", "button_text", "button_icon"] as $appointmentFormFieldKey): ?>
+                                                            <?php
+                                                            $appointmentFormFieldConfig = null;
+                                                            foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                if ((string) ($simpleFieldConfig["field_key"] ?? "") === $appointmentFormFieldKey) {
+                                                                    $appointmentFormFieldConfig = $simpleFieldConfig;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!is_array($appointmentFormFieldConfig)) {
+                                                                continue;
+                                                            }
+                                                            $appointmentFormFieldData = $contentData["simple_fields"][$appointmentFormFieldKey] ?? null;
+                                                            $appointmentFormFieldType = (string) ($appointmentFormFieldConfig["field_type"] ?? "text");
+                                                            $appointmentFormFieldValue = (string) ($appointmentFormFieldData["field_value"] ?? "");
+                                                            $appointmentFormFieldVisible = (int) ($appointmentFormFieldData["is_visible"] ?? 1) === 1;
+                                                            $appointmentFormIsTextarea = $appointmentFormFieldType === "textarea";
+                                                            ?>
+                                                            <div class="field-group <?php echo $appointmentFormIsTextarea ? "field-group-full" : ""; ?>">
+                                                                <div class="field-header">
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentFormFieldConfig["label"] ?? $appointmentFormFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="toggle-row">
+                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $appointmentFormFieldVisible ? " checked" : ""; ?>>
+                                                                        <span>Mostrar</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <?php if ($appointmentFormIsTextarea): ?>
+                                                                    <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($appointmentFormFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                                <?php else: ?>
+                                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($appointmentFormFieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                                                 <?php endif; ?>
                                                             </div>
                                                         <?php endforeach; ?>
