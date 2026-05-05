@@ -1767,6 +1767,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .appointment-info-items-inline { grid-column: 1 / -1; margin-top: 12px; }
         .appointment-info-area-inline { grid-column: 1 / -1; margin-top: 12px; background: #fff; }
         .appointment-info-area-inline .appointment-info-items-inline { margin-top: 12px; }
+        .appointment-info-area-inline .field-help { margin-top: 2px; margin-bottom: 6px; font-size: 12px; color: #6b7280; line-height: 1.4; }
         .appointment-form-inline { grid-column: 1 / -1; margin-top: 16px; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
         .cta-features-admin-section .item-title h3 { font-size: 17px; }
@@ -2821,6 +2822,20 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <div class="section-block appointment-form-inline">
                                                     <h3>Formulario</h3>
                                                     <div class="field-grid">
+                                                        <?php
+                                                        $appointmentFormFieldLabels = [
+                                                            "name_placeholder" => "Texto dentro del campo Nombre",
+                                                            "email_placeholder" => "Texto dentro del campo Correo electrónico",
+                                                            "phone_placeholder" => "Texto dentro del campo Teléfono",
+                                                            "department_placeholder" => "Texto dentro del campo Departamento",
+                                                            "doctor_placeholder" => "Texto dentro del campo Doctor",
+                                                            "message_placeholder" => "Texto dentro del campo Mensaje",
+                                                            "loading_text" => "Mensaje de carga",
+                                                            "sent_message" => "Mensaje de éxito",
+                                                            "button_text" => "Texto del botón",
+                                                            "button_icon" => "Icono del boton",
+                                                        ];
+                                                        ?>
                                                         <?php foreach (["name_placeholder", "email_placeholder", "phone_placeholder", "department_placeholder", "doctor_placeholder", "message_placeholder", "loading_text", "sent_message", "button_text", "button_icon"] as $appointmentFormFieldKey): ?>
                                                             <?php
                                                             $appointmentFormFieldConfig = null;
@@ -2841,7 +2856,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             ?>
                                                             <div class="field-group <?php echo $appointmentFormIsTextarea ? "field-group-full" : ""; ?>">
                                                                 <div class="field-header">
-                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentFormFieldConfig["label"] ?? $appointmentFormFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentFormFieldLabels[$appointmentFormFieldKey] ?? ($appointmentFormFieldConfig["label"] ?? $appointmentFormFieldKey)), ENT_QUOTES, "UTF-8"); ?></label>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $appointmentFormFieldVisible ? " checked" : ""; ?>>
                                                                         <span>Mostrar</span>
