@@ -36,7 +36,33 @@ $infoTitle = appointmentFieldValue($appointmentFields, "info_title", "Quick & Ea
 $infoText = appointmentFieldValue($appointmentFields, "info_text", "Book your appointment in just a few simple steps. Our healthcare professionals are ready to provide you with the best medical care tailored to your needs.");
 $emergencyTitle = appointmentFieldValue($appointmentFields, "emergency_title", "Emergency Hotline");
 $emergencyIcon = appointmentFieldValue($appointmentFields, "emergency_icon", "bi bi-telephone-fill me-2");
-$emergencyText = appointmentFieldValue($appointmentFields, "emergency_text", "Call <strong>+1 (555) 911-4567</strong> for urgent medical assistance");
+$emergencyText = htmlspecialchars(appointmentFieldValue($appointmentFields, "emergency_text", "Call {telefono} for urgent medical assistance"), ENT_QUOTES, "UTF-8");
+$emergencyPhone = appointmentFieldValue($appointmentFields, "emergency_phone", "");
+if ($emergencyPhone === "" && isset($conn, $page["id"]) && $conn instanceof mysqli) {
+    $emergencyPhoneStmt = $conn->prepare(
+        "SELECT field_value
+         FROM site_page_content_fields
+         WHERE site_page_id = ? AND field_key = 'emergency_phone'
+         LIMIT 1"
+    );
+
+    if ($emergencyPhoneStmt) {
+        $emergencyPhonePageId = (int) $page["id"];
+        $emergencyPhoneStmt->bind_param("i", $emergencyPhonePageId);
+        $emergencyPhoneStmt->execute();
+        $emergencyPhoneResult = $emergencyPhoneStmt->get_result();
+        $emergencyPhoneRow = $emergencyPhoneResult ? $emergencyPhoneResult->fetch_assoc() : null;
+        $emergencyPhone = (string) ($emergencyPhoneRow["field_value"] ?? "");
+        $emergencyPhoneStmt->close();
+    }
+}
+if ($emergencyPhone !== "") {
+    $emergencyText = str_replace(
+        "{telefono}",
+        "<strong>" . htmlspecialchars($emergencyPhone, ENT_QUOTES, "UTF-8") . "</strong>",
+        $emergencyText
+    );
+}
 $namePlaceholder = appointmentFieldValue($appointmentFields, "name_placeholder", "Your Full Name");
 $emailPlaceholder = appointmentFieldValue($appointmentFields, "email_placeholder", "Your Email");
 $phonePlaceholder = appointmentFieldValue($appointmentFields, "phone_placeholder", "Your Phone Number");

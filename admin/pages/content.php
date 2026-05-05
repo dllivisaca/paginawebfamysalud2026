@@ -1249,6 +1249,28 @@ if ($page && !$schema) {
     $errors[] = "La plantilla actual de esta pagina aun no tiene edicion de contenido disponible.";
 }
 
+if ($templateKey === "appointment" && is_array($schema)) {
+    $appointmentHasEmergencyPhoneField = false;
+    foreach ($schema["simple_fields"] ?? [] as &$simpleFieldConfig) {
+        if ((string) ($simpleFieldConfig["field_key"] ?? "") === "emergency_text") {
+            $simpleFieldConfig["default"] = "Call {telefono} for urgent medical assistance";
+        }
+
+        if ((string) ($simpleFieldConfig["field_key"] ?? "") === "emergency_phone") {
+            $appointmentHasEmergencyPhoneField = true;
+        }
+    }
+    unset($simpleFieldConfig);
+
+    if (!$appointmentHasEmergencyPhoneField) {
+        $schema["simple_fields"][] = [
+            "field_key" => "emergency_phone",
+            "label" => "Teléfono del banner",
+            "field_type" => "text",
+        ];
+    }
+}
+
 if ($page && $schema) {
     ensurePageContentRepeaterItems($conn, (int) $page["id"], $schema);
 }
@@ -2634,7 +2656,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                         if ($templateKey === "department-details" && in_array($fieldKey, ["intro_title", "intro_text", "overview_image", "overview_image_alt", "experience_number", "experience_text", "key_services_title", "key_services_text", "cta_title", "cta_text", "cta_primary_text", "cta_primary_url", "cta_secondary_text", "cta_secondary_url", "cta_image", "cta_image_alt"], true)) {
                                             continue;
                                         }
-                                        if ($templateKey === "appointment" && in_array($fieldKey, ["info_title", "info_text", "emergency_title", "emergency_icon", "emergency_text"], true)) {
+                                        if ($templateKey === "appointment" && in_array($fieldKey, ["info_title", "info_text", "emergency_title", "emergency_icon", "emergency_text", "emergency_phone"], true)) {
                                             continue;
                                         }
                                         if ($templateKey === "appointment" && in_array($fieldKey, ["name_placeholder", "email_placeholder", "phone_placeholder", "department_placeholder", "doctor_placeholder", "message_placeholder", "loading_text", "sent_message", "button_text", "button_icon"], true)) {
@@ -2729,18 +2751,27 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             "emergency_title" => "Titulo del banner",
                                                             "emergency_icon" => "Icono del banner",
                                                             "emergency_text" => "Texto del banner",
+                                                            "emergency_phone" => "Teléfono del banner",
                                                         ];
                                                         $appointmentEmergencyIconOptions = [
                                                             "bi bi-telephone-fill me-2" => "Teléfono",
                                                         ];
                                                         ?>
-                                                        <?php foreach (["emergency_title", "emergency_icon", "emergency_text"] as $appointmentInfoFieldKey): ?>
+                                                        <?php foreach (["emergency_title", "emergency_icon", "emergency_text", "emergency_phone"] as $appointmentInfoFieldKey): ?>
                                                             <?php
                                                             $appointmentInfoFieldConfig = null;
-                                                            foreach ($schema["simple_fields"] as $simpleFieldConfig) {
-                                                                if ((string) ($simpleFieldConfig["field_key"] ?? "") === $appointmentInfoFieldKey) {
-                                                                    $appointmentInfoFieldConfig = $simpleFieldConfig;
-                                                                    break;
+                                                            if ($appointmentInfoFieldKey === "emergency_phone") {
+                                                                $appointmentInfoFieldConfig = [
+                                                                    "field_key" => "emergency_phone",
+                                                                    "label" => "Teléfono del banner",
+                                                                    "field_type" => "text",
+                                                                ];
+                                                            } else {
+                                                                foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                    if ((string) ($simpleFieldConfig["field_key"] ?? "") === $appointmentInfoFieldKey) {
+                                                                        $appointmentInfoFieldConfig = $simpleFieldConfig;
+                                                                        break;
+                                                                    }
                                                                 }
                                                             }
                                                             if (!is_array($appointmentInfoFieldConfig)) {
@@ -2748,7 +2779,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             }
                                                             $appointmentInfoFieldData = $contentData["simple_fields"][$appointmentInfoFieldKey] ?? null;
                                                             $appointmentInfoFieldType = (string) ($appointmentInfoFieldConfig["field_type"] ?? "text");
-                                                            $appointmentInfoFieldValue = (string) ($appointmentInfoFieldData["field_value"] ?? "");
+                                                            $appointmentInfoFieldValue = (string) ($appointmentInfoFieldData["field_value"] ?? ($appointmentInfoFieldData["value"] ?? ""));
                                                             $appointmentInfoFieldVisible = (int) ($appointmentInfoFieldData["is_visible"] ?? 1) === 1;
                                                             $appointmentInfoIsTextarea = $appointmentInfoFieldType === "textarea";
                                                             $isAppointmentEmergencyIconField = $templateKey === "appointment" && $appointmentInfoFieldKey === "emergency_icon";
@@ -2761,6 +2792,11 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                         <span>Mostrar</span>
                                                                     </label>
                                                                 </div>
+                                                                <?php if ($templateKey === "appointment" && $appointmentInfoFieldKey === "emergency_text"): ?>
+                                                                    <div class="field-help">
+                                                                        Usa {telefono} para insertar el número automáticamente
+                                                                    </div>
+                                                                <?php endif; ?>
 
                                                                 <?php if ($isAppointmentEmergencyIconField): ?>
                                                                     <select class="form-input" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]">
