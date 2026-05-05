@@ -56,6 +56,27 @@ function serviceDetailsNormalizeCustomHref(string $url): string
     return $url;
 }
 
+function serviceDetailsNormalizePhoneOrHref(string $value): string
+{
+    $value = trim($value);
+
+    if ($value === "") {
+        return "";
+    }
+
+    if ($value[0] === "#" || $value[0] === "/" || preg_match('~^[a-z][a-z0-9+.-]*:~i', $value) === 1 || preg_match('~^(?:https?:)?//~i', $value) === 1) {
+        return serviceDetailsNormalizeCustomHref($value);
+    }
+
+    if (preg_match('/^[0-9\s+().-]+$/', $value) === 1 && preg_match('/\d/', $value) === 1) {
+        $phoneNumber = ($value[0] === "+" ? "+" : "") . preg_replace('/\D+/', '', $value);
+
+        return $phoneNumber !== "" && $phoneNumber !== "+" ? "tel:" . $phoneNumber : "";
+    }
+
+    return serviceDetailsNormalizeCustomHref($value);
+}
+
 function serviceDetailsButtonHref(mysqli $conn, array $fields, string $prefix, string $fallbackUrl = "#"): string
 {
     $linkType = trim(serviceDetailsFieldValue($fields, $prefix . "_button_link_type", ""));
@@ -113,7 +134,7 @@ $appointmentButtonText = serviceDetailsFieldValue($serviceDetailsFields, "appoin
 $appointmentButtonUrl = serviceDetailsNormalizeCustomHref(serviceDetailsFieldValue($serviceDetailsFields, "appointment_button_url", "appointment.html"));
 $appointmentAlternativeText = serviceDetailsFieldValue($serviceDetailsFields, "appointment_alternative_text", "Or call us at");
 $appointmentPhoneText = serviceDetailsFieldValue($serviceDetailsFields, "appointment_phone_text", "+1 (555) 123-4567");
-$appointmentPhoneUrl = serviceDetailsNormalizeCustomHref(serviceDetailsFieldValue($serviceDetailsFields, "appointment_phone_url", "tel:+15551234567"));
+$appointmentPhoneUrl = serviceDetailsNormalizePhoneOrHref(serviceDetailsFieldValue($serviceDetailsFields, "appointment_phone_url", "tel:+15551234567"));
 $features = serviceDetailsVisibleRepeaterItems($serviceDetailsRepeaters["features"] ?? []);
 $serviceCards = serviceDetailsVisibleRepeaterItems($serviceDetailsRepeaters["service_cards"] ?? []);
 $availabilityItems = serviceDetailsVisibleRepeaterItems($serviceDetailsRepeaters["availability_items"] ?? []);

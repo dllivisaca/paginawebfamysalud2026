@@ -2351,18 +2351,19 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                         "appointment_button_url" => "URL del botón",
                                                                         "appointment_alternative_text" => "Texto descriptivo de link alternativo",
                                                                         "appointment_phone_text" => "Texto de link alternativo",
-                                                                        "appointment_phone_url" => "URL de link alternativo",
+                                                                        "appointment_phone_url" => "Teléfono o URL de link alternativo",
                                                                     ];
-                                                                    ?>
-                                                                    <?php foreach (["appointment_title", "appointment_text", "appointment_button_text", "appointment_button_url", "appointment_alternative_text", "appointment_phone_text", "appointment_phone_url"] as $serviceDetailsAppointmentFieldKey): ?>
-                                                                        <?php
-                                                                        $serviceDetailsAppointmentFieldConfig = null;
-                                                                        foreach ($schema["simple_fields"] as $simpleFieldConfig) {
-                                                                            if ((string) ($simpleFieldConfig["field_key"] ?? "") === $serviceDetailsAppointmentFieldKey) {
-                                                                                $serviceDetailsAppointmentFieldConfig = $simpleFieldConfig;
-                                                                                break;
-                                                                            }
+                                                                    $serviceDetailsAppointmentFieldConfigs = [];
+                                                                    foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                        $simpleFieldKey = (string) ($simpleFieldConfig["field_key"] ?? "");
+                                                                        if (isset($serviceDetailsAppointmentFieldLabels[$simpleFieldKey])) {
+                                                                            $serviceDetailsAppointmentFieldConfigs[$simpleFieldKey] = $simpleFieldConfig;
                                                                         }
+                                                                    }
+                                                                    ?>
+                                                                    <?php foreach (["appointment_title", "appointment_text"] as $serviceDetailsAppointmentFieldKey): ?>
+                                                                        <?php
+                                                                        $serviceDetailsAppointmentFieldConfig = $serviceDetailsAppointmentFieldConfigs[$serviceDetailsAppointmentFieldKey] ?? null;
                                                                         if (!is_array($serviceDetailsAppointmentFieldConfig)) {
                                                                             continue;
                                                                         }
@@ -2388,6 +2389,104 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                             <?php endif; ?>
                                                                         </div>
                                                                     <?php endforeach; ?>
+                                                                    <?php
+                                                                    $serviceDetailsAppointmentButtonTextKey = "appointment_button_text";
+                                                                    $serviceDetailsAppointmentButtonUrlKey = "appointment_button_url";
+                                                                    $serviceDetailsAppointmentButtonTextConfig = $serviceDetailsAppointmentFieldConfigs[$serviceDetailsAppointmentButtonTextKey] ?? null;
+                                                                    $serviceDetailsAppointmentButtonUrlConfig = $serviceDetailsAppointmentFieldConfigs[$serviceDetailsAppointmentButtonUrlKey] ?? null;
+                                                                    ?>
+                                                                    <?php if (is_array($serviceDetailsAppointmentButtonTextConfig) && is_array($serviceDetailsAppointmentButtonUrlConfig)): ?>
+                                                                        <?php
+                                                                        $serviceDetailsAppointmentButtonTextData = $contentData["simple_fields"][$serviceDetailsAppointmentButtonTextKey] ?? null;
+                                                                        $serviceDetailsAppointmentButtonUrlData = $contentData["simple_fields"][$serviceDetailsAppointmentButtonUrlKey] ?? null;
+                                                                        $serviceDetailsAppointmentButtonTextValue = (string) ($serviceDetailsAppointmentButtonTextData["field_value"] ?? "");
+                                                                        $serviceDetailsAppointmentButtonUrlValue = (string) ($serviceDetailsAppointmentButtonUrlData["field_value"] ?? "");
+                                                                        $serviceDetailsAppointmentButtonTextVisible = (int) ($serviceDetailsAppointmentButtonTextData["is_visible"] ?? 1) === 1;
+                                                                        $serviceDetailsAppointmentButtonUrlVisible = (int) ($serviceDetailsAppointmentButtonUrlData["is_visible"] ?? 1) === 1 ? 1 : 0;
+                                                                        $serviceDetailsAppointmentButtonLinkScope = "service_details_appointment_button_url";
+                                                                        $serviceDetailsAppointmentButtonSelectedInternalUrl = "";
+
+                                                                        foreach ($linkableSitePages as $sitePageOption) {
+                                                                            $sitePagePublicUrl = (string) ($sitePageOption["public_url"] ?? "");
+
+                                                                            if ($sitePagePublicUrl !== "" && $sitePagePublicUrl === $serviceDetailsAppointmentButtonUrlValue) {
+                                                                                $serviceDetailsAppointmentButtonSelectedInternalUrl = $sitePagePublicUrl;
+                                                                                break;
+                                                                            }
+                                                                        }
+
+                                                                        $serviceDetailsAppointmentButtonLinkTypeValue = $serviceDetailsAppointmentButtonSelectedInternalUrl !== "" ? "internal" : "custom";
+                                                                        $serviceDetailsAppointmentButtonCustomUrlValue = $serviceDetailsAppointmentButtonLinkTypeValue === "custom" ? $serviceDetailsAppointmentButtonUrlValue : "";
+                                                                        ?>
+                                                                        <div class="field-group field-group-full">
+                                                                            <div class="button-destination-box">
+                                                                                <div class="field-header">
+                                                                                    <h4>Texto del botón</h4>
+                                                                                    <label class="toggle-row">
+                                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentButtonTextKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $serviceDetailsAppointmentButtonTextVisible ? " checked" : ""; ?>>
+                                                                                        <span>Mostrar</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>][value]" class="js-service-details-appointment-url" data-link-scope="<?php echo htmlspecialchars($serviceDetailsAppointmentButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>" value="<?php echo htmlspecialchars($serviceDetailsAppointmentButtonUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="<?php echo $serviceDetailsAppointmentButtonUrlVisible; ?>">
+                                                                                <div class="field-group field-group-full">
+                                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentButtonTextKey, ENT_QUOTES, "UTF-8"); ?>">Texto del botón</label>
+                                                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentButtonTextKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentButtonTextKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($serviceDetailsAppointmentButtonTextValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                </div>
+                                                                                <div class="button-destination-grid">
+                                                                                    <div class="field-group field-group-full">
+                                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>_link_type">Tipo de enlace</label>
+                                                                                        <select class="form-select js-link-type js-service-details-appointment-link-type" id="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>_link_type" data-link-scope="<?php echo htmlspecialchars($serviceDetailsAppointmentButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                            <option value="internal"<?php echo $serviceDetailsAppointmentButtonLinkTypeValue === "internal" ? " selected" : ""; ?>>P&aacute;gina interna</option>
+                                                                                            <option value="custom"<?php echo $serviceDetailsAppointmentButtonLinkTypeValue === "custom" ? " selected" : ""; ?>>URL personalizada</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="field-group field-group-full js-link-panel <?php echo $serviceDetailsAppointmentButtonLinkTypeValue === "internal" ? "" : "is-hidden"; ?>" data-link-panel="internal" data-link-scope="<?php echo htmlspecialchars($serviceDetailsAppointmentButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>_page">P&aacute;gina interna</label>
+                                                                                        <select class="form-select js-service-details-appointment-page" id="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>_page" data-link-scope="<?php echo htmlspecialchars($serviceDetailsAppointmentButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                            <option value="">Selecciona una p&aacute;gina</option>
+                                                                                            <?php foreach ($linkableSitePages as $sitePageOption): ?>
+                                                                                                <?php $sitePagePublicUrl = (string) ($sitePageOption["public_url"] ?? ""); ?>
+                                                                                                <option value="<?php echo htmlspecialchars($sitePagePublicUrl, ENT_QUOTES, "UTF-8"); ?>" data-public-url="<?php echo htmlspecialchars($sitePagePublicUrl, ENT_QUOTES, "UTF-8"); ?>"<?php echo $sitePagePublicUrl !== "" && $sitePagePublicUrl === $serviceDetailsAppointmentButtonSelectedInternalUrl ? " selected" : ""; ?>><?php echo htmlspecialchars((string) ($sitePageOption["title"] ?? ""), ENT_QUOTES, "UTF-8"); ?></option>
+                                                                                            <?php endforeach; ?>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="field-group field-group-full js-link-panel <?php echo $serviceDetailsAppointmentButtonLinkTypeValue === "custom" ? "" : "is-hidden"; ?>" data-link-panel="custom" data-link-scope="<?php echo htmlspecialchars($serviceDetailsAppointmentButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                        <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>_custom">URL personalizada</label>
+                                                                                        <input class="form-input js-service-details-appointment-custom-url" type="text" id="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentButtonUrlKey, ENT_QUOTES, "UTF-8"); ?>_custom" data-link-scope="<?php echo htmlspecialchars($serviceDetailsAppointmentButtonLinkScope, ENT_QUOTES, "UTF-8"); ?>" value="<?php echo htmlspecialchars($serviceDetailsAppointmentButtonCustomUrlValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    <div class="field-group field-group-full">
+                                                                        <div class="button-destination-box">
+                                                                            <h4>Texto descriptivo de link alternativo</h4>
+                                                                            <div class="field-grid">
+                                                                                <?php foreach (["appointment_alternative_text", "appointment_phone_text", "appointment_phone_url"] as $serviceDetailsAppointmentFieldKey): ?>
+                                                                                    <?php
+                                                                                    $serviceDetailsAppointmentFieldConfig = $serviceDetailsAppointmentFieldConfigs[$serviceDetailsAppointmentFieldKey] ?? null;
+                                                                                    if (!is_array($serviceDetailsAppointmentFieldConfig)) {
+                                                                                        continue;
+                                                                                    }
+                                                                                    $serviceDetailsAppointmentFieldData = $contentData["simple_fields"][$serviceDetailsAppointmentFieldKey] ?? null;
+                                                                                    $serviceDetailsAppointmentFieldValue = (string) ($serviceDetailsAppointmentFieldData["field_value"] ?? "");
+                                                                                    $serviceDetailsAppointmentFieldVisible = (int) ($serviceDetailsAppointmentFieldData["is_visible"] ?? 1) === 1;
+                                                                                    ?>
+                                                                                    <div class="field-group field-group-full">
+                                                                                        <div class="field-header">
+                                                                                            <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($serviceDetailsAppointmentFieldLabels[$serviceDetailsAppointmentFieldKey] ?? ($serviceDetailsAppointmentFieldConfig["label"] ?? $serviceDetailsAppointmentFieldKey)), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                                            <label class="toggle-row">
+                                                                                                <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $serviceDetailsAppointmentFieldVisible ? " checked" : ""; ?>>
+                                                                                                <span>Mostrar</span>
+                                                                                            </label>
+                                                                                        </div>
+                                                                                        <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($serviceDetailsAppointmentFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                                    </div>
+                                                                                <?php endforeach; ?>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         <?php endif; ?>
@@ -3052,6 +3151,38 @@ if (($schema["template_key"] ?? "") === "about") {
 
                 selector.addEventListener("change", syncDepartmentCtaUrl);
                 syncDepartmentCtaUrl();
+            });
+
+            var serviceDetailsAppointmentLinkSelectors = document.querySelectorAll(".js-service-details-appointment-link-type");
+
+            serviceDetailsAppointmentLinkSelectors.forEach(function (selector) {
+                var scope = selector.getAttribute("data-link-scope");
+                var finalUrlInput = document.querySelector('.js-service-details-appointment-url[data-link-scope="' + scope + '"]');
+                var pageSelect = document.querySelector('.js-service-details-appointment-page[data-link-scope="' + scope + '"]');
+                var customUrlInput = document.querySelector('.js-service-details-appointment-custom-url[data-link-scope="' + scope + '"]');
+                var syncServiceDetailsAppointmentUrl = function () {
+                    if (!finalUrlInput) {
+                        return;
+                    }
+
+                    if (selector.value === "internal" && pageSelect) {
+                        var selectedPage = pageSelect.options[pageSelect.selectedIndex];
+                        finalUrlInput.value = selectedPage ? (selectedPage.getAttribute("data-public-url") || "") : "";
+                    } else if (customUrlInput) {
+                        finalUrlInput.value = customUrlInput.value;
+                    }
+                };
+
+                if (pageSelect) {
+                    pageSelect.addEventListener("change", syncServiceDetailsAppointmentUrl);
+                }
+
+                if (customUrlInput) {
+                    customUrlInput.addEventListener("input", syncServiceDetailsAppointmentUrl);
+                }
+
+                selector.addEventListener("change", syncServiceDetailsAppointmentUrl);
+                syncServiceDetailsAppointmentUrl();
             });
 
             var doctorAvailabilityMap = {
