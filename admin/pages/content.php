@@ -1720,6 +1720,8 @@ if (($schema["template_key"] ?? "") === "about") {
         .service-details-availability-inline { grid-column: 1 / -1; margin-top: 12px; }
         .service-details-appointment-card-inline { grid-column: 1 / -1; margin-top: 12px; }
         .appointment-info-items-inline { grid-column: 1 / -1; margin-top: 12px; }
+        .appointment-info-area-inline { grid-column: 1 / -1; margin-top: 12px; }
+        .appointment-info-area-inline .appointment-info-items-inline { margin-top: 12px; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
         .cta-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-doctors-admin-section { background: #fff; }
@@ -2608,6 +2610,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                         if ($templateKey === "department-details" && in_array($fieldKey, ["intro_title", "intro_text", "overview_image", "overview_image_alt", "experience_number", "experience_text", "key_services_title", "key_services_text", "cta_title", "cta_text", "cta_primary_text", "cta_primary_url", "cta_secondary_text", "cta_secondary_url", "cta_image", "cta_image_alt"], true)) {
                                             continue;
                                         }
+                                        if ($templateKey === "appointment" && in_array($fieldKey, ["info_title", "info_text", "emergency_title", "emergency_icon", "emergency_text"], true)) {
+                                            continue;
+                                        }
                                         $fieldData = $contentData["simple_fields"][$fieldKey] ?? null;
                                         $fieldType = (string) ($fieldConfig["field_type"] ?? "text");
                                         $fieldValue = (string) ($fieldData["field_value"] ?? "");
@@ -2639,13 +2644,90 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <img id="preview_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
                                             <?php endif; ?>
                                         </div>
-                                        <?php if ($templateKey === "appointment" && $fieldKey === "info_text"): ?>
-                                            <?php foreach ($schema["repeaters"] as $appointmentInfoRepeaterConfig): ?>
-                                                <?php if (((string) ($appointmentInfoRepeaterConfig["repeater_key"] ?? "")) === "info_items"): ?>
-                                                    <?php renderAdminRepeaterSection($appointmentInfoRepeaterConfig, $contentData, "appointment-info-items-inline"); ?>
-                                                    <?php break; ?>
-                                                <?php endif; ?>
-                                            <?php endforeach; ?>
+                                        <?php if ($templateKey === "appointment" && $fieldKey === "hero_subtitle"): ?>
+                                            <div class="field-group-full">
+                                                <div class="section-block appointment-info-area-inline">
+                                                    <h3>Área informativa</h3>
+                                                    <div class="field-grid">
+                                                        <?php foreach (["info_title", "info_text"] as $appointmentInfoFieldKey): ?>
+                                                            <?php
+                                                            $appointmentInfoFieldConfig = null;
+                                                            foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                if ((string) ($simpleFieldConfig["field_key"] ?? "") === $appointmentInfoFieldKey) {
+                                                                    $appointmentInfoFieldConfig = $simpleFieldConfig;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!is_array($appointmentInfoFieldConfig)) {
+                                                                continue;
+                                                            }
+                                                            $appointmentInfoFieldData = $contentData["simple_fields"][$appointmentInfoFieldKey] ?? null;
+                                                            $appointmentInfoFieldType = (string) ($appointmentInfoFieldConfig["field_type"] ?? "text");
+                                                            $appointmentInfoFieldValue = (string) ($appointmentInfoFieldData["field_value"] ?? "");
+                                                            $appointmentInfoFieldVisible = (int) ($appointmentInfoFieldData["is_visible"] ?? 1) === 1;
+                                                            $appointmentInfoIsTextarea = $appointmentInfoFieldType === "textarea";
+                                                            ?>
+                                                            <div class="field-group <?php echo $appointmentInfoIsTextarea ? "field-group-full" : ""; ?>">
+                                                                <div class="field-header">
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentInfoFieldConfig["label"] ?? $appointmentInfoFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="toggle-row">
+                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $appointmentInfoFieldVisible ? " checked" : ""; ?>>
+                                                                        <span>Mostrar</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <?php if ($appointmentInfoIsTextarea): ?>
+                                                                    <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                                <?php else: ?>
+                                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                    <?php foreach ($schema["repeaters"] as $appointmentInfoRepeaterConfig): ?>
+                                                        <?php if (((string) ($appointmentInfoRepeaterConfig["repeater_key"] ?? "")) === "info_items"): ?>
+                                                            <?php renderAdminRepeaterSection($appointmentInfoRepeaterConfig, $contentData, "appointment-info-items-inline"); ?>
+                                                            <?php break; ?>
+                                                        <?php endif; ?>
+                                                    <?php endforeach; ?>
+                                                    <div class="field-grid">
+                                                        <?php foreach (["emergency_title", "emergency_icon", "emergency_text"] as $appointmentInfoFieldKey): ?>
+                                                            <?php
+                                                            $appointmentInfoFieldConfig = null;
+                                                            foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                if ((string) ($simpleFieldConfig["field_key"] ?? "") === $appointmentInfoFieldKey) {
+                                                                    $appointmentInfoFieldConfig = $simpleFieldConfig;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!is_array($appointmentInfoFieldConfig)) {
+                                                                continue;
+                                                            }
+                                                            $appointmentInfoFieldData = $contentData["simple_fields"][$appointmentInfoFieldKey] ?? null;
+                                                            $appointmentInfoFieldType = (string) ($appointmentInfoFieldConfig["field_type"] ?? "text");
+                                                            $appointmentInfoFieldValue = (string) ($appointmentInfoFieldData["field_value"] ?? "");
+                                                            $appointmentInfoFieldVisible = (int) ($appointmentInfoFieldData["is_visible"] ?? 1) === 1;
+                                                            $appointmentInfoIsTextarea = $appointmentInfoFieldType === "textarea";
+                                                            ?>
+                                                            <div class="field-group <?php echo $appointmentInfoIsTextarea ? "field-group-full" : ""; ?>">
+                                                                <div class="field-header">
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentInfoFieldConfig["label"] ?? $appointmentInfoFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="toggle-row">
+                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $appointmentInfoFieldVisible ? " checked" : ""; ?>>
+                                                                        <span>Mostrar</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <?php if ($appointmentInfoIsTextarea): ?>
+                                                                    <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                                <?php else: ?>
+                                                                    <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         <?php endif; ?>
                                         <?php if ($templateKey === "department-details" && $fieldKey === "hero_subtitle"): ?>
                                             <div class="field-group-full">
