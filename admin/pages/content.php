@@ -305,7 +305,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $itemTitleAttributes = ' class="js-contact-social-link-title" data-contact-social-link-item="' . $itemIndex . '" data-contact-social-link-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"';
                     }
                     ?>
-                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats", "key_services"], true)) && !($templateKey === "service-details" && in_array($repeaterKey, ["features", "service_cards", "availability_items"], true))): ?>
+                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats", "key_services"], true)) && !($templateKey === "service-details" && in_array($repeaterKey, ["features", "service_cards", "availability_items"], true)) && !($templateKey === "appointment" && $repeaterKey === "info_items")): ?>
                         <h3<?php echo $itemTitleAttributes; ?>><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
                     <?php endif; ?>
                     <?php if ($repeaterKey === "doctors"): ?>
@@ -1720,7 +1720,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .service-details-availability-inline { grid-column: 1 / -1; margin-top: 12px; }
         .service-details-appointment-card-inline { grid-column: 1 / -1; margin-top: 12px; }
         .appointment-info-items-inline { grid-column: 1 / -1; margin-top: 12px; }
-        .appointment-info-area-inline { grid-column: 1 / -1; margin-top: 12px; }
+        .appointment-info-area-inline { grid-column: 1 / -1; margin-top: 12px; background: #fff; }
         .appointment-info-area-inline .appointment-info-items-inline { margin-top: 12px; }
         .appointment-form-inline { grid-column: 1 / -1; margin-top: 16px; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
@@ -2653,6 +2653,12 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <div class="section-block appointment-info-area-inline">
                                                     <h3>Área informativa</h3>
                                                     <div class="field-grid">
+                                                        <?php
+                                                        $appointmentInfoAreaLabels = [
+                                                            "info_title" => "Título",
+                                                            "info_text" => "Descripción",
+                                                        ];
+                                                        ?>
                                                         <?php foreach (["info_title", "info_text"] as $appointmentInfoFieldKey): ?>
                                                             <?php
                                                             $appointmentInfoFieldConfig = null;
@@ -2673,7 +2679,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             ?>
                                                             <div class="field-group <?php echo $appointmentInfoIsTextarea ? "field-group-full" : ""; ?>">
                                                                 <div class="field-header">
-                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentInfoFieldConfig["label"] ?? $appointmentInfoFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentInfoAreaLabels[$appointmentInfoFieldKey] ?? ($appointmentInfoFieldConfig["label"] ?? $appointmentInfoFieldKey)), ENT_QUOTES, "UTF-8"); ?></label>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $appointmentInfoFieldVisible ? " checked" : ""; ?>>
                                                                         <span>Mostrar</span>
@@ -2690,7 +2696,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                     </div>
                                                     <?php foreach ($schema["repeaters"] as $appointmentInfoRepeaterConfig): ?>
                                                         <?php if (((string) ($appointmentInfoRepeaterConfig["repeater_key"] ?? "")) === "info_items"): ?>
-                                                            <?php renderAdminRepeaterSection($appointmentInfoRepeaterConfig, $contentData, "appointment-info-items-inline"); ?>
+                                                            <?php renderAdminRepeaterSection($appointmentInfoRepeaterConfig, $contentData, "appointment-info-items-inline", "Items"); ?>
                                                             <?php break; ?>
                                                         <?php endif; ?>
                                                     <?php endforeach; ?>
