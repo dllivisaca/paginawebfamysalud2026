@@ -2701,6 +2701,13 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         <?php endif; ?>
                                                     <?php endforeach; ?>
                                                     <div class="field-grid">
+                                                        <?php
+                                                        $appointmentEmergencyLabels = [
+                                                            "emergency_title" => "Titulo del banner",
+                                                            "emergency_icon" => "Icono del banner",
+                                                            "emergency_text" => "Texto del banner",
+                                                        ];
+                                                        ?>
                                                         <?php foreach (["emergency_title", "emergency_icon", "emergency_text"] as $appointmentInfoFieldKey): ?>
                                                             <?php
                                                             $appointmentInfoFieldConfig = null;
@@ -2721,7 +2728,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             ?>
                                                             <div class="field-group <?php echo $appointmentInfoIsTextarea ? "field-group-full" : ""; ?>">
                                                                 <div class="field-header">
-                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentInfoFieldConfig["label"] ?? $appointmentInfoFieldKey), ENT_QUOTES, "UTF-8"); ?></label>
+                                                                    <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentEmergencyLabels[$appointmentInfoFieldKey] ?? ($appointmentInfoFieldConfig["label"] ?? $appointmentInfoFieldKey)), ENT_QUOTES, "UTF-8"); ?></label>
                                                                     <label class="toggle-row">
                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $appointmentInfoFieldVisible ? " checked" : ""; ?>>
                                                                         <span>Mostrar</span>
