@@ -277,6 +277,23 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                     });
                 }
             }
+            if ($templateKey === "service-details" && $repeaterKey === "availability_items") {
+                $availabilityFieldOrder = ["title", "icon_class", "text"];
+                $availabilityOriginalFieldOrder = [];
+                foreach ($repeaterFields as $repeaterFieldIndex => $repeaterFieldConfig) {
+                    $availabilityOriginalFieldOrder[(string) ($repeaterFieldConfig["field_key"] ?? "")] = $repeaterFieldIndex;
+                }
+                usort($repeaterFields, function ($leftField, $rightField) use ($availabilityFieldOrder, $availabilityOriginalFieldOrder) {
+                    $leftFieldKey = (string) ($leftField["field_key"] ?? "");
+                    $rightFieldKey = (string) ($rightField["field_key"] ?? "");
+                    $leftPosition = array_search($leftFieldKey, $availabilityFieldOrder, true);
+                    $rightPosition = array_search($rightFieldKey, $availabilityFieldOrder, true);
+                    $leftOriginalPosition = $availabilityOriginalFieldOrder[$leftFieldKey] ?? PHP_INT_MAX;
+                    $rightOriginalPosition = $availabilityOriginalFieldOrder[$rightFieldKey] ?? PHP_INT_MAX;
+
+                    return [($leftPosition === false ? PHP_INT_MAX : $leftPosition), $leftOriginalPosition] <=> [($rightPosition === false ? PHP_INT_MAX : $rightPosition), $rightOriginalPosition];
+                });
+            }
             ?>
             <div class="card">
                 <div class="item-title">
@@ -1695,6 +1712,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .section-block.service-details-cards-admin-section { background: #fff; }
         .service-details-cards-admin-section .card { background: #f9fafb; }
         .service-details-availability-inline { grid-column: 1 / -1; margin-top: 12px; }
+        .service-details-appointment-card-inline { grid-column: 1 / -1; margin-top: 12px; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
         .cta-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-doctors-admin-section { background: #fff; }
@@ -2081,6 +2099,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && in_array($groupFieldKey, ["primary_button_link_type", "primary_button_page_id", "primary_button_url", "secondary_button_link_type", "secondary_button_page_id", "secondary_button_url"], true)) {
                                                             continue;
                                                         }
+                                                        if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Agendamiento" && in_array($groupFieldKey, ["appointment_title", "appointment_text", "appointment_button_text", "appointment_button_url", "appointment_alternative_text", "appointment_phone_text", "appointment_phone_url"], true)) {
+                                                            continue;
+                                                        }
 
                                                         $fieldConfig = null;
 
@@ -2313,6 +2334,45 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                     <?php break; ?>
                                                                 <?php endif; ?>
                                                             <?php endforeach; ?>
+                                                            <div class="section-block service-details-appointment-card-inline">
+                                                                <h3>Tarjeta de agendamiento</h3>
+                                                                <div class="field-grid">
+                                                                    <?php foreach (["appointment_title", "appointment_text", "appointment_button_text", "appointment_button_url", "appointment_alternative_text", "appointment_phone_text", "appointment_phone_url"] as $serviceDetailsAppointmentFieldKey): ?>
+                                                                        <?php
+                                                                        $serviceDetailsAppointmentFieldConfig = null;
+                                                                        foreach ($schema["simple_fields"] as $simpleFieldConfig) {
+                                                                            if ((string) ($simpleFieldConfig["field_key"] ?? "") === $serviceDetailsAppointmentFieldKey) {
+                                                                                $serviceDetailsAppointmentFieldConfig = $simpleFieldConfig;
+                                                                                break;
+                                                                            }
+                                                                        }
+                                                                        if (!is_array($serviceDetailsAppointmentFieldConfig)) {
+                                                                            continue;
+                                                                        }
+                                                                        $serviceDetailsAppointmentFieldData = $contentData["simple_fields"][$serviceDetailsAppointmentFieldKey] ?? null;
+                                                                        $serviceDetailsAppointmentFieldType = (string) ($serviceDetailsAppointmentFieldConfig["field_type"] ?? "text");
+                                                                        $serviceDetailsAppointmentFieldValue = (string) ($serviceDetailsAppointmentFieldData["field_value"] ?? "");
+                                                                        $serviceDetailsAppointmentFieldVisible = (int) ($serviceDetailsAppointmentFieldData["is_visible"] ?? 1) === 1;
+                                                                        $serviceDetailsAppointmentIsTextarea = $serviceDetailsAppointmentFieldType === "textarea";
+                                                                        ?>
+                                                                        <div class="field-group <?php echo $serviceDetailsAppointmentIsTextarea ? "field-group-full" : ""; ?>">
+                                                                            <div class="field-header">
+                                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($serviceDetailsAppointmentFieldConfig["label"] ?? $serviceDetailsAppointmentFieldKey)); ?></label>
+                                                                                <label class="toggle-row">
+                                                                                    <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $serviceDetailsAppointmentFieldVisible ? " checked" : ""; ?>>
+                                                                                    <span>Mostrar</span>
+                                                                                </label>
+                                                                            </div>
+
+                                                                            <?php if ($serviceDetailsAppointmentIsTextarea): ?>
+                                                                                <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($serviceDetailsAppointmentFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
+                                                                            <?php else: ?>
+                                                                                <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($serviceDetailsAppointmentFieldValue, ENT_QUOTES, "UTF-8"); ?>">
+                                                                            <?php endif; ?>
+                                                                        </div>
+                                                                    <?php endforeach; ?>
+                                                                </div>
+                                                            </div>
                                                         <?php endif; ?>
                                                         <?php if ($templateKey === "contact" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && $groupFieldKey === "info_text"): ?>
                                                             <div class="field-group-full">
