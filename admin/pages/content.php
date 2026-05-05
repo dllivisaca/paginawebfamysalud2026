@@ -2421,7 +2421,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                         <div class="field-group field-group-full">
                                                                             <div class="button-destination-box">
                                                                                 <div class="field-header">
-                                                                                    <h4>Texto del botón</h4>
+                                                                                    <?php /* título oculto por UX */ ?>
                                                                                     <label class="toggle-row">
                                                                                         <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentButtonTextKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $serviceDetailsAppointmentButtonTextVisible ? " checked" : ""; ?>>
                                                                                         <span>Mostrar</span>
@@ -2461,7 +2461,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                     <?php endif; ?>
                                                                     <div class="field-group field-group-full">
                                                                         <div class="button-destination-box">
-                                                                            <h4>Texto descriptivo de link alternativo</h4>
+                                                                            <?php /* título oculto por UX */ ?>
                                                                             <div class="field-grid">
                                                                                 <?php foreach (["appointment_alternative_text", "appointment_phone_text", "appointment_phone_url"] as $serviceDetailsAppointmentFieldKey): ?>
                                                                                     <?php
