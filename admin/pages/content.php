@@ -427,6 +427,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isContactSocialLinkIconField = $templateKey === "contact" && $repeaterKey === "social_links" && $fieldKey === "icon_class";
                         $isDepartmentServiceCardIconField = $templateKey === "department-details" && $repeaterKey === "service_cards" && $fieldKey === "icon_class";
                         $isServiceDetailsCardIconField = $templateKey === "service-details" && $repeaterKey === "service_cards" && $fieldKey === "icon_class";
+                        $isServiceDetailsAvailabilityIconField = $templateKey === "service-details" && $repeaterKey === "availability_items" && $fieldKey === "icon_class";
                         $isCtaFeatureLinkTextField = $repeaterKey === "cta_features" && $fieldKey === "link_text";
                         $isCtaFeatureLinkTypeField = $repeaterKey === "cta_features" && $fieldKey === "link_type";
                         $isCtaFeaturePageIdField = $repeaterKey === "cta_features" && $fieldKey === "page_id";
@@ -661,6 +662,11 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                             "bi bi-hospital" => "Hospital",
                             "bi bi-shield-check" => "Escudo",
                         ];
+                        $serviceDetailsAvailabilityIconOptions = [
+                            "bi bi-clock" => "Reloj",
+                            "bi bi-telephone" => "Teléfono",
+                            "bi bi-geo-alt" => "Ubicación",
+                        ];
                         if ($repeaterKey === "about_stats" && $fieldKey === "value") {
                             $fieldLabel = "Valor";
                         }
@@ -686,10 +692,10 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                                 <label class="file-input-label" for="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">Reemplazar imagen</label>
                                 <input class="form-file js-image-upload" type="file" id="repeater_file_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-preview-target="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>">
                                 <img id="preview_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
-                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField || $isQuickActionIconField || $isEmergencyContactIconField || $isFeaturedDepartmentIconField || $isFeaturedServiceIconField || $isDepartmentsIconField || $isServiceIconField || $isContactInfoCardIconField || $isContactSocialLinkIconField || $isDepartmentServiceCardIconField || $isServiceDetailsCardIconField): ?>
+                            <?php elseif ($isHeroFeatureIconField || $isHomeAboutFeatureIconField || $isCtaFeatureIconField || $isQuickActionIconField || $isEmergencyContactIconField || $isFeaturedDepartmentIconField || $isFeaturedServiceIconField || $isDepartmentsIconField || $isServiceIconField || $isContactInfoCardIconField || $isContactSocialLinkIconField || $isDepartmentServiceCardIconField || $isServiceDetailsCardIconField || $isServiceDetailsAvailabilityIconField): ?>
                                 <select class="form-input" id="repeater_<?php echo htmlspecialchars($repeaterKey . "_" . $itemIndex . "_" . $fieldKey, ENT_QUOTES, "UTF-8"); ?>" name="repeaters[<?php echo htmlspecialchars($repeaterKey, ENT_QUOTES, "UTF-8"); ?>][<?php echo $itemIndex; ?>][fields][<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>]"<?php echo $isContactSocialLinkIconField ? ' data-contact-social-link-icon-input="' . $itemIndex . '"' : ""; ?>>
-                                    <?php $iconOptions = $isServiceDetailsCardIconField ? $serviceDetailsCardIconOptions : ($isDepartmentServiceCardIconField ? $departmentServiceCardIconOptions : ($isContactSocialLinkIconField ? $contactSocialLinkIconOptions : ($isContactInfoCardIconField ? $contactInfoCardIconOptions : ($isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : ($isCtaFeatureIconField ? $ctaFeatureIconOptions : ($isQuickActionIconField ? $quickActionIconOptions : ($isEmergencyContactIconField ? $emergencyContactIconOptions : ($isFeaturedDepartmentIconField ? $featuredDepartmentIconOptions : ($isDepartmentsIconField ? $departmentsIconOptions : ($isServiceIconField ? $serviceIconOptions : $featuredServiceIconOptions))))))))))); ?>
-                                    <?php if (($isQuickActionIconField || $isServiceDetailsCardIconField) && $fieldValue !== "" && !array_key_exists($fieldValue, $iconOptions)): ?>
+                                    <?php $iconOptions = $isServiceDetailsAvailabilityIconField ? $serviceDetailsAvailabilityIconOptions : ($isServiceDetailsCardIconField ? $serviceDetailsCardIconOptions : ($isDepartmentServiceCardIconField ? $departmentServiceCardIconOptions : ($isContactSocialLinkIconField ? $contactSocialLinkIconOptions : ($isContactInfoCardIconField ? $contactInfoCardIconOptions : ($isHeroFeatureIconField ? $heroFeatureIconOptions : ($isHomeAboutFeatureIconField ? $homeAboutFeatureIconOptions : ($isCtaFeatureIconField ? $ctaFeatureIconOptions : ($isQuickActionIconField ? $quickActionIconOptions : ($isEmergencyContactIconField ? $emergencyContactIconOptions : ($isFeaturedDepartmentIconField ? $featuredDepartmentIconOptions : ($isDepartmentsIconField ? $departmentsIconOptions : ($isServiceIconField ? $serviceIconOptions : $featuredServiceIconOptions)))))))))))); ?>
+                                    <?php if (($isQuickActionIconField || $isServiceDetailsCardIconField || $isServiceDetailsAvailabilityIconField) && $fieldValue !== "" && !array_key_exists($fieldValue, $iconOptions)): ?>
                                         <option value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>" selected>Icono actual: <?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?></option>
                                     <?php endif; ?>
                                     <?php foreach ($iconOptions as $iconValue => $iconLabel): ?>
@@ -2337,6 +2343,17 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             <div class="section-block service-details-appointment-card-inline">
                                                                 <h3>Tarjeta de agendamiento</h3>
                                                                 <div class="field-grid">
+                                                                    <?php
+                                                                    $serviceDetailsAppointmentFieldLabels = [
+                                                                        "appointment_title" => "Título",
+                                                                        "appointment_text" => "Descripción",
+                                                                        "appointment_button_text" => "Texto del botón",
+                                                                        "appointment_button_url" => "URL del botón",
+                                                                        "appointment_alternative_text" => "Texto descriptivo de link alternativo",
+                                                                        "appointment_phone_text" => "Texto de link alternativo",
+                                                                        "appointment_phone_url" => "URL de link alternativo",
+                                                                    ];
+                                                                    ?>
                                                                     <?php foreach (["appointment_title", "appointment_text", "appointment_button_text", "appointment_button_url", "appointment_alternative_text", "appointment_phone_text", "appointment_phone_url"] as $serviceDetailsAppointmentFieldKey): ?>
                                                                         <?php
                                                                         $serviceDetailsAppointmentFieldConfig = null;
@@ -2357,7 +2374,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                         ?>
                                                                         <div class="field-group <?php echo $serviceDetailsAppointmentIsTextarea ? "field-group-full" : ""; ?>">
                                                                             <div class="field-header">
-                                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo escapeAdminFieldLabel((string) ($serviceDetailsAppointmentFieldConfig["label"] ?? $serviceDetailsAppointmentFieldKey)); ?></label>
+                                                                                <label class="field-label" for="simple_<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($serviceDetailsAppointmentFieldLabels[$serviceDetailsAppointmentFieldKey] ?? ($serviceDetailsAppointmentFieldConfig["label"] ?? $serviceDetailsAppointmentFieldKey)), ENT_QUOTES, "UTF-8"); ?></label>
                                                                                 <label class="toggle-row">
                                                                                     <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($serviceDetailsAppointmentFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $serviceDetailsAppointmentFieldVisible ? " checked" : ""; ?>>
                                                                                     <span>Mostrar</span>
