@@ -1719,6 +1719,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .service-details-cards-admin-section .card { background: #f9fafb; }
         .service-details-availability-inline { grid-column: 1 / -1; margin-top: 12px; }
         .service-details-appointment-card-inline { grid-column: 1 / -1; margin-top: 12px; }
+        .appointment-info-items-inline { grid-column: 1 / -1; margin-top: 12px; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
         .cta-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-doctors-admin-section { background: #fff; }
@@ -2638,6 +2639,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                 <img id="preview_<?php echo htmlspecialchars($fieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
                                             <?php endif; ?>
                                         </div>
+                                        <?php if ($templateKey === "appointment" && $fieldKey === "info_text"): ?>
+                                            <?php foreach ($schema["repeaters"] as $appointmentInfoRepeaterConfig): ?>
+                                                <?php if (((string) ($appointmentInfoRepeaterConfig["repeater_key"] ?? "")) === "info_items"): ?>
+                                                    <?php renderAdminRepeaterSection($appointmentInfoRepeaterConfig, $contentData, "appointment-info-items-inline"); ?>
+                                                    <?php break; ?>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                         <?php if ($templateKey === "department-details" && $fieldKey === "hero_subtitle"): ?>
                                             <div class="field-group-full">
                                                 <div class="section-block department-intro-admin-section">
@@ -2774,6 +2783,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "service-details" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "availability_items"): ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <?php if ($templateKey === "appointment" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "info_items"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
