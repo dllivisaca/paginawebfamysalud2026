@@ -1768,7 +1768,9 @@ if (($schema["template_key"] ?? "") === "about") {
         .appointment-info-area-inline { grid-column: 1 / -1; margin-top: 12px; background: #fff; }
         .appointment-info-area-inline .appointment-info-items-inline { margin-top: 12px; }
         .appointment-info-area-inline .field-help { margin-top: 2px; margin-bottom: 6px; font-size: 12px; color: #6b7280; line-height: 1.4; }
-        .appointment-form-inline { grid-column: 1 / -1; margin-top: 16px; }
+        .appointment-form-inline { grid-column: 1 / -1; margin-top: 16px; background: #fff; }
+        .section-block.appointment-process-steps-admin-section { background: #fff; }
+        .appointment-process-steps-admin-section .card { background: #f9fafb; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
         .cta-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-doctors-admin-section { background: #fff; }
@@ -2788,10 +2790,14 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             <div class="field-group <?php echo $appointmentInfoIsTextarea ? "field-group-full" : ""; ?>">
                                                                 <div class="field-header">
                                                                     <label class="field-label" for="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>"><?php echo htmlspecialchars((string) ($appointmentEmergencyLabels[$appointmentInfoFieldKey] ?? ($appointmentInfoFieldConfig["label"] ?? $appointmentInfoFieldKey)), ENT_QUOTES, "UTF-8"); ?></label>
-                                                                    <label class="toggle-row">
-                                                                        <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $appointmentInfoFieldVisible ? " checked" : ""; ?>>
-                                                                        <span>Mostrar</span>
-                                                                    </label>
+                                                                    <?php if ($templateKey === "appointment" && $appointmentInfoFieldKey === "emergency_phone"): ?>
+                                                                        <input type="hidden" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1">
+                                                                    <?php else: ?>
+                                                                        <label class="toggle-row">
+                                                                            <input type="checkbox" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][is_visible]" value="1"<?php echo $appointmentInfoFieldVisible ? " checked" : ""; ?>>
+                                                                            <span>Mostrar</span>
+                                                                        </label>
+                                                                    <?php endif; ?>
                                                                 </div>
                                                                 <?php if ($templateKey === "appointment" && $appointmentInfoFieldKey === "emergency_text"): ?>
                                                                     <div class="field-help">
@@ -3015,7 +3021,9 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php if ($templateKey === "appointment" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "info_items"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
-                            <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
+                            <?php if ($templateKey === "appointment" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "process_steps"): ?>
+                                <?php renderAdminRepeaterSection($repeaterConfig, $contentData, "appointment-process-steps-admin-section"); ?>
+                            <?php elseif ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
                                 <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : "", "Servicios - generales", "general"); ?>
                                 <?php renderAdminRepeaterSection($repeaterConfig, $contentData, "services-emergency-admin-section", "Servicio destacado de emergencia", "emergency"); ?>
                             <?php else: ?>
