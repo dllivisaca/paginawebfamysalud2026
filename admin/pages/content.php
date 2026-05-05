@@ -1694,6 +1694,7 @@ if (($schema["template_key"] ?? "") === "about") {
         .service-details-features-admin-section .card { background: #f9fafb; }
         .section-block.service-details-cards-admin-section { background: #fff; }
         .service-details-cards-admin-section .card { background: #f9fafb; }
+        .service-details-availability-inline { grid-column: 1 / -1; margin-top: 12px; }
         .section-block.cta-features-admin-section > h3 { font-size: 17px; }
         .cta-features-admin-section .item-title h3 { font-size: 17px; }
         .section-block.featured-doctors-admin-section { background: #fff; }
@@ -2297,10 +2298,18 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                 <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($fieldValue, ENT_QUOTES, "UTF-8"); ?>">
                                                             <?php endif; ?>
 
-                                                            <?php if ($isImage): ?>
+                                                        <?php if ($isImage): ?>
                                                                 <img id="preview_<?php echo htmlspecialchars($groupFieldKey, ENT_QUOTES, "UTF-8"); ?>" src="<?php echo $fieldValue !== "" ? "../../" . htmlspecialchars(ltrim($fieldValue, "/"), ENT_QUOTES, "UTF-8") : ""; ?>" alt="" class="preview-image<?php echo $fieldValue !== "" ? "" : " is-empty"; ?>">
                                                             <?php endif; ?>
                                                         </div>
+                                                        <?php if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Agendamiento" && $groupFieldKey === "booking_text"): ?>
+                                                            <?php foreach ($schema["repeaters"] as $serviceDetailsAvailabilityRepeaterConfig): ?>
+                                                                <?php if (((string) ($serviceDetailsAvailabilityRepeaterConfig["repeater_key"] ?? "")) === "availability_items"): ?>
+                                                                    <?php renderAdminRepeaterSection($serviceDetailsAvailabilityRepeaterConfig, $contentData, "service-details-availability-inline"); ?>
+                                                                    <?php break; ?>
+                                                                <?php endif; ?>
+                                                            <?php endforeach; ?>
+                                                        <?php endif; ?>
                                                         <?php if ($templateKey === "contact" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && $groupFieldKey === "info_text"): ?>
                                                             <div class="field-group-full">
                                                                 <?php foreach ($schema["repeaters"] as $contactRepeaterConfig): ?>
@@ -2582,6 +2591,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "service-details" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "service_cards"): ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
+                            <?php if ($templateKey === "service-details" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "availability_items"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
                             <?php if ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
