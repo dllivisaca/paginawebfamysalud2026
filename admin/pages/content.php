@@ -288,7 +288,7 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $itemTitleAttributes = ' class="js-contact-social-link-title" data-contact-social-link-item="' . $itemIndex . '" data-contact-social-link-fallback="' . htmlspecialchars($itemTitle, ENT_QUOTES, "UTF-8") . '"';
                     }
                     ?>
-                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats", "key_services"], true)) && !($templateKey === "service-details" && in_array($repeaterKey, ["features", "service_cards"], true))): ?>
+                    <?php if (!($templateKey === "department-details" && in_array($repeaterKey, ["service_cards", "stats", "key_services"], true)) && !($templateKey === "service-details" && in_array($repeaterKey, ["features", "service_cards", "availability_items"], true))): ?>
                         <h3<?php echo $itemTitleAttributes; ?>><?php echo escapeAdminFieldLabel($itemTitle); ?></h3>
                     <?php endif; ?>
                     <?php if ($repeaterKey === "doctors"): ?>
@@ -2115,7 +2115,11 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             "features_title" => "Título",
                                                         ];
 
-                                                        if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && isset($serviceDetailsInfoLabels[$groupFieldKey])) {
+                                                        if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Agendamiento" && $groupFieldKey === "booking_title") {
+                                                            $displayLabelHtml = "Título";
+                                                        } elseif ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Agendamiento" && $groupFieldKey === "booking_text") {
+                                                            $displayLabelHtml = "Descripción";
+                                                        } elseif ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Área informativa" && isset($serviceDetailsInfoLabels[$groupFieldKey])) {
                                                             $displayLabelHtml = htmlspecialchars($serviceDetailsInfoLabels[$groupFieldKey], ENT_QUOTES, "UTF-8");
                                                         } elseif ($templateKey === "home" && $groupFieldKey === "hero_badge") {
                                                             $displayLabelHtml = "Etiqueta destacada";
@@ -2305,7 +2309,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                         <?php if ($templateKey === "service-details" && ((string) ($groupConfig["title"] ?? "")) === "Agendamiento" && $groupFieldKey === "booking_text"): ?>
                                                             <?php foreach ($schema["repeaters"] as $serviceDetailsAvailabilityRepeaterConfig): ?>
                                                                 <?php if (((string) ($serviceDetailsAvailabilityRepeaterConfig["repeater_key"] ?? "")) === "availability_items"): ?>
-                                                                    <?php renderAdminRepeaterSection($serviceDetailsAvailabilityRepeaterConfig, $contentData, "service-details-availability-inline"); ?>
+                                                                    <?php renderAdminRepeaterSection($serviceDetailsAvailabilityRepeaterConfig, $contentData, "service-details-availability-inline", "Disponibilidad"); ?>
                                                                     <?php break; ?>
                                                                 <?php endif; ?>
                                                             <?php endforeach; ?>
