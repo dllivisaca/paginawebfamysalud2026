@@ -2730,6 +2730,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             "emergency_icon" => "Icono del banner",
                                                             "emergency_text" => "Texto del banner",
                                                         ];
+                                                        $appointmentEmergencyIconOptions = [
+                                                            "bi bi-telephone-fill me-2" => "Teléfono",
+                                                        ];
                                                         ?>
                                                         <?php foreach (["emergency_title", "emergency_icon", "emergency_text"] as $appointmentInfoFieldKey): ?>
                                                             <?php
@@ -2748,6 +2751,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $appointmentInfoFieldValue = (string) ($appointmentInfoFieldData["field_value"] ?? "");
                                                             $appointmentInfoFieldVisible = (int) ($appointmentInfoFieldData["is_visible"] ?? 1) === 1;
                                                             $appointmentInfoIsTextarea = $appointmentInfoFieldType === "textarea";
+                                                            $isAppointmentEmergencyIconField = $templateKey === "appointment" && $appointmentInfoFieldKey === "emergency_icon";
                                                             ?>
                                                             <div class="field-group <?php echo $appointmentInfoIsTextarea ? "field-group-full" : ""; ?>">
                                                                 <div class="field-header">
@@ -2758,7 +2762,16 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                     </label>
                                                                 </div>
 
-                                                                <?php if ($appointmentInfoIsTextarea): ?>
+                                                                <?php if ($isAppointmentEmergencyIconField): ?>
+                                                                    <select class="form-input" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]">
+                                                                        <?php if ($appointmentInfoFieldValue !== "" && !array_key_exists($appointmentInfoFieldValue, $appointmentEmergencyIconOptions)): ?>
+                                                                            <option value="<?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?>" selected>Icono actual: <?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?></option>
+                                                                        <?php endif; ?>
+                                                                        <?php foreach ($appointmentEmergencyIconOptions as $appointmentEmergencyIconValue => $appointmentEmergencyIconLabel): ?>
+                                                                            <option value="<?php echo htmlspecialchars($appointmentEmergencyIconValue, ENT_QUOTES, "UTF-8"); ?>"<?php echo $appointmentInfoFieldValue === $appointmentEmergencyIconValue ? " selected" : ""; ?>><?php echo htmlspecialchars($appointmentEmergencyIconLabel, ENT_QUOTES, "UTF-8"); ?></option>
+                                                                        <?php endforeach; ?>
+                                                                    </select>
+                                                                <?php elseif ($appointmentInfoIsTextarea): ?>
                                                                     <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
                                                                 <?php else: ?>
                                                                     <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentInfoFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($appointmentInfoFieldValue, ENT_QUOTES, "UTF-8"); ?>">
