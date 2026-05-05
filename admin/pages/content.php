@@ -248,7 +248,9 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                     return ($leftPosition === false ? PHP_INT_MAX : $leftPosition) <=> ($rightPosition === false ? PHP_INT_MAX : $rightPosition);
                 });
             }
-            if ($repeaterKey === "departments") {
+            if ($templateKey === "appointment" && $repeaterKey === "departments") {
+                $itemTitle = "Departamento " . ($itemIndex + 1);
+            } elseif ($templateKey === "departments" && $repeaterKey === "departments") {
                 $departmentsLayoutVariant = strtolower(trim((string) ($itemData["fields"]["layout_variant"]["field_value"] ?? "")));
                 $departmentsTitleValue = trim((string) ($itemData["fields"]["title"]["field_value"] ?? ""));
                 if ($departmentsLayoutVariant === "featured") {
@@ -482,17 +484,17 @@ function renderAdminRepeaterSection(array $repeaterConfig, array $contentData, s
                         $isEmergencyContactButtonLinkTypeField = $repeaterKey === "emergency_contacts" && $fieldKey === "button_link_type";
                         $isEmergencyContactButtonPageIdField = $repeaterKey === "emergency_contacts" && $fieldKey === "button_page_id";
                         $isEmergencyContactButtonUrlField = $repeaterKey === "emergency_contacts" && $fieldKey === "button_url";
-                        $isDepartmentsFeaturedSubtitleField = $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "subtitle";
-                        $isDepartmentsFeaturedDescriptionField = $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "description";
-                        $isDepartmentsFeaturedButtonTextField = $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "button_text";
-                        $isDepartmentsFeaturedButtonLinkTypeField = $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "button_link_type";
-                        $isDepartmentsFeaturedButtonPageIdField = $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "button_page_id";
-                        $isDepartmentsFeaturedButtonUrlField = $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "button_url";
-                        $isDepartmentsStandardFeatureThreeField = $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "feature_3";
-                        $isDepartmentsStandardButtonTextField = $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "button_text";
-                        $isDepartmentsStandardButtonLinkTypeField = $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "button_link_type";
-                        $isDepartmentsStandardButtonPageIdField = $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "button_page_id";
-                        $isDepartmentsStandardButtonUrlField = $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "button_url";
+                        $isDepartmentsFeaturedSubtitleField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "subtitle";
+                        $isDepartmentsFeaturedDescriptionField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "description";
+                        $isDepartmentsFeaturedButtonTextField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "button_text";
+                        $isDepartmentsFeaturedButtonLinkTypeField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "button_link_type";
+                        $isDepartmentsFeaturedButtonPageIdField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "button_page_id";
+                        $isDepartmentsFeaturedButtonUrlField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant === "featured" && $fieldKey === "button_url";
+                        $isDepartmentsStandardFeatureThreeField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "feature_3";
+                        $isDepartmentsStandardButtonTextField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "button_text";
+                        $isDepartmentsStandardButtonLinkTypeField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "button_link_type";
+                        $isDepartmentsStandardButtonPageIdField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "button_page_id";
+                        $isDepartmentsStandardButtonUrlField = $templateKey === "departments" && $repeaterKey === "departments" && $departmentsLayoutVariant !== "featured" && $fieldKey === "button_url";
                         $isDepartmentServiceCardTextField = $templateKey === "department-details" && $repeaterKey === "service_cards" && $fieldKey === "text";
                         $isServiceDetailsCardLinkTextField = $templateKey === "service-details" && $repeaterKey === "service_cards" && $fieldKey === "link_text";
                         $isServiceDetailsCardLinkHiddenField = $templateKey === "service-details" && $repeaterKey === "service_cards" && in_array($fieldKey, ["link_type", "page_id", "link_url"], true);
@@ -2841,6 +2843,9 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             "button_text" => "Texto del botón",
                                                             "button_icon" => "Icono del boton",
                                                         ];
+                                                        $appointmentFormButtonIconOptions = [
+                                                            "bi bi-calendar-plus me-2" => "Calendario",
+                                                        ];
                                                         ?>
                                                         <?php foreach (["name_placeholder", "email_placeholder", "phone_placeholder", "department_placeholder", "doctor_placeholder", "message_placeholder", "loading_text", "sent_message", "button_text", "button_icon"] as $appointmentFormFieldKey): ?>
                                                             <?php
@@ -2859,6 +2864,7 @@ if (($schema["template_key"] ?? "") === "about") {
                                                             $appointmentFormFieldValue = (string) ($appointmentFormFieldData["field_value"] ?? "");
                                                             $appointmentFormFieldVisible = (int) ($appointmentFormFieldData["is_visible"] ?? 1) === 1;
                                                             $appointmentFormIsTextarea = $appointmentFormFieldType === "textarea";
+                                                            $isAppointmentFormButtonIconField = $templateKey === "appointment" && $appointmentFormFieldKey === "button_icon";
                                                             ?>
                                                             <div class="field-group <?php echo $appointmentFormIsTextarea ? "field-group-full" : ""; ?>">
                                                                 <div class="field-header">
@@ -2869,7 +2875,16 @@ if (($schema["template_key"] ?? "") === "about") {
                                                                     </label>
                                                                 </div>
 
-                                                                <?php if ($appointmentFormIsTextarea): ?>
+                                                                <?php if ($isAppointmentFormButtonIconField): ?>
+                                                                    <select class="form-input" id="simple_<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]">
+                                                                        <?php if ($appointmentFormFieldValue !== "" && !array_key_exists($appointmentFormFieldValue, $appointmentFormButtonIconOptions)): ?>
+                                                                            <option value="<?php echo htmlspecialchars($appointmentFormFieldValue, ENT_QUOTES, "UTF-8"); ?>" selected>Icono actual: <?php echo htmlspecialchars($appointmentFormFieldValue, ENT_QUOTES, "UTF-8"); ?></option>
+                                                                        <?php endif; ?>
+                                                                        <?php foreach ($appointmentFormButtonIconOptions as $appointmentFormButtonIconValue => $appointmentFormButtonIconLabel): ?>
+                                                                            <option value="<?php echo htmlspecialchars($appointmentFormButtonIconValue, ENT_QUOTES, "UTF-8"); ?>"<?php echo $appointmentFormFieldValue === $appointmentFormButtonIconValue ? " selected" : ""; ?>><?php echo htmlspecialchars($appointmentFormButtonIconLabel, ENT_QUOTES, "UTF-8"); ?></option>
+                                                                        <?php endforeach; ?>
+                                                                    </select>
+                                                                <?php elseif ($appointmentFormIsTextarea): ?>
                                                                     <textarea class="form-textarea" id="simple_<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]"><?php echo htmlspecialchars($appointmentFormFieldValue, ENT_QUOTES, "UTF-8"); ?></textarea>
                                                                 <?php else: ?>
                                                                     <input class="form-input" type="text" id="simple_<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>" name="simple_fields[<?php echo htmlspecialchars($appointmentFormFieldKey, ENT_QUOTES, "UTF-8"); ?>][value]" value="<?php echo htmlspecialchars($appointmentFormFieldValue, ENT_QUOTES, "UTF-8"); ?>">
@@ -3021,7 +3036,9 @@ if (($schema["template_key"] ?? "") === "about") {
                             <?php if ($templateKey === "appointment" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "info_items"): ?>
                                 <?php continue; ?>
                             <?php endif; ?>
-                            <?php if ($templateKey === "appointment" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "process_steps"): ?>
+                            <?php if ($templateKey === "appointment" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "departments"): ?>
+                                <?php renderAdminRepeaterSection($repeaterConfig, $contentData, "", "Departamentos del formulario"); ?>
+                            <?php elseif ($templateKey === "appointment" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "process_steps"): ?>
                                 <?php renderAdminRepeaterSection($repeaterConfig, $contentData, "appointment-process-steps-admin-section"); ?>
                             <?php elseif ($templateKey === "services" && ((string) ($repeaterConfig["repeater_key"] ?? "")) === "services"): ?>
                                 <?php renderAdminRepeaterSection($repeaterConfig, $contentData, ($templateKey === "about" && $repeaterIndex === 1) ? "repeater-after-certifications" : "", "Servicios - generales", "general"); ?>
